@@ -283,9 +283,37 @@ function TradeSkillScanner:GetProfessionList()
 end
 
 function private.GetProfessions()
-	local primary1, primary2, _, _, secondary1, secondary2 = GetProfessions()
-	if not (primary1 or primary2 or secondary1 or secondary2) then return end
-	return { primary1, primary2, secondary1, secondary2 }
+    local primary = {}
+    local prof1
+    local prof2
+    local cooking
+    local firstAid
+
+    for i = 1, GetNumSkillLines() do
+        if GetSkillLineInfo(i) == "Professions" then
+            i = i + 1
+            while not select(2, GetSkillLineInfo(i)) do
+                table.insert(primary, i)
+                i = i + 1
+            end
+        elseif GetSkillLineInfo(i) == "Secondary Skills" then
+            i = i + 1
+            while not select(2, GetSkillLineInfo(i)) do
+                local name = GetSkillLineInfo(i)
+                if name == "Cooking" then
+                    cooking = i
+                elseif name == "First Aid" then
+                    firstAid = i
+                end
+                i = i + 1
+            end
+        end
+    end
+
+    prof1 = primary[1]
+    prof2 = primary[2]
+
+    return { prof1, prof2, cooking, firstAid }
 end
 
 
@@ -297,12 +325,10 @@ function private.UpdatePlayerTradeSkillsThread(self)
 	-- get the player's tradeskills
 	local oldTradeSkills = TSM.db.factionrealm.playerProfessions[playerName] or {}
 	local newTradeSkills = {}
-	SpellBook_UpdateProfTab()
 	local tradeSkills = self:WaitForFunction(private.GetProfessions)
-	local btns = { PrimaryProfession1SpellButtonBottom, PrimaryProfession2SpellButtonBottom, SecondaryProfession3SpellButtonRight, SecondaryProfession4SpellButtonRight }
-	for i, id in pairs(tradeSkills) do -- needs to be pairs since there might be holes
-		if not btns[i]:GetParent().missingHeader:IsVisible() then
-			local skillName, _, level, maxLevel = self:WaitForFunction(GetProfessionInfo, id)
+    for i, id in pairs(tradeSkills) do -- needs to be pairs since there might be holes
+        local skillName, _, _, level, _, _, maxLevel = self:WaitForFunction(GetSkillLineInfo, id)
+		if skillName then
 			newTradeSkills[skillName] = {}
 			newTradeSkills[skillName].level = level
 			newTradeSkills[skillName].maxLevel = maxLevel

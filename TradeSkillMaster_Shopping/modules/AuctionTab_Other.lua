@@ -52,7 +52,7 @@ function private:StartFilterSearch()
 		filter = format("%s/%s", filter, classes[class])
 		local subClass = private.frame.filter.subClassDropdown:GetValue()
 		if subClass then
-			local subClasses = TSMAPI.Item:GetItemSubClasses(TSMAPI.Item:GetClassIdFromClassString(classes[class]))
+			local subClasses = TSMAPI.Item:GetItemSubClasses(class)
 			filter = format("%s/%s", filter, subClasses[subClass])
 		end
 	end
@@ -458,7 +458,7 @@ function AuctionTabOther:GetFrameInfo()
 				classDropdown = {
 					OnValueChanged = function(_, value)
 						private.frame.filter.subClassDropdown:SetValue()
-						private.frame.filter.subClassDropdown:SetList(TSMAPI.Item:GetItemSubClasses(TSMAPI.Item:GetClassIdFromClassString(itemClasses[value])))
+						private.frame.filter.subClassDropdown:SetList(TSMAPI.Item:GetItemSubClasses(value))
 						private.frame.filter.subClassDropdown:SetDisabled(false)
 					end,
 				},

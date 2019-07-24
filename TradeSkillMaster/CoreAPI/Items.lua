@@ -17,35 +17,20 @@ local ITEM_CLASS_WEAPON = 1
 local ITEM_CLASS_ARMOR = 2
 STATIC_DATA.weaponClassName = select(ITEM_CLASS_WEAPON, GetAuctionItemClasses())
 STATIC_DATA.armorClassName = select(ITEM_CLASS_ARMOR, GetAuctionItemClasses())
--- Needed because NUM_ITEM_CLASSS contains an erroneous value
-local ITEM_CLASS_IDS = {
-	ITEM_CLASS_WEAPON = 1,
-	ITEM_CLASS_ARMOR = 2,
-    ITEM_CLASS_CONTAINER = 3,
-    ITEM_CLASS_CONSUMABLE = 4,
-    ITEM_CLASS_GLYPH = 5,
-    ITEM_CLASS_TRADEGOODS = 6,
-    ITEM_CLASS_PROJECTILE = 7,
-    ITEM_CLASS_QUIVER = 8,
-    ITEM_CLASS_RECIPE = 9,
-    ITEM_CLASS_GEM = 10,
-    ITEM_CLASS_MISCELLANEOUS = 11,
-    ITEM_CLASS_QUESTITEM = 12,
-}
 
-for _, classId in ipairs(ITEM_CLASS_IDS) do
-	local class = TSMAPI.Item:GetItemClassInfo(classId)
-	if class then
-		STATIC_DATA.classIdLookup[strlower(class)] = classId
-		STATIC_DATA.classLookup[class] = {}
-		STATIC_DATA.classLookup[class]._index = classId
-		for _, subClassId in pairs({GetAuctionItemSubClasses(classId)}) do
-			STATIC_DATA.classLookup[class][GetItemSubClassInfo(classId, subClassId)] = subClassId
-		end
-	end
+for classId, class in pairs({GetAuctionItemClasses()}) do
+    STATIC_DATA.classIdLookup[strlower(class)] = classId
+    STATIC_DATA.classLookup[class] = {}
+    STATIC_DATA.classLookup[class]._index = classId
+    for subClassId, subClass in pairs({GetAuctionItemSubClasses(classId)}) do
+        STATIC_DATA.classLookup[class][subClass] = subClassId
+        print(format("%d %s %d %s", classId, class, subClassId, subClass))
+    end
 end
+
 local invTypes = {GetAuctionInvTypes(2,1)}
 for i = 1, #invTypes, 2 do
+    TSMAPI:Assert(type(invTypes[i]) == "string")
     local invType = invTypes[i]
 	if invType then
 		STATIC_DATA.inventorySlotIdLookup[strlower(invType)] = (i + 1) / 2
@@ -259,24 +244,11 @@ function TSMAPI.Item:IsDisenchantable(itemString)
 end
 
 function TSMAPI.Item:GetItemClasses()
-	local result = {}
-	for class in pairs(STATIC_DATA.classLookup) do
-		tinsert(result, class)
-	end
-	sort(result, function(a, b) return TSMAPI.Item:GetClassIdFromClassString(a) < TSMAPI.Item:GetClassIdFromClassString(b) end)
-	return result
+	return {GetAuctionItemClasses()}
 end
 
 function TSMAPI.Item:GetItemSubClasses(classId)
-	local class = TSMAPI.Item:GetItemClassInfo(classId)
-	local result = {}
-	for subClass in pairs(STATIC_DATA.classLookup[class]) do
-		if subClass ~= "_index" then
-			tinsert(result, subClass)
-		end
-	end
-	sort(result, function(a, b) return STATIC_DATA.classLookup[class][a] < STATIC_DATA.classLookup[class][b] end)
-	return result
+	return {GetAuctionItemSubClasses(classId)}
 end
 
 function TSMAPI.Item:GetClassIdFromClassString(class)

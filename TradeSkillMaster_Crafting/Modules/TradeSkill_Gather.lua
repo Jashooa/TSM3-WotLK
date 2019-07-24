@@ -256,39 +256,6 @@ function Gather:GetFrameInfo()
 		},
 		handlers = {
 			OnShow = function(self)
-				if not self.helpBtn then
-					local helpPlateInfo = {
-						FramePos = { x = 0, y = 0 },
-						FrameSize = { width = private.selectionFrame.gather:GetWidth(), height = private.selectionFrame.gather:GetHeight() },
-						{
-							ButtonPos = { x = 100, y = -50 },
-							HighLightBox = { x = 0, y = -50, width = private.selectionFrame.gather:GetWidth(), height = 50 },
-							ToolTipDir = "RIGHT",
-							ToolTipText = L["You can use this dropdown to switch between crafters."]
-						},
-						{
-							ButtonPos = { x = 100, y = -100 },
-							HighLightBox = { x = 0, y = -100, width = private.selectionFrame.gather:GetWidth(), height = 50 },
-							ToolTipDir = "RIGHT",
-							ToolTipText = L["Once a crafter is selected, you can use this dropdown to select the profession(s) you want to gather for."]
-						},
-						{
-							ButtonPos = { x = 100, y = -150 },
-							HighLightBox = { x = 0, y = -150, width = private.selectionFrame.gather:GetWidth(), height = 50 },
-							ToolTipDir = "RIGHT",
-							ToolTipText = L["Once a crafter and profession(s) are selected, Click this button to start gathering."]
-						},
-					}
-
-					self.helpBtn = CreateFrame("Button", nil, private.selectionFrame.gather, "MainHelpPlateButton")
-					self.helpBtn:SetPoint("CENTER", private.selectionFrame.gather, "TOPRIGHT", 0, 0)
-					self.helpBtn:SetScript("OnClick", function() TradeSkill:ToggleHelpPlate(private.selectionFrame.gather, helpPlateInfo, self.helpBtn, true) end)
-					self.helpBtn:SetScript("OnHide", function() if HelpPlate_IsShowing(helpPlateInfo) then TradeSkill:ToggleHelpPlate(private.selectionFrame.gather, helpPlateInfo, self.helpBtn, false) end end)
-					if not TSM.db.global.helpPlatesShown.gatherSelection then
-						TSM.db.global.helpPlatesShown.gatherSelection = true
-						TradeSkill:ToggleHelpPlate(private.selectionFrame.gather, helpPlateInfo, self.helpBtn, false)
-					end
-				end
 				private:UpdateGatherSelectionWindow()
 			end,
 			OnMouseDown = function(self)
@@ -615,51 +582,6 @@ function Gather:CreateMainFrame()
 
 	private.gatheringFrame = TSMAPI.GUI:BuildFrame(frameInfo)
 	TSMAPI.Design:SetFrameBackdropColor(private.gatheringFrame)
-
-	local helpPlateInfo = {
-		FramePos = { x = 0, y = 0 },
-		FrameSize = { width = private.gatheringFrame:GetWidth(), height = private.gatheringFrame:GetHeight() },
-		{
-			ButtonPos = { x = 100, y = -180 },
-			HighLightBox = { x = 0, y = -70, width = private.gatheringFrame:GetWidth() / 2, height = private.gatheringFrame:GetHeight() - 140 },
-			ToolTipDir = "UP",
-			ToolTipText = L["This displays the available sources for each item that is required as per your session settings"]
-		},
-		{
-			ButtonPos = { x = 350, y = -180 },
-			HighLightBox = { x = 252, y = -70, width = (private.gatheringFrame:GetWidth() / 2) - 3, height = private.gatheringFrame:GetHeight() - 140 },
-			ToolTipDir = "UP",
-			ToolTipText = L["This displays the tasks that you need to perform to gather the required materials from the selected sources."]
-		},
-		{
-			ButtonPos = { x = 100, y = -331 },
-			HighLightBox = { x = 0, y = -338, width = private.gatheringFrame:GetWidth() / 2, height = 30 },
-			ToolTipDir = "UP",
-			ToolTipText = L["Clicking this button will gather the required materials when you are at a valid source, the text of the button will change according to source."]
-		},
-		{
-			ButtonPos = { x = 350, y = -331 },
-			HighLightBox = { x = 252, y = -338, width = (private.gatheringFrame:GetWidth() / 2) - 3, height = 30 },
-			ToolTipDir = "UP",
-			ToolTipText = L["Click this button to stop gathering and close the window."]
-		},
-		{
-			ButtonPos = { x = 463, y = -365 },
-			HighLightBox = { x = 470, y = -375, width = 30, height = 25 },
-			ToolTipDir = "UP",
-			ToolTipText = L["Hold the left mouse button down and drag this handle to resize the window."]
-		},
-	}
-
-	local mainHelpBtn = CreateFrame("Button", nil, private.gatheringFrame, "MainHelpPlateButton")
-	mainHelpBtn:SetPoint("CENTER", private.gatheringFrame, "TOPRIGHT", 0, 0)
-	mainHelpBtn:SetScript("OnClick", function() TradeSkill:ToggleHelpPlate(private.gatheringFrame, helpPlateInfo, mainHelpBtn, true) end)
-	mainHelpBtn:SetScript("OnHide", function() if HelpPlate_IsShowing(helpPlateInfo) then TradeSkill:ToggleHelpPlate(private.gatheringFrame, helpPlateInfo, mainHelpBtn, false) end end)
-
-	if not TSM.db.global.helpPlatesShown.gatheringFrame then
-		TSM.db.global.helpPlatesShown.gatheringFrame = true
-		TradeSkill:ToggleHelpPlate(private.gatheringFrame, helpPlateInfo, mainHelpBtn, false)
-	end
 end
 
 -- ============================================================================

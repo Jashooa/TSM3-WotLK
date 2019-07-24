@@ -32,7 +32,6 @@ local settingsInfo = {
 		keepMailSpace = { type = "number", default = 0, lastModifiedVersion = 1 },
 		deMaxQuality = { type = "number", default = 2, lastModifiedVersion = 1 },
 		openMailSound = { type = "string", default = TSMAPI:GetNoSoundKey(), lastModifiedVersion = 1 },
-		helpPlatesShown = { type = "table", default = { inbox = nil, groups = nil, quickSend = nil, other = nil }, lastModifiedVersion = 1 },
 	},
 	factionrealm = {
 		deMailTarget = { type = "string", default = "", lastModifiedVersion = 1 },
@@ -75,7 +74,7 @@ function TSM:OnEnable()
 			end
 		end
 	end
-	
+
 	-- fix patch 7.3 sound changes
 	local sounds = TSMAPI:GetSounds()
 	if not sounds[TSM.db.global.openMailSound] then

@@ -23,7 +23,6 @@ local settingsInfo = {
 		priceColumn = { type = "number", default = 1, lastModifiedVersion = 1 },
 		scanCompleteSound = { type = "string", default = TSMAPI:GetNoSoundKey(), lastModifiedVersion = 1 },
 		confirmCompleteSound = { type = "string", default = TSMAPI:GetNoSoundKey(), lastModifiedVersion = 1 },
-		helpPlatesShown = { type = "table", default = { selection = nil }, lastModifiedVersion = 1 },
 	},
 	factionrealm = {
 		whitelist = { type = "table", default = {}, lastModifiedVersion = 1 },
@@ -97,7 +96,7 @@ function TSM:OnInitialize()
 			operation.blacklist = operation.blacklist or ""
 		end
 	end
-	
+
 	-- fix patch 7.3 sound changes
 	local sounds = TSMAPI:GetSounds()
 	if not sounds[TSM.db.global.scanCompleteSound] then

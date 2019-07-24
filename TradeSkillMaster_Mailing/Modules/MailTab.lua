@@ -16,18 +16,6 @@ function MailTab:OnEnable()
 	MailTab:RegisterEvent("MAIL_SHOW", function() TSMAPI.Delay:AfterTime(0, private.OnMailShow) end)
 end
 
-function MailTab:ToggleHelpPlate(frame, info, btn, isUser)
-	if not HelpPlate_IsShowing(info) then
-		HelpPlate:SetParent(frame)
-		HelpPlate:SetFrameStrata("DIALOG")
-		HelpPlate_Show(info, frame, btn, isUser)
-	else
-		HelpPlate:SetParent(UIParent)
-		HelpPlate:SetFrameStrata("DIALOG")
-		HelpPlate_Hide(isUser)
-	end
-end
-
 function private:OnMailShow()
 	private:CreateMailTab()
 	if not private.didHook then

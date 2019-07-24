@@ -31,7 +31,6 @@ local settingsInfo = {
 		timeFormat = { type = "string", default = "ago", lastModifiedVersion = 1},
 		history = { type = "table", default = {}, lastModifiedVersion = 1},
 		ignore = { type = "table", default = {}, lastModifiedVersion = 1},
-		helpPlatesShown = { type = "table", default = { destroyingFrame = nil }, lastModifiedVersion = 1},
 	},
 }
 

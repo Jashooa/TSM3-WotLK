@@ -67,20 +67,6 @@ function private:UpdateMoney()
 
 	private.frame.moneyText:SetText(TSMAPI:MoneyToString(GetMoney(), "OPT_ICON"))
 
-	local currencies = { GetMerchantCurrencies() };
-
-	local currencyText = ""
-
-	if #currencies > 0 then
-		for index = 1, #currencies do
-
-			local name, count, icon = GetCurrencyInfo(currencies[index]);
-			currencyText = format("%s %d |T%s:0|t",currencyText,count, icon)
-		end
-	end
-
-	private.frame.currencyText:SetText(currencyText)
-
 	-- Hide default UI
 	if MerchantPageText then MerchantPageText:Hide() end
 	if MerchantFrameLootFilter then MerchantFrameLootFilter:Hide() end
@@ -361,12 +347,7 @@ end
 function private.OnTabClick(self)
 	PanelTemplates_SetTab(MerchantFrame, self:GetID())
 
-	MerchantFrameInset:Hide()
-	MerchantFramePortraitFrame:Hide()
-	MerchantFrameBg:Hide()
 	if MerchantFrameText then MerchantFrameText:Hide() end
-	MerchantFrameTitleBg:Hide()
-	MerchantFrameTitleText:Hide()
 	MerchantFrameCloseButton:Hide()
 
 	for i = 1, 12 do
@@ -377,26 +358,13 @@ function private.OnTabClick(self)
 	if MerchantBuyBackItem then MerchantBuyBackItem:Hide() end
 
 	MerchantNameText:Hide()
-	MerchantFrameLeftBorder:Hide()
-	MerchantFrameTopBorder:Hide()
-	MerchantFrameRightBorder:Hide()
-	MerchantFrameBottomBorder:Hide()
-	MerchantFrameTopTileStreaks:Hide()
-	MerchantFrameTopRightCorner:Hide()
-	MerchantFrameBotLeftCorner:Hide()
-	MerchantFrameBotRightCorner:Hide()
 	MerchantNextPageButton:Hide()
 	MerchantPrevPageButton:Hide()
 	MerchantRepairText:Hide()
 	MerchantFrameBottomLeftBorder:Hide()
-	MerchantFrameBottomRightBorder:Hide()
-	MerchantFrameBotLeftCorner:Hide()
-	MerchantFrameBotRightCorner:Hide()
-	MerchantFrameBtnCornerLeft:Hide()
-	MerchantFrameBtnCornerRight:Hide()
-	MerchantFrameButtonBottomBorder:Hide()
+    MerchantFrameBottomRightBorder:Hide()
 
-	BuybackBG:Hide()
+    MerchantFrameTab1:SetPoint("CENTER", MerchantFrame, "BOTTOMLEFT", 60, -14)
 
 	private.frame:Show()
 
@@ -433,37 +401,20 @@ function private.OnOtherTabClick(a,b,c)
 	end
 
 	MerchantNameText:Show()
-	MerchantFrameLeftBorder:Show()
-	MerchantFrameTopBorder:Show()
-	MerchantFrameRightBorder:Show()
-	MerchantFrameBottomBorder:Show()
-	MerchantFrameTopTileStreaks:Show()
-	MerchantFrameTopRightCorner:Show()
-	MerchantFrameBotLeftCorner:Show()
-	MerchantFrameBotRightCorner:Show()
 	MerchantFrameBottomLeftBorder:Show()
 	MerchantFrameBottomRightBorder:Show()
 
-	MerchantFrameLootFilter:Show()
 	MerchantMoneyFrame:Show()
-	MerchantMoneyInset:Show()
-	MerchantMoneyBg:Show()
-	MerchantExtraCurrencyInset:Show()
-	MerchantExtraCurrencyBg:Show()
 	MerchantPageText:Show()
 
-	MerchantFrameInset:Show()
 	MerchantFramePortrait:Show()
-	MerchantFramePortraitFrame:Show()
-	MerchantFrameBg:Show()
 	if MerchantFrameText then MerchantFrameText:Show() end
-	MerchantFrameTitleBg:Show()
-	MerchantFrameTitleText:Show()
 	MerchantFrameCloseButton:Show()
 	MerchantNextPageButton:Show()
 	MerchantPrevPageButton:Show()
-	MerchantRepairText:Show()
-	BuybackBG:Show()
+    MerchantRepairText:Show()
+
+    MerchantFrameTab1:SetPoint("CENTER", MerchantFrame, "BOTTOMLEFT", 60, 46)
 
 	if MerchantToken1 then MerchantToken1:Show() end
 

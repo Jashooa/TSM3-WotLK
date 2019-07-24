@@ -83,13 +83,7 @@ function TSMAPI.Util:ShowStaticPopupDialog(name)
 end
 
 function TSMAPI.Util:SafeTooltipLink(link)
-	if strmatch(link, "p:") then
-		link = TSMAPI.Item:GetLink(link)
-	end
-	if strmatch(link, "battlepet") then
-		local _, speciesID, level, breedQuality, maxHealth, power, speed, battlePetID = strsplit(":", link)
-		BattlePetToolTip_Show(tonumber(speciesID), tonumber(level) or 0, tonumber(breedQuality) or 0, tonumber(maxHealth) or 0, tonumber(power) or 0, tonumber(speed) or 0, gsub(gsub(link, "^(.*)%[", ""), "%](.*)$", ""))
-	elseif strmatch(link, "currency") then
+	if strmatch(link, "currency") then
 		local currencyID = strmatch(link, "currency:(%d+)")
 		GameTooltip:SetCurrencyByID(currencyID)
 	else
@@ -100,9 +94,8 @@ end
 
 function TSMAPI.Util:SafeItemRef(link)
 	if type(link) ~= "string" then return end
-	-- extract the Blizzard itemString for both items and pets
+	-- extract the Blizzard itemString for items
 	local blizzItemString = strmatch(link, "^\124c[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]\124H(item:[^\124]+)\124.+$")
-	blizzItemString = blizzItemString or strmatch(link, "^\124c[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]\124H(battlepet:[^\124]+)\124.+$")
 	if blizzItemString then
 		SetItemRef(blizzItemString, link)
 	end

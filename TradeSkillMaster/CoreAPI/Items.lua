@@ -26,7 +26,6 @@ local ITEM_CLASS_IDS = {
 	LE_ITEM_CLASS_GLYPH,
 	LE_ITEM_CLASS_TRADEGOODS,
 	LE_ITEM_CLASS_RECIPE,
-	LE_ITEM_CLASS_BATTLEPET,
 	LE_ITEM_CLASS_QUESTITEM,
 	LE_ITEM_CLASS_MISCELLANEOUS
 }
@@ -67,18 +66,6 @@ local GET_ITEM_INFO_KEYS = {
 	classId = 12,
 	subClassId = 13
 }
-local GET_PET_INFO_KEYS = {
-	name = 1,
-	quality = 2,
-	itemLevel = 3,
-	minLevel = 4,
-	maxStack = 5,
-	equipSlot = 6,
-	texture = 7,
-	vendorPrice = 8,
-	classId = 9,
-	subClassId = 10
-}
 for key in pairs(GET_ITEM_INFO_INSTANT_KEYS) do
 	TSMAPI:Assert(GET_ITEM_INFO_KEYS[key])
 end
@@ -102,14 +89,8 @@ function TSMAPI.Item:ToItemString(item)
 		item = item:trim()
 	end
 
-	-- test if it's already (likely) an item string or battle pet string
-	if strmatch(item, "^p:([0-9%-:]+)$") then
-		result = strjoin(":", strmatch(item, "^(p):(%d+:%d+:%d+)"))
-		if result then
-			return result
-		end
-		return item
-	elseif strmatch(item, "^i:([0-9%-:]+)$") then
+	-- test if it's already (likely) an item string
+	if strmatch(item, "^i:([0-9%-:]+)$") then
 		return private:FixItemString(item)
 	end
 
@@ -123,20 +104,6 @@ function TSMAPI.Item:ToItemString(item)
 	result = strjoin(":", strmatch(item, "^(i)tem:([0-9%-]+):[0-9%-]+:[0-9%-]+:[0-9%-]+:[0-9%-]+:[0-9%-]+:([0-9%-]+)$"))
 	if result then
 		return private:FixItemString(result)
-	end
-
-	-- test if it's an old style battle pet string (or if it was a link)
-	result = strjoin(":", strmatch(item, "^battle(p)et:(%d+:%d+:%d+)"))
-	if result then
-		return result
-	end
-	result = strjoin(":", strmatch(item, "^battle(p)et:(%d+)$"))
-	if result then
-		return result
-	end
-	result = strjoin(":", strmatch(item, "^(p):(%d+:%d+:%d+)"))
-	if result then
-		return result
 	end
 
 	-- test if it's a long item string
@@ -184,10 +151,6 @@ function TSMAPI.Item:IsSoulbound(...)
 		TSMAPI:Assert(numArgs <= 2, "Too many arguments provided with itemString")
 		itemString, ignoreBOA = ...
 		itemString = TSMAPI.Item:ToItemString(itemString)
-		if strmatch(itemString, "^p:") then
-			-- battle pets are not soulbound
-			return
-		end
 	elseif type(firstArg) == "number" then
 		bag, slot, ignoreBOA = ...
 		TSMAPI:Assert(slot, "Second argument must be slot within bag")
@@ -262,11 +225,6 @@ function TSMAPI.Item:IsSoulbound(...)
 end
 
 function TSMAPI.Item:IsCraftingReagent(itemLink)
-	if strmatch(itemLink, "battlepet:") or strmatch(itemLink, "^p:") then
-		-- ignore battle pets
-		return false
-	end
-
 	-- workaround for recipes having the item info and crafting reagent in the tooltip
 	if TSMAPI.Item:GetClassId(itemLink) == LE_ITEM_CLASS_RECIPE then
 		return false
@@ -527,27 +485,11 @@ end
 -- Item Info Thread
 -- ============================================================================
 
-function private.GetPetInfo(speciesId)
-	TSMAPI:Assert(type(speciesId) == "number")
-	local name, texture, petType = C_PetJournal.GetPetInfoBySpeciesID(speciesId)
-	-- name is equal to the speciesId if it's invalid, so check the texture instead
-	if not texture then return end
-	-- name, quality, itemLevel, minLevel, maxStack, equipSlot, texture, vendorPrice, classId, subClassId
-	return name, 0, 0, 0, 1, "", texture, 0, LE_ITEM_CLASS_BATTLEPET, petType - 1
-end
-
 function private.GetCachedItemInfo(itemString)
 	if not itemString then return end
 	if not private.itemInfo[itemString] then
 		private.itemInfo[itemString] = {}
-		if strmatch(itemString, "^p:") then
-			-- pets don't have a variant of GetItemInfoInstant, so just pretend we already got it
-			local speciesId = tonumber(strmatch(itemString, "^p:(%d+)"))
-			private.StoreGetPetInfoResult(itemString, private.GetPetInfo(speciesId))
-			private.itemInfo[itemString]._getInfoInstantResult = true
-		else
-			private.newItems[itemString] = 1
-		end
+		private.newItems[itemString] = 1
 	end
 	return private.itemInfo[itemString]
 end
@@ -603,22 +545,6 @@ function private.StoreGetItemInfoInstantResult(itemString, ...)
 	end
 end
 
-function private.StoreGetPetInfoResult(itemString, ...)
-	TSMAPI:Assert(type(itemString) == "string")
-	if select('#', ...) == 0 then
-		private.itemInfo[itemString]._isInvalid = true
-	end
-	local info = private.GetCachedItemInfo(itemString)
-	for key, index in pairs(GET_PET_INFO_KEYS) do
-		info[key] = select(index, ...)
-	end
-	private.itemInfo[itemString]._getInfoResult = true
-	if private.itemInfo[itemString]._isPending then
-		private.itemInfo[itemString]._isPending = nil
-		private.numPending = private.numPending - 1
-	end
-end
-
 function private.ItemInfoThread(self)
 	self:SetThreadName("ITEM_INFO")
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED", function(event, itemId)
@@ -667,12 +593,8 @@ function private.ItemInfoThread(self)
 				private.StoreGetItemInfoInstantResult(itemString, GetItemInfoInstant(TSMAPI.Item:ToItemID(itemString)))
 			end
 			if private.numPending < maxPending then
-				local itemId = TSMAPI.Item:ToItemID(itemString)
-				local speciesId = strmatch(itemString, "^p:(%d+)")
-				speciesId = tonumber(speciesId)
-				if speciesId then
-					private.StoreGetPetInfoResult(itemString, private.GetPetInfo(speciesId))
-				elseif itemId then
+                local itemId = TSMAPI.Item:ToItemID(itemString)
+                if itemId then
 					private.StoreGetItemInfoResult(itemString, GetItemInfo(itemId))
 				else
 					TSMAPI:Assert(false, "Invalid item: "..tostring(itemString))
@@ -738,8 +660,8 @@ function TSMAPI.Item:GetName(itemString)
 		private.newItems[baseItemString] = true
 	end
 	local name = nil
-	if strmatch(itemString, "^p:") or (info and itemString == baseItemString) then
-		-- This is either a pet or base item, just return what we have.
+	if (info and itemString == baseItemString) then
+		-- This is a base item, just return what we have.
 		name = info.name
 	elseif info and info._getInfoResult then
 		-- we have the base item info, so should be able to call GetItemInfo() for this version of the item
@@ -796,11 +718,6 @@ function TSMAPI.Item:GetLink(itemString)
 	end
 	if link then
 		return link
-	elseif strmatch(itemString, "p:") then
-		local _, speciesId, level, quality, health, power, speed, petId = strsplit(":", itemString)
-		name = private.GetPetInfo(tonumber(speciesId)) or "Unknown Pet"
-		local fullItemString = strjoin(":", speciesId, level or "", quality or "", health or "", power or "", speed or "", petId or "")
-		return ITEM_QUALITY_COLORS[tonumber(quality) or 0].hex .. "|Hbattlepet:" .. fullItemString .. "|h[" .. name .. "]|h|r"
 	elseif strmatch(itemString, "i:") then
 		name = name or "Unknown Item"
 		local color = "|cffff0000"

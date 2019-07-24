@@ -341,6 +341,5 @@ function private.ShowTooltip(self)
 end
 
 function private.HideTooltip()
-	BattlePetTooltip:Hide()
 	GameTooltip:Hide()
 end

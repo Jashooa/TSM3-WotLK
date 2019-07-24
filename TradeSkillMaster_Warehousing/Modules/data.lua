@@ -14,7 +14,6 @@ local TSM = select(2, ...)
 local data = TSM:NewModule("data", "AceEvent-3.0")
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI librarie
 local private = {
-	petSpeciesCache={},
 }
 
 ----------------------------------
@@ -231,12 +230,6 @@ function data:getTotalItems(src, dest)
 					local link = GetGuildBankItemLink(tab, slot)
 					local itemString = TSMAPI.Item:ToBaseItemString(link, true)
 					if itemString then
-						if itemString == "i:82800" then
-							if not private.petSpeciesCache[link] then
-								private.petSpeciesCache[link] = GameTooltip:SetGuildBankItem(tab, slot)
-							end
-							itemString = private.petSpeciesCache[link] and ("p:" .. private.petSpeciesCache[link])
-						end
 						local quantity = select(2, GetGuildBankItemInfo(tab, slot))
 						results[itemString] = (results[itemString] or 0) + quantity
 					end

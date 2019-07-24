@@ -31,7 +31,7 @@ end
 
 function BankUI:createTab(parent)
 	if private.frame then return private.frame end
-	
+
 	local BFC = TSMAPI.GUI:GetBuildFrameConstants()
 	local frameInfo = {
 		type = "Frame",
@@ -111,7 +111,7 @@ function BankUI:createTab(parent)
 			},
 		},
 	}
-	
+
 	private.frame = TSMAPI.GUI:BuildFrame(frameInfo)
 
 	local helpPlateInfo = {
@@ -340,10 +340,6 @@ function BankUI:getTotalItems(src)
 				local link = GetGuildBankItemLink(bag, slot)
 				local itemString = TSMAPI.Item:ToBaseItemString(link, true)
 				if itemString then
-					if itemString == "i:82800" then
-						local speciesID = GameTooltip:SetGuildBankItem(bag, slot)
-						itemString = speciesID and ("p:" .. speciesID)
-					end
 					local quantity = select(2, GetGuildBankItemInfo(bag, slot))
 					if not results[itemString] then results[itemString] = 0 end
 					results[itemString] = results[itemString] + quantity

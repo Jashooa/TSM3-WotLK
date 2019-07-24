@@ -9,7 +9,6 @@
 -- This file contains code for scanning the auction house
 local TSM = select(2, ...)
 local private = {threadId=nil, db=nil, nameTemp={}}
-local BATTLE_PET_CLASS = 11
 
 
 
@@ -247,7 +246,7 @@ function private.GenerateQueriesThread(self, itemList)
 	local itemListByClass = {}
 	for _, itemString in ipairs(itemStrings) do
 		local classId = TSMAPI.Item:GetClassId(itemString)
-		if classId and classId ~= LE_ITEM_CLASS_BATTLEPET then
+		if classId then
 			itemListByClass[classId] = itemListByClass[classId] or {}
 			tinsert(itemListByClass[classId], itemString)
 		else

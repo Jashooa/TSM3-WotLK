@@ -964,12 +964,6 @@ function private.ImportGroupHelperThread(self, importStr, groupPath)
 		elseif strmatch(noSpaceStr, "^group:") then
 			subPath = strsub(str, strfind(str, ":")+1, -1)
 			subPath = gsub(subPath, TSM.GROUP_SEP.."[ ]*"..TSM.GROUP_SEP, ",")
-		elseif strmatch(noSpaceStr, "p:") then
-			if strmatch(noSpaceStr, "^p:%d+$") or strmatch(noSpaceStr, "^p:%d+:%d+:%d+$") then
-				itemString = noSpaceStr
-				-- validate this pet import
-				if not TSMAPI.Item:GetName(itemString) then return end
-			end
 		elseif strmatch(noSpaceStr, "i:") then
 			itemString = noSpaceStr
 		elseif strmatch(noSpaceStr, ":") then
@@ -982,11 +976,8 @@ function private.ImportGroupHelperThread(self, importStr, groupPath)
 			currentSubPath = subPath
 		elseif itemString then
 			if not TSMAPI.Item:IsSoulbound(itemString, true) then
-				local isValid = false
-				if strmatch(itemString, "^p:") then
-					-- validate this pet import
-					isValid = TSMAPI.Item:GetName(itemString) and true
-				elseif strmatch(itemString, "^i:") then
+                local isValid = false
+                if strmatch(itemString, "^i:") then
 					itemString = gsub(itemString, ":0:", "::") -- remove empty parts from before patch 7.0.x
 					isValid = TSMAPI.Item:ToItemString(itemString) == itemString
 				end

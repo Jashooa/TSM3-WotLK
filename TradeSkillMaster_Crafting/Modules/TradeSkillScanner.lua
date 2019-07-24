@@ -124,10 +124,6 @@ function private.ScanCurrentProfessionThread(self, args)
 			if spellId == 169092 and itemString == "i:113588" then
 				lNum, hNum = 1, 1
 			end
-			-- workaround for incorrect values returned for new mass milling recipes
-			if TSM.MASS_MILLING_RECIPES[spellId] then
-				lNum, hNum = 8, 8.8
-			end
 			scanResult.crafts[spellId].numResult = floor(((lNum or 1) + (hNum or 1)) / 2)
 			scanResult.crafts[spellId].hasCD = select(2, C_TradeSkillUI.GetRecipeCooldown(spellId)) and true or nil
 
@@ -242,7 +238,7 @@ function private:GetCraftInfo(spellId)
 	TSMAPI:Assert(spellLink and strfind(spellLink, "enchant:"), "Invalid profession spell.")
 	if strfind(itemLink, "enchant:") then
 		-- result of craft is enchant
-		itemString = TSM.enchantingItemIDs[spellId] or TSM.MASS_MILLING_RECIPES[spellId]
+		itemString = TSM.enchantingItemIDs[spellId]
 		craftName = GetSpellInfo(spellId)
 		if not itemString then
 			-- this craft does not result in an item but we need to return something that evalulates to true

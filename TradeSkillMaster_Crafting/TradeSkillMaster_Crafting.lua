@@ -13,15 +13,6 @@ local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loa
 
 TSM.MINING_SPELLID = 2575
 TSM.SMELTING_SPELLID = 2656
-TSM.MASS_MILLING_RECIPES = {
-	[190381] = "i:114931",  -- Frostweed
-	[190382] = "i:114931",  -- Fireweed
-	[190383] = "i:114931",  -- Gorgrond Flytrap
-	[190384] = "i:114931",  -- Starflower
-	[190385] = "i:114931",  -- Nargrand Arrowbloom
-	[190386] = "i:114931",  -- Talador Orchid
-}
-
 
 -- default values for the savedDB
 local settingsInfo = {
@@ -141,7 +132,7 @@ function TSM:OnInitialize()
 			sourceItem = itemString
 			rate = data.numResult / num
 		end
-		if numMats == 1 and not data.hasCD and not TSM.MASS_MILLING_RECIPES[spell] then
+		if numMats == 1 and not data.hasCD then
 			TSMAPI.Conversions:Add(data.itemString, sourceItem, rate, "craft")
 		end
 	end

@@ -63,12 +63,12 @@ function TradeSkill:EventHandler(event, ...)
 		private:OnProfessionUpdate()
 		private:UpdateCooldownsFrame()
 	elseif event == "UPDATE_TRADESKILL_RECAST" then
-		private.frame.professionsTab.craftInfoFrame.buttonsFrame.inputBox:SetNumber(C_TradeSkillUI.GetRecipeRepeatCount())
+		private.frame.professionsTab.craftInfoFrame.buttonsFrame.inputBox:SetNumber(GetTradeskillRepeatCount())
 	elseif event == "CHAT_MSG_SKILL" then
 		-- update the skill level of the player's tradeskill
 		local skillName = TSM:GetCurrentProfessionName()
 		local level, maxLevel = select(3, C_TradeSkillUI.GetTradeSkillLine())
-		local isLinked, linkedPlayer = C_TradeSkillUI.IsTradeSkillLinked()
+		local isLinked, linkedPlayer = IsTradeSkillLinked()
 		local playerName = linkedPlayer or UnitName("player")
 		if skillName and skillName ~= "UNKNOWN" and not isLinked and TSM.db.factionrealm.playerProfessions[playerName] and TSM.db.factionrealm.playerProfessions[playerName][skillName] then
 			TSM.db.factionrealm.playerProfessions[playerName][skillName].level = level
@@ -554,7 +554,7 @@ function private.SetTSMCraftingProfessionFrameVisible(visible)
 		private.switchBtn:Update()
 		private.frame.professionsBtn:Enable()
 		TradeSkill.Queue:UpdateFrameStatus(private.frame)
-		local isLinked, linkedPlayer = C_TradeSkillUI.IsTradeSkillLinked()
+		local isLinked, linkedPlayer = IsTradeSkillLinked()
 		local playerName = linkedPlayer or UnitName("player")
 		local professionName = TSM:GetCurrentProfessionName()
 		if not isLinked and TSM.db.factionrealm.playerProfessions[playerName][professionName] and not TSM.db.factionrealm.playerProfessions[playerName][professionName].prompted then
@@ -573,7 +573,7 @@ end
 
 function private.CloseProfession()
 	if not C_TradeSkillUI.GetTradeSkillLine() then return end
-	C_TradeSkillUI.CloseTradeSkill()
+	CloseTradeSkill()
 end
 
 function private.ProfessionScanCompleteCallback()
@@ -585,7 +585,7 @@ function private.ScanOpenProfessionThread(self)
 	TradeSkill:ClearFilters()
 
 	-- scan the profession
-	local isLinked, linkedPlayer = C_TradeSkillUI.IsTradeSkillLinked()
+	local isLinked, linkedPlayer = IsTradeSkillLinked()
 	local playerName = linkedPlayer or UnitName("player")
 	local professionName = TSM:GetCurrentProfessionName()
 	private.scanSuccess = nil
@@ -616,7 +616,7 @@ function private.ProfessionWindowManagerHandleShowThread(self)
 	private.currentProfessionId = C_TradeSkillUI.GetTradeSkillLine()
 
 	-- check if it's a profession we don't support showing our frame for (runeforging, guild profession, or random linked profession)
-	local isLinked, linkedPlayer = C_TradeSkillUI.IsTradeSkillLinked()
+	local isLinked, linkedPlayer = IsTradeSkillLinked()
 	if TSM:GetCurrentProfessionName() == GetSpellInfo(53428) or (isLinked and (not TSMAPI.Player:GetCharacters()[linkedPlayer])) then
 		-- we don't support this profession, so show Blizzard's frame without the switch button
 		TSM:LOG_INFO("Aborting for unsupported profession (isRuneforging=%s, linkedPlayer=%s)", TSM:GetCurrentProfessionName() == GetSpellInfo(53428), tostring(linkedPlayer))

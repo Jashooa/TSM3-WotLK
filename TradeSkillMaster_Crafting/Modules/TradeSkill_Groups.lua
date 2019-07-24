@@ -54,7 +54,7 @@ function Groups:GetFrameInfo()
 			OnShow = function(self)
 				private.frame = self:GetParent()
 				if not TradeSkill:GetVisibilityInfo().frame then return end
-				self.createBtn:SetDisabled(C_TradeSkillUI.IsTradeSkillLinked())
+				self.createBtn:SetDisabled(IsTradeSkillLinked())
 				private.frame.groupsBtn:LockHighlight()
 				private.frame.professionsBtn:UnlockHighlight()
 				private.frame.professionsTab:Hide()

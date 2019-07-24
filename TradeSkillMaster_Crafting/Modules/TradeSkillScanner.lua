@@ -53,7 +53,7 @@ function private.ScanCurrentProfessionThread(self, args)
 	-- whenever we yield there's a chance that the profession may change
 	-- set a yield invariant so that the thread will be killed if it does
 	self:SetYieldInvariant(function()
-		return C_TradeSkillUI.IsTradeSkillLinked() == isLinked and TSM:GetCurrentProfessionName() == professionName and #C_TradeSkillUI.GetFilteredRecipeIDs() == numTradeSkills
+		return IsTradeSkillLinked() == isLinked and TSM:GetCurrentProfessionName() == professionName and #C_TradeSkillUI.GetFilteredRecipeIDs() == numTradeSkills
 	end)
 	self:Yield(true) -- do an initial check
 
@@ -61,7 +61,7 @@ function private.ScanCurrentProfessionThread(self, args)
 		 -- check if this player (probably) doesn't have any professions in which case don't scan any others to avoid errors
 		if not TSM.db.factionrealm.playerProfessions[playerName] then return end
 		if TSM.db.factionrealm.playerProfessions[playerName][professionName] then
-			TSM.db.factionrealm.playerProfessions[playerName][professionName].link = C_TradeSkillUI.GetTradeSkillListLink()
+			TSM.db.factionrealm.playerProfessions[playerName][professionName].link = GetTradeSkillListLink()
 			TSMAPI.Sync:KeyUpdated(TSM.db.factionrealm.playerProfessions, playerName)
 		end
 	end
@@ -119,7 +119,7 @@ function private.ScanCurrentProfessionThread(self, args)
 			-- it should be a valid craft
 			local itemLink, spellLink, itemString, spellId, craftName, mats = unpack(data)
 			scanResult.crafts[spellId] = { name = craftName, itemString = itemString, mats = {}, profession = professionName }
-			local lNum, hNum = C_TradeSkillUI.GetRecipeNumItemsProduced(spellId)
+			local lNum, hNum = GetTradeSkillNumMade(spellId)
 			-- workaround for incorrect values returned for Temporal Crystal
 			if spellId == 169092 and itemString == "i:113588" then
 				lNum, hNum = 1, 1
@@ -255,9 +255,9 @@ function private:GetCraftInfo(spellId)
 
 	local mats = {}
 	local haveInvalidMats = false
-	for i = 1, C_TradeSkillUI.GetRecipeNumReagents(spellId) do
-		local name, _, quantity = C_TradeSkillUI.GetRecipeReagentInfo(spellId, i)
-		local matItemString = TSMAPI.Item:ToItemString(C_TradeSkillUI.GetRecipeReagentItemLink(spellId, i))
+	for i = 1, GetTradeSkillNumReagents(spellId) do
+		local name, _, quantity = GetTradeSkillReagentInfo(spellId, i)
+		local matItemString = TSMAPI.Item:ToItemString(GetTradeSkillReagentItemLink(spellId, i))
 		TSMAPI.Item:FetchInfo(matItemString)
 		if name and matItemString and quantity then
 			mats[matItemString] = { quantity = quantity, name = name }

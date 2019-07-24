@@ -404,7 +404,7 @@ function Professions:GetFrameInfo()
 			},
 			linkBtn = {
 				OnClick = function(self)
-					local link = C_TradeSkillUI.GetTradeSkillListLink()
+					local link = GetTradeSkillListLink()
 					if not link then return TSM:Print(L["Could not get link for profession."]) end
 
 					local activeEditBox = ChatEdit_GetActiveWindow()
@@ -573,7 +573,7 @@ function Professions:GetFrameInfo()
 							local spellId = self:GetParent():GetParent().spellId
 							local quantity = C_TradeSkillUI.GetRecipeInfo(spellId).numAvailable
 							TradeSkill:CastTradeSkill(spellId, quantity, self.vellum)
-							self:GetParent().inputBox:SetNumber(C_TradeSkillUI.GetRecipeRepeatCount())
+							self:GetParent().inputBox:SetNumber(GetTradeskillRepeatCount())
 						end
 					},
 				},
@@ -629,7 +629,7 @@ function private:UpdateCraftTimeText()
 	local startTime, endTime, isTradeSkill = select(4, UnitCastingInfo("player"))
 	if isTradeSkill then
 		local timePerCraft = endTime - startTime
-		endTime = endTime + (timePerCraft * (C_TradeSkillUI.GetRecipeRepeatCount() - 1))
+		endTime = endTime + (timePerCraft * (GetTradeskillRepeatCount() - 1))
 		private.craftTimeInfo.endTime = ceil(endTime / 1000)
 	elseif not startTime then
 		-- not casting a tradeskill
@@ -664,7 +664,7 @@ end
 function private:UpdateProfessionDropdown()
 	if not private.frame then return end
 	local list = TSM.TradeSkillScanner:GetProfessionList()
-	local playerName = select(2, C_TradeSkillUI.IsTradeSkillLinked()) or UnitName("player")
+	local playerName = select(2, IsTradeSkillLinked()) or UnitName("player")
 	local professionName = TSM:GetCurrentProfessionName()
 	local level, maxLevel = select(3, C_TradeSkillUI.GetTradeSkillLine())
 	local currentSelection = playerName .. "~" .. professionName
@@ -862,7 +862,7 @@ function Professions:UpdateST()
 
 	private.frame.professionsTab.st:SetData(stData)
 	Professions:SetSelectedTradeSkill(private.selectedTradeSkill, true)
-	private.frame.professionsTab.craftInfoFrame.buttonsFrame.inputBox:SetNumber(C_TradeSkillUI.GetRecipeRepeatCount())
+	private.frame.professionsTab.craftInfoFrame.buttonsFrame.inputBox:SetNumber(GetTradeskillRepeatCount())
 end
 
 function private.ValidateTradeSkill(spellId)
@@ -896,7 +896,7 @@ function Professions:SetSelectedTradeSkill(spellId, forceUpdate)
 		local info = C_TradeSkillUI.GetRecipeInfo(spellId)
 		local name = info.name
 		-- Enable display of items created
-		local lNum, hNum = C_TradeSkillUI.GetRecipeNumItemsProduced(spellId)
+		local lNum, hNum = GetTradeSkillNumMade(spellId)
 		-- workaround for incorrect values returned for Temporal Crystal
 		if TSM:IsCurrentProfessionEnchanting() and spellId == 169092 then
 			local itemString = TSM.db.factionrealm.crafts[spellId] and TSM.db.factionrealm.crafts[spellId].itemString
@@ -932,10 +932,10 @@ function Professions:SetSelectedTradeSkill(spellId, forceUpdate)
 		end
 
 		for i, btn in ipairs(frame.craftInfoFrame.matsFrame.reagentButtons) do
-			local name, texture, needed, player = C_TradeSkillUI.GetRecipeReagentInfo(spellId, i)
+			local name, texture, needed, player = GetTradeSkillReagentInfo(spellId, i)
 			if player ~= nil then
 				btn:Show()
-				btn.link = C_TradeSkillUI.GetRecipeReagentItemLink(spellId, i)
+				btn.link = GetTradeSkillReagentItemLink(spellId, i)
 				local linkText = (texture and "|T" .. texture .. ":0|t" or "") .. " " .. (btn.link or name)
 				local color = (needed > player) and "|cffff0000" or "|cff00ff00"
 				btn:SetText(format("%s(%d/%d) %s|r", color, player, needed, linkText))
@@ -954,7 +954,7 @@ function Professions:SetSelectedTradeSkill(spellId, forceUpdate)
 		end
 
 		local isUnavailable = info.disabled
-		if info.numAvailable > 0 and not C_TradeSkillUI.IsTradeSkillLinked() then
+		if info.numAvailable > 0 and not IsTradeSkillLinked() then
 			local num = frame.craftInfoFrame.buttonsFrame.inputBox:GetNumber()
 			frame.craftInfoFrame.buttonsFrame.inputBox:SetNumber(max(min(num, info.numAvailable), 1))
 		else

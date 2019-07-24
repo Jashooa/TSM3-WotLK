@@ -162,14 +162,14 @@ do
 			PreHookHelper(self, quantityFunc, 3, ...)
 		end,
 		SetRecipeReagentItem = function(self, ...)
-			local reg = PreHookHelper(self, C_TradeSkillUI.GetRecipeReagentInfo, 3, ...)
-			reg.item = C_TradeSkillUI.GetRecipeReagentItemLink(...)
+			local reg = PreHookHelper(self, GetTradeSkillReagentInfo, 3, ...)
+			reg.item = GetTradeSkillReagentItemLink(...)
 		end,
 		SetRecipeResultItem = function(self, ...)
 			private.OnTooltipCleared(self)
 			local reg = private.tooltipRegistry[self]
 			reg.ignoreOnCleared = true
-			local lNum, hNum = C_TradeSkillUI.GetRecipeNumItemsProduced(...)
+			local lNum, hNum = GetTradeSkillNumMade(...)
 			-- the quantity can be a range, so use a quantity of 1 if so
 			reg.quantity = lNum == hNum and lNum or 1
 		end,

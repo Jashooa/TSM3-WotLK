@@ -338,12 +338,12 @@ function TSM:GetSpellId(link)
 end
 
 function TSM:GetCurrentProfessionName()
-	local name = select(7, C_TradeSkillUI.GetTradeSkillLine())
-	return name or "UNKNOWN"
+	local name = GetTradeSkillLine()
+	return name
 end
 
 function TSM:IsCurrentProfessionEnchanting()
-	return select(7, C_TradeSkillUI.GetTradeSkillLine()) == GetSpellInfo(7411)
+	return GetTradeSkillLine() == GetSpellInfo(7411)
 end
 
 function TSM:GetInventoryTotals()

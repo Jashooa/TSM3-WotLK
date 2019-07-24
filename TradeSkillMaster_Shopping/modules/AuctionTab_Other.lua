@@ -171,14 +171,6 @@ function private:StartSniperSearch()
 	TSM.AuctionTab:StartSearch({searchMode="normal", extraInfo={searchType="sniper", continue=continueInfo}, searchBoxText="~"..L["sniper"].."~"})
 end
 
-function private:StartGreatDealsSearch()
-	TSM.AuctionTab:StartSearch({searchMode="normal", extraInfo={searchType="deals"}, filter=private.appData.greatDeals, searchBoxText="~"..L["great deals"].."~"})
-end
-
-function private:StartItemNotificationsSearch()
-	TSM.AuctionTab:StartSearch({searchMode="normal", extraInfo={searchType="deals"}, filter=private.appData.itemNotifications, searchBoxText="~"..L["item notifications"].."~"})
-end
-
 
 
 function AuctionTabOther:GetFrameInfo()
@@ -450,49 +442,6 @@ function AuctionTabOther:GetFrameInfo()
 						type = "HLine",
 						offset = -230,
 					},
-					{
-						type = "Frame",
-						key = "appData",
-						points = {{"TOPLEFT", 0, -230}, {"BOTTOMRIGHT"}},
-						children = {
-							{
-								type = "Text",
-								text = L["Desktop App Searches"],
-								textHeight = 18,
-								justify = {"CENTER", "MIDDLE"},
-								size = {0, 20},
-								points = {{"TOPLEFT", 0, -5}, {"TOPRIGHT", 0, -5}},
-							},
-							{
-								type = "HLine",
-								offset = -30,
-							},
-							{
-								type = "Button",
-								key = "greatDealsBtn",
-								text = L["Great Deals"],
-								tooltip = L["This searches the AH for all items found on the TSM Great Deals page (http://tradeskillmaster.com/great-deals)."],
-								textHeight = 18,
-								size = {0, 25},
-								points = {{"TOPLEFT", 5, -35}, {"TOPRIGHT", -5, -35}},
-								scripts = {"OnClick"},
-							},
-							{
-								type = "HLine",
-								offset = -65,
-							},
-							{
-								type = "Button",
-								key = "itemNotificationsBtn",
-								text = L["Item Notifications"],
-								tooltip = L["This searches the AH for your current deals as displayed on the TSM website."],
-								textHeight = 18,
-								size = {0, 25},
-								points = {{"TOPLEFT", 5, -70}, {"TOPRIGHT", -5, -70}},
-								scripts = {"OnClick"},
-							},
-						},
-					},
 				},
 			},
 		},
@@ -503,33 +452,6 @@ function AuctionTabOther:GetFrameInfo()
 				private.frame.filter.filterInputBox:SetFocus()
 				for itemID in pairs(TSMAPI:ModuleAPI("AuctionDB", "lastCompleteScan") or {}) do
 					TSMAPI.Item:FetchInfo(TSMAPI.Item:ToItemString(itemID))
-				end
-				local appData = TSMAPI.AppHelper and TSMAPI.AppHelper:FetchData("SHOPPING_SEARCHES")
-				if appData then
-					for _, info in pairs(appData) do
-						local realmName, data = unpack(info)
-						if TSMAPI.AppHelper:IsCurrentRealm(realmName) then
-							private.appData = assert(loadstring(data))()
-							break
-						end
-					end
-				end
-				if private.appData then
-					private.frame.other.appData:Show()
-					if private.appData.greatDeals then
-						-- populate item info cache
-						for _, item in ipairs({(";"):split(private.appData.greatDeals)}) do
-							item = ("/"):split(item)
-							TSMAPI.Item:FetchInfo(item)
-						end
-					else
-						private.frame.other.appData.greatDealsBtn:Disable()
-					end
-					if not private.appData.itemNotifications then
-						private.frame.other.appData.itemNotificationsBtn:Disable()
-					end
-				else
-					private.frame.other.appData:Hide()
 				end
 			end,
 			filter = {
@@ -556,14 +478,6 @@ function AuctionTabOther:GetFrameInfo()
 				},
 				sniperStartBtn = {
 					OnClick = private.StartSniperSearch,
-				},
-				appData = {
-					greatDealsBtn = {
-						OnClick = private.StartGreatDealsSearch,
-					},
-					itemNotificationsBtn = {
-						OnClick = private.StartItemNotificationsSearch,
-					},
 				},
 			},
 		},

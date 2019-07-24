@@ -26,17 +26,12 @@ StaticPopupDialogs["TSM_AUCTIONDB_NO_DATA_POPUP"] = {
 local settingsInfo = {
 	version = 2,
 	realm = {
-		hasAppData = { type = "boolean", default = true, lastModifiedVersion = 1},
 		lastSaveTime = { type = "number", default = 0, lastModifiedVersion = 1},
 		lastCompleteScan = { type = "number", default = 0, lastModifiedVersion = 1},
 		lastPartialScan = { type = "number", default = 0, lastModifiedVersion = 1},
 		scanData = { type = "string", default = "", lastModifiedVersion = 1},
 	},
 	global = {
-		scanDataUS = { type = "string", default = "", lastModifiedVersion = 2},
-		scanDataEU = { type = "string", default = "", lastModifiedVersion = 2},
-		lastUpdateUS = { type = "number", default = 0, lastModifiedVersion = 2},
-		lastUpdateEU = { type = "number", default = 0, lastModifiedVersion = 2},
 		showAHTab = { type = "boolean", default = true, lastModifiedVersion = 1},
 	},
 }
@@ -44,17 +39,6 @@ local tooltipDefaults = {
 	_version = 2,
 	minBuyout = true,
 	marketValue = true,
-	historical = false,
-	regionMinBuyout = false,
-	regionMarketValue = true,
-	regionHistorical = false,
-	regionSale = true,
-	regionSalePercent = true,
-	regionSoldPerDay = true,
-	globalMinBuyout = false,
-	globalMarketValue = false,
-	globalHistorical = false,
-	globalSale = false,
 }
 
 -- Called once the player has loaded WOW.
@@ -80,16 +64,6 @@ function TSM:RegisterModule()
 	TSM.priceSources = {
 		{ key = "DBMarket", label = L["AuctionDB - Market Value"], callback = "GetRealmItemData", arg = "marketValue", takeItemString = true },
 		{ key = "DBMinBuyout", label = L["AuctionDB - Minimum Buyout"], callback = "GetRealmItemData", arg = "minBuyout", takeItemString = true },
-		-- prices from the app
-		{ key = "DBHistorical", label = L["AuctionDB - Historical Price (via TSM App)"], callback = "GetRealmItemData", arg = "historical", takeItemString = true },
-		{ key = "DBRegionMinBuyoutAvg", label = L["AuctionDB - Region Minimum Buyout Average (via TSM App)"], callback = "GetRegionItemData", arg = "regionMinBuyout", takeItemString = true },
-		{ key = "DBRegionMarketAvg", label = L["AuctionDB - Region Market Value Average (via TSM App)"], callback = "GetRegionItemData", arg = "regionMarketValue", takeItemString = true },
-		{ key = "DBRegionHistorical", label = L["AuctionDB - Region Historical Price (via TSM App)"], callback = "GetRegionItemData", arg = "regionHistorical", takeItemString = true },
-		{ key = "DBRegionSaleAvg", label = L["AuctionDB - Region Sale Average (via TSM App)"], callback = "GetRegionItemData", arg = "regionSale", takeItemString = true },
-		{ key = "DBGlobalMinBuyoutAvg", label = L["AuctionDB - Global Minimum Buyout Average (via TSM App)"], callback = "GetGlobalItemData", arg = "globalMinBuyout", takeItemString = true },
-		{ key = "DBGlobalMarketAvg", label = L["AuctionDB - Global Market Value Average (via TSM App)"], callback = "GetGlobalItemData", arg = "globalMarketValue", takeItemString = true },
-		{ key = "DBGlobalHistorical", label = L["AuctionDB - Global Historical Price (via TSM App)"], callback = "GetGlobalItemData", arg = "globalHistorical", takeItemString = true },
-		{ key = "DBGlobalSaleAvg", label = L["AuctionDB - Global Sale Average (via TSM App)"], callback = "GetGlobalItemData", arg = "globalSale", takeItemString = true },
 	}
 	TSM.moduleOptions = {callback="Config:Load"}
 	if TSM.db.global.showAHTab then
@@ -116,105 +90,7 @@ function TSM:OnEnable()
 		TSMAPI.Util:ShowStaticPopupDialog("TSM_AUCTIONDB_TSM_UPDATE")
 	end
 
-	local realmAppData, regionAppDataUS, regionAppDataEU = nil, nil, nil
-	local appData = TSMAPI.AppHelper and TSMAPI.AppHelper:FetchData("AUCTIONDB_MARKET_DATA") -- get app data from TSM_AppHelper if it's installed
-	if appData then
-		for _, info in ipairs(appData) do
-			local realm, data = unpack(info)
-			local downloadTime = "?"
-			if realm == "US" then
-				regionAppDataUS = TSM:ProcessAppData(data)
-				downloadTime = SecondsToTime(time() - regionAppDataUS.downloadTime).." ago"
-			elseif realm == "EU" then
-				regionAppDataEU = TSM:ProcessAppData(data)
-				downloadTime = SecondsToTime(time() - regionAppDataEU.downloadTime).." ago"
-			elseif TSMAPI.AppHelper:IsCurrentRealm(realm) then
-				realmAppData = TSM:ProcessAppData(data)
-				downloadTime = SecondsToTime(time() - realmAppData.downloadTime).." ago"
-			end
-			TSM:LOG_INFO("Got AppData for %s (isCurrent=%s, %s)", realm, tostring(TSMAPI.AppHelper:IsCurrentRealm(realm)), downloadTime)
-		end
-	end
-
-	-- check if we can load realm data from the app
-	if realmAppData and (realmAppData.downloadTime > TSM.db.realm.lastCompleteScan or (realmAppData.downloadTime == TSM.db.realm.lastCompleteScan and realmAppData.downloadTime > TSM.db.realm.lastPartialScan)) then
-		TSM.updatedRealmData = (realmAppData.downloadTime > TSM.db.realm.lastCompleteScan)
-		TSM.db.realm.lastCompleteScan = realmAppData.downloadTime
-		TSM.db.realm.hasAppData = true
-		TSM.realmData = {}
-		local fields = realmAppData.fields
-		for _, data in ipairs(realmAppData.data) do
-			local itemString
-			for i, key in ipairs(fields) do
-				if i == 1 then
-					-- item string must be the first field
-					if type(data[i]) == "number" then
-						itemString = "i:"..data[i]
-					else
-						itemString = gsub(data[i], ":0:", "::")
-					end
-					TSM.realmData[itemString] = {}
-				else
-					TSM.realmData[itemString][key] = data[i]
-				end
-			end
-			TSM.realmData[itemString].lastScan = realmAppData.downloadTime
-		end
-	else
-		TSM.Compress:LoadRealmData()
-	end
-
-	-- check if we can load US region data from the app
-	if regionAppDataUS and regionAppDataUS.downloadTime >= TSM.db.global.lastUpdateUS then
-		TSM.updatedRegionDataUS = (regionAppDataUS.downloadTime > TSM.db.global.lastUpdateUS)
-		TSM.db.global.lastUpdateUS = regionAppDataUS.downloadTime
-		TSM.regionDataUS = {}
-		local fields = regionAppDataUS.fields
-		for _, data in ipairs(regionAppDataUS.data) do
-			local itemString
-			for i, key in ipairs(fields) do
-				if i == 1 then
-					-- item string must be the first field
-					if type(data[i]) == "number" then
-						itemString = "i:"..data[i]
-					else
-						itemString = gsub(data[i], ":0:", "::")
-					end
-					TSM.regionDataUS[itemString] = {}
-				else
-					TSM.regionDataUS[itemString][key] = data[i]
-				end
-			end
-		end
-	else
-		TSM.Compress:LoadRegionDataUS()
-	end
-
-	-- check if we can load EU region data from the app
-	if regionAppDataEU and regionAppDataEU.downloadTime >= TSM.db.global.lastUpdateEU then
-		TSM.updatedRegionDataEU = (regionAppDataEU.downloadTime > TSM.db.global.lastUpdateEU)
-		TSM.db.global.lastUpdateEU = regionAppDataEU.downloadTime
-		TSM.regionDataEU = {}
-		local fields = regionAppDataEU.fields
-		for _, data in ipairs(regionAppDataEU.data) do
-			local itemString
-			for i, key in ipairs(fields) do
-				if i == 1 then
-					-- item string must be the first field
-					if type(data[i]) == "number" then
-						itemString = "i:"..data[i]
-					else
-						itemString = gsub(data[i], ":0:", "::")
-					end
-					TSM.regionDataEU[itemString] = {}
-				else
-					TSM.regionDataEU[itemString][key] = data[i]
-				end
-			end
-		end
-	else
-		TSM.Compress:LoadRegionDataEU()
-	end
+	TSM.Compress:LoadRealmData()
 
 	for itemString in pairs(TSM.realmData) do
 		TSMAPI.Item:FetchInfo(itemString)
@@ -224,47 +100,13 @@ function TSM:OnEnable()
 	end
 end
 
-function TSM:ProcessAppData(rawData)
-	if #rawData < 3500000 then
-		-- we can safely just use loadstring() for strings below 3.5M
-		return assert(loadstring(rawData)())
-	end
-	-- We'll manually load the data part, since that might be too big for loadstring() to process
-	local leader, itemData, trailer = strmatch(rawData, "^(.+)data={{(.+)}}(.+)$")
-	__AUCTIONDB_IMPORT_TEMP = {}
-	for _, part in ipairs(TSMAPI.Util:SafeStrSplit(itemData, "},{")) do
-		local entry = {(","):split(part)}
-		for j = 1, #entry do
-			entry[j] = entry[j]:trim("\"")
-			entry[j] = tonumber(entry[j]) or (entry[j] ~= "" and entry[j]) or nil
-		end
-		tinsert(__AUCTIONDB_IMPORT_TEMP, entry)
-	end
-	local result = assert(loadstring(leader.."data=__AUCTIONDB_IMPORT_TEMP"..trailer)())
-	__AUCTIONDB_IMPORT_TEMP = nil
-	return result
-end
-
 function TSM:OnTSMDBShutdown()
 	TSM.Compress:SaveRealmData()
-	TSM.Compress:SaveRegionDataUS()
-	TSM.Compress:SaveRegionDataEU()
 end
 
 local TOOLTIP_STRINGS = {
 	minBuyout = {L["Min Buyout:"], L["Min Buyout x%s:"]},
 	marketValue = {L["Market Value:"], L["Market Value x%s:"]},
-	historical = {L["Historical Price:"], L["Historical Price x%s:"]},
-	regionMinBuyout = {L["Region Min Buyout Avg:"], L["Region Min Buyout Avg x%s:"]},
-	regionMarketValue = {L["Region Market Value Avg:"], L["Region Market Value Avg x%s:"]},
-	regionHistorical = {L["Region Historical Price:"], L["Region Historical Price x%s:"]},
-	regionSale = {L["Region Sale Avg:"], L["Region Sale Avg x%s:"]},
-	regionSalePercent = {L["Region Sale Rate:"], L["Region Sale Rate x%s:"]},
-	regionSoldPerDay = {L["Region Avg Daily Sold:"], L["Region Avg Daily Sold x%s:"]},
-	globalMinBuyout = {L["Global Min Buyout Avg:"], L["Global Min Buyout Avg x%s:"]},
-	globalMarketValue = {L["Global Market Value Avg:"], L["Global Market Value Avg x%s:"]},
-	globalHistorical = {L["Global Historical Price:"], L["Global Historical Price x%s:"]},
-	globalSale = {L["Global Sale Avg:"], L["Global Sale Avg x%s:"]},
 }
 local function TooltipMoneyFormat(value, quantity, moneyCoins)
 	return TSMAPI:MoneyToString(value*quantity, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil)
@@ -301,28 +143,6 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 	InsertTooltipValueLine(itemString, quantity, "minBuyout", "realm", lines, options, TooltipMoneyFormat, moneyCoins)
 	-- add market value
 	InsertTooltipValueLine(itemString, quantity, "marketValue", "realm", lines, options, TooltipMoneyFormat, moneyCoins)
-	-- add historical price
-	InsertTooltipValueLine(itemString, quantity, "historical", "realm", lines, options, TooltipMoneyFormat, moneyCoins)
-	-- add region min buyout
-	InsertTooltipValueLine(itemString, quantity, "regionMinBuyout", "region", lines, options, TooltipMoneyFormat, moneyCoins)
-	-- add region market value
-	InsertTooltipValueLine(itemString, quantity, "regionMarketValue", "region", lines, options, TooltipMoneyFormat, moneyCoins)
-	-- add region historical price
-	InsertTooltipValueLine(itemString, quantity, "regionHistorical", "region", lines, options, TooltipMoneyFormat, moneyCoins)
-	-- add region sale avg
-	InsertTooltipValueLine(itemString, quantity, "regionSale", "region", lines, options, TooltipMoneyFormat, moneyCoins)
-	-- add region sale rate
-	InsertTooltipValueLine(itemString, quantity, "regionSalePercent", "region", lines, options, TooltipX100Format)
-	-- add region sold per day
-	InsertTooltipValueLine(itemString, quantity, "regionSoldPerDay", "region", lines, options, TooltipX100Format)
-	-- add global min buyout
-	InsertTooltipValueLine(itemString, quantity, "globalMinBuyout", "global", lines, options, TooltipMoneyFormat, moneyCoins)
-	-- add global market value
-	InsertTooltipValueLine(itemString, quantity, "globalMarketValue", "global", lines, options, TooltipMoneyFormat, moneyCoins)
-	-- add global historical price
-	InsertTooltipValueLine(itemString, quantity, "globalHistorical", "global", lines, options, TooltipMoneyFormat, moneyCoins)
-	-- add global sale avg
-	InsertTooltipValueLine(itemString, quantity, "globalSale", "global", lines, options, TooltipMoneyFormat, moneyCoins)
 
 	-- add the header if we've added at least one line
 	if #lines > numStartingLines then

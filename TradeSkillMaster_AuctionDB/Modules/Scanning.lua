@@ -251,7 +251,7 @@ function private:ProcessScanDataThread(self, scanData, itemList)
 		for _, itemString in ipairs(itemList) do
 			scannedItems[itemString] = true
 		end
-	elseif not TSM.db.realm.hasAppData then
+	else
 		TSM.db.realm.lastCompleteScan = scanTime
 	end
 
@@ -269,22 +269,15 @@ function private:ProcessScanDataThread(self, scanData, itemList)
 	TSM.updatedRealmData = true
 	for itemString, data in pairs(scanData) do
 		itemString = TSMAPI.Item:ToBaseItemString(itemString)
-		if TSM.db.realm.hasAppData and TSM.realmData[itemString] then
-			-- if we have data from the app, just update the minBuyout/numAuctions/lastScan
-			TSM.realmData[itemString].minBuyout = data.minBuyout
-			TSM.realmData[itemString].numAuctions = data.numAuctions
-			TSM.realmData[itemString].lastScan = scanTime
-		else
-			TSM.realmData[itemString] = TSM.realmData[itemString] or {}
-			if #data.buyouts > 0 then
-				TSM.realmData[itemString].marketValue = private:CalculateMarketValue(data.buyouts)
-			else
-				TSM.realmData[itemString].marketValue = TSM.realmData[itemString].marketValue or 0
-			end
-			TSM.realmData[itemString].minBuyout = data.minBuyout
-			TSM.realmData[itemString].numAuctions = data.numAuctions
-			TSM.realmData[itemString].lastScan = scanTime
-		end
+        TSM.realmData[itemString] = TSM.realmData[itemString] or {}
+        if #data.buyouts > 0 then
+            TSM.realmData[itemString].marketValue = private:CalculateMarketValue(data.buyouts)
+        else
+            TSM.realmData[itemString].marketValue = TSM.realmData[itemString].marketValue or 0
+        end
+        TSM.realmData[itemString].minBuyout = data.minBuyout
+        TSM.realmData[itemString].numAuctions = data.numAuctions
+        TSM.realmData[itemString].lastScan = scanTime
 		self:Yield()
 	end
 end

@@ -119,8 +119,6 @@ function private:ShowError(msg, isVerify, isUnofficial)
 		l:SetText(L["Looks like TradeSkillMaster has detected an error with your configuration. Please address this in order to ensure TSM remains functional."].."\n"..L["|cffffff00DO NOT report this as an error to the developers.|r If you require assistance with this, join our IRC channel or make a post on the TSM forums instead."].."|r")
 	elseif isUnofficial then
 		l:SetText(L["Looks like an |cffff0000unofficial|r TSM module has encountered an error. Please do not report this to the TSM team, but instead report it to the author of the addon. If it's affecting the operation of TSM, you may want to disable it."])
-	elseif TSM.Modules:HasOutdatedAddons() then
-		l:SetText(L["|cffff0000Your TSM addons are out of date!|r Please DO NOT report this error, but instead update your TSM addons from here:"].." |cffffff00http://tradeskillmaster.com/addon/overview|r")
 	else
 		l:SetText(L["Looks like TradeSkillMaster has encountered an error. Please help the author fix this error by copying the entire error below and following the instructions for reporting lua errors listed at the following URL:"].." |cffffff00http://tradeskillmaster.com/site/getting-help|r")
 	end

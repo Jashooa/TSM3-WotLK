@@ -11,7 +11,7 @@
 local TSM = select(2, ...)
 local Modules = TSM:NewModule("Modules", "AceConsole-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
-local private = {hasOutdatedAddons=nil}
+local private = {}
 local moduleObjects = TSM.moduleObjects
 local moduleNames = TSM.moduleNames
 local MODULE_FIELD_INFO = { -- info on all the possible fields of the module objects which TSM core cares about
@@ -194,34 +194,7 @@ function Modules:OnEnable()
 			}
 			TSMAPI.Util:ShowStaticPopupDialog("TSMInfoPopup")
 		end
-		local addonVersions = TSM:GetAppAddonVersions()
-		if addonVersions then
-			for _, obj in pairs(moduleObjects) do
-				local fullName = gsub(obj.name, "TSM_", "TradeSkillMaster_")
-				local currentVersion = private:VersionStrToInt(obj._version)
-				if currentVersion and addonVersions[fullName] and currentVersion < addonVersions[fullName] then
-					TSM.db.global.pendingAddonUpdate[fullName] = TSM.db.global.pendingAddonUpdate[fullName] or time()
-					if TSM.db.global.pendingAddonUpdate[fullName] + 48 * 60 * 60 < time() then
-						TSM.db.global.pendingAddonUpdate[fullName] = time()
-						StaticPopupDialogs["TSMUpdatePopup_"..fullName] = {
-							text = format(L["|cffffff00Important Note:|r An update is available for %s. You should update as soon as possible to ensure TSM continues to function properly."], fullName),
-							button1 = L["I'll Go Update!"],
-							timeout = 0,
-							whileDead = true,
-						}
-						TSMAPI.Util:ShowStaticPopupDialog("TSMUpdatePopup_"..fullName)
-						private.hasOutdatedAddons = true
-					end
-				else
-					TSM.db.global.pendingAddonUpdate[fullName] = nil
-				end
-			end
-		end
 	end)
-end
-
-function Modules:HasOutdatedAddons()
-	return private.hasOutdatedAddons
 end
 
 function Modules:ProfileUpdated(isReset)
@@ -285,15 +258,10 @@ function Modules:GetName(obj)
 end
 
 function Modules:OnLogout()
-	local appDB = nil
-	if TSMAPI:HasModule("AppHelper") and TSM:GetAppVersion() > 300 then
-		TradeSkillMaster_AppHelperDB = TradeSkillMaster_AppHelperDB or {}
-		appDB = TradeSkillMaster_AppHelperDB
-	end
 	local originalProfile = TSM.db:GetCurrentProfile()
 	for _, obj in pairs(moduleObjects) do
 		-- erroring here would cause the profile to be reset, so use pcall
-		if obj.OnTSMDBShutdown and not pcall(obj.OnTSMDBShutdown, nil, appDB) then
+		if obj.OnTSMDBShutdown and not pcall(obj.OnTSMDBShutdown, nil) then
 			-- the callback hit an error, so ensure the correct profile is restored
 			TSM.db:SetProfile(originalProfile)
 		end

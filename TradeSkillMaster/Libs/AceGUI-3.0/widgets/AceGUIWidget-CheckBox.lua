@@ -60,9 +60,9 @@ local function CheckBox_OnMouseUp(frame)
 		self:ToggleChecked()
 
 		if self.checked then
-			PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
+			PlaySound("igMainMenuOptionCheckBoxOn")
 		else -- for both nil and false (tristate)
-			PlaySound(857) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
+			PlaySound("igMainMenuOptionCheckBoxOff")
 		end
 
 		self:Fire("OnValueChanged", self.checked)
@@ -221,11 +221,11 @@ local methods = {
 			self:SetHeight(24)
 		end
 	end,
-	
+
 	["SetImage"] = function(self, path, ...)
 		local image = self.image
 		image:SetTexture(path)
-		
+
 		if image:GetTexture() then
 			local n = select("#", ...)
 			if n == 4 or n == 8 then

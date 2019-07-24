@@ -15,7 +15,7 @@ local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 local select, assert = select, assert
 
 -- WoW APIs
-local PlaySound, SOUNDKIT = PlaySound, SOUNDKIT
+local PlaySound = PlaySound
 local CreateFrame = CreateFrame
 
 
@@ -48,7 +48,7 @@ do
 			self.highlight:Show()
 		end
 		self:Fire("OnEnter")
-		
+
 		if self.specialOnEnter then
 			self.specialOnEnter(self)
 		end
@@ -56,10 +56,10 @@ do
 
 	local function Frame_OnLeave(this)
 		local self = this.obj
-		
+
 		self.highlight:Hide()
 		self:Fire("OnLeave")
-		
+
 		if self.specialOnLeave then
 			self.specialOnLeave(self)
 		end
@@ -87,7 +87,7 @@ do
 
 		["SetPullout"] = function(self, pullout)
 			self.pullout = pullout
-			
+
 			self.frame:SetParent(nil)
 			self.frame:SetParent(pullout.itemFrame)
 			self.parent = pullout.itemFrame
@@ -132,10 +132,10 @@ do
 	function ItemBase.Create(type)
 		local count = AceGUI:GetNextWidgetNum(type)
 		local frame = CreateFrame("Button", "TSMDropDownItem"..count)
-		
+
 		frame:SetHeight(17)
 		frame:SetFrameStrata("FULLSCREEN_DIALOG")
-		
+
 		local text = frame:CreateFontString(nil,"OVERLAY")
 		text:SetFont(TSMAPI.Design:GetContentFont("normal"))
 		text:SetJustifyH("LEFT")
@@ -151,7 +151,7 @@ do
 		highlight:SetPoint("LEFT",frame,"LEFT",5,0)
 		highlight:Hide()
 
-		local check = frame:CreateTexture("OVERLAY")	
+		local check = frame:CreateTexture("OVERLAY")
 		check:SetWidth(16)
 		check:SetHeight(16)
 		check:SetPoint("LEFT",frame,"LEFT",3,-1)
@@ -164,10 +164,10 @@ do
 		sub:SetPoint("RIGHT",frame,"RIGHT",-3,-1)
 		sub:SetTexture("Interface\\ChatFrame\\ChatFrameExpandArrow")
 		sub:Hide()
-		
+
 		frame:SetScript("OnEnter", Frame_OnEnter)
 		frame:SetScript("OnLeave", Frame_OnLeave)
-		
+
 		local widget = {
 			frame = frame,
 			text = text,
@@ -182,7 +182,7 @@ do
 			widget[method] = func
 		end
 		frame.obj = widget
-		
+
 		return widget
 	end
 end
@@ -190,7 +190,7 @@ end
 
 do
 	local Type, Version = "TSMDropdown-Item-Execute", 2
-	
+
 	local function Frame_OnClick(this)
 		local self = this.obj
 		if self.disabled then return end
@@ -199,33 +199,33 @@ do
 			self.pullout:Close()
 		end
 	end
-	
+
 	local function Constructor()
 		local item = ItemBase.Create(Type)
 		item.frame:SetScript("OnClick", Frame_OnClick)
 		return AceGUI:RegisterAsWidget(item)
 	end
-	
+
 	AceGUI:RegisterWidgetType(Type, Constructor, Version)
 end
 
 
 do
 	local Type, Version = "TSMDropdown-Item-Toggle", 2
-	
+
 	local function Frame_OnClick(this, button)
 		local self = this.obj
 		if self.disabled then return end
 		self.value = not self.value
 		if self.value then
-			PlaySound(SOUNDKIT["IG_MAINMENU_OPTION_CHECKBOX_ON"])
+			PlaySound("igMainMenuOptionCheckBoxOn")
 		else
-			PlaySound(SOUNDKIT["IG_MAINMENU_OPTION_CHECKBOX_OFF"])
+			PlaySound("igMainMenuOptionCheckBoxOff")
 		end
 		self:UpdateToggle()
 		self:Fire("OnValueChanged", self.value)
 	end
-	
+
 	local methods = {
 		["UpdateToggle"] = function(self)
 			if self.value then
@@ -234,17 +234,17 @@ do
 				self.check:Hide()
 			end
 		end,
-		
+
 		["SetValue"] = function(self, value)
 			self.value = value
 			self:UpdateToggle()
 		end,
-		
+
 		["GetValue"] = function(self)
 			return self.value
 		end,
 	}
-	
+
 	local function Constructor()
 		local item = ItemBase.Create(Type)
 		item.frame:SetScript("OnClick", Frame_OnClick)
@@ -253,6 +253,6 @@ do
 		end
 		return AceGUI:RegisterAsWidget(item)
 	end
-	
+
 	AceGUI:RegisterWidgetType(Type, Constructor, Version)
 end

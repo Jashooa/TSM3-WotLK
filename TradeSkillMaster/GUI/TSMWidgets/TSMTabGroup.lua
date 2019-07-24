@@ -12,7 +12,6 @@ local TSM = select(2, ...)
 local Type, Version = "TSMTabGroup", 2
 local AceGUI = LibStub("AceGUI-3.0")
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
-local SOUNDKIT = SOUNDKIT
 
 
 --[[-----------------------------------------------------------------------------
@@ -80,7 +79,7 @@ Scripts
 
 local function Tab_OnClick(frame)
 	if not (frame.selected or frame.disabled) then
-		PlaySound(SOUNDKIT["IG_CHARACTER_INFO_TAB"])
+		PlaySound("igCharacterInfoTab")
 		frame.obj:SelectTab(frame.value)
 	end
 end

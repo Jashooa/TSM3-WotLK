@@ -30,24 +30,6 @@ local SOUNDS = {
 	["ReadyCheck"] = L["Ready Check"],
 	["UnwrapGift"] = L["Unwrap Gift"],
 }
-local SOUNDKITIDS = {
-	["AuctionWindowOpen"] = 5274,
-	["AuctionWindowClose"] = 5275,
-	["alarmclockwarning3"] = 12889,
-	["UI_AutoQuestComplete"] = 23404,
-	["HumanExploration"] = 4140,
-	["Fishing Reel in"] = 3407,
-	["LevelUp"] = 888,
-	["MapPing"] = 3175,
-	["MONEYFRAMEOPEN"] = 891,
-	["IgPlayerInviteAccept"] = 880,
-	["QUESTADDED"] = 618,
-	["QUESTCOMPLETED"] = 878,
-	["UI_QuestObjectivesComplete"] = 26905,
-	["RaidWarning"] = 8959,
-	["ReadyCheck"] = 8960,
-	["UnwrapGift"] = 64329,
-}
 
 
 
@@ -70,7 +52,7 @@ function TSMAPI:DoPlaySound(soundKey)
 		PlaySoundFile("Interface\\Addons\\TradeSkillMaster\\Media\\register.mp3", "Master")
 		FlashClientIcon()
 	else
-		PlaySound(SOUNDKITIDS[soundKey], "Master")
+		PlaySound(soundKey, "Master")
 		FlashClientIcon()
 	end
 end

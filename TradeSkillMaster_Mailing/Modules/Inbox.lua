@@ -141,7 +141,7 @@ function Inbox:CreateTab()
 						OpenMail_Update()
 						ShowUIPanel(OpenMailFrame)
 						OpenMailFrameInset:SetPoint("TOPLEFT", 4, -80)
-						PlaySound(SOUNDKIT["IG_SPELLBOOK_OPEN"])
+						PlaySound("igSpellBookOpen")
 					else
 						InboxFrame.openMailID = 0
 						HideUIPanel(OpenMailFrame)

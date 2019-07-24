@@ -18,7 +18,7 @@ local min, max, floor = math.min, math.max, math.floor
 local tonumber, pairs = tonumber, pairs
 
 -- WoW APIs
-local PlaySound, SOUNDKIT = PlaySound, SOUNDKIT
+local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
 
 
@@ -130,9 +130,9 @@ local function EditBox_OnEnterPressed(frame)
 	else
 		value = tonumber(value)
 	end
-	
+
 	if value then
-		PlaySound(SOUNDKIT["IG_MAINMENU_OPTION_CHECKBOX_ON"])
+		PlaySound("igMainMenuOptionCheckBoxOn")
 		self.slider:SetValue(value)
 		self:Fire("OnMouseUp", value)
 		frame:ClearFocus()

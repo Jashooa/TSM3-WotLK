@@ -51,12 +51,6 @@ for i = 1, #invTypes, 2 do
 		STATIC_DATA.inventorySlotIdLookup[strlower(invType)] = (i + 1) / 2
 	end
 end
-local GET_ITEM_INFO_INSTANT_KEYS = {
-	equipSlot = 4,
-	texture = 5,
-	classId = 6,
-	subClassId = 7
-}
 local GET_ITEM_INFO_KEYS = {
 	name = 1,
 	link = 2,
@@ -70,9 +64,6 @@ local GET_ITEM_INFO_KEYS = {
 	classId = 12,
 	subClassId = 13
 }
-for key in pairs(GET_ITEM_INFO_INSTANT_KEYS) do
-	TSMAPI:Assert(GET_ITEM_INFO_KEYS[key])
-end
 local MAX_REQUESTS_PENDING = 200
 local UPGRADE_VALUE_SHIFT = 1000000
 
@@ -514,46 +505,9 @@ function private.StoreGetItemInfoResult(itemString, ...)
 		info[key] = select(index, ...)
 	end
 	private.itemInfo[itemString]._getInfoResult = true
-	private.itemInfo[itemString]._getInfoInstantResult = true
 	if private.itemInfo[itemString]._isPending then
 		private.itemInfo[itemString]._isPending = nil
 		private.numPending = private.numPending - 1
-	end
-end
-
-function private.StoreGetItemInfoInstantResult(itemString, ...)
-	local info = private.itemInfo[itemString]
-	TSMAPI:Assert(type(itemString) == "string" and info)
-	if select('#', ...) == 0 then
-		info._isInvalid = true
-	end
-	local info = private.GetCachedItemInfo(itemString)
-	for key, index in pairs(GET_ITEM_INFO_INSTANT_KEYS) do
-		info[key] = select(index, ...)
-	end
-	info._getInfoInstantResult = true
-
-	-- we might be able to deduce the maxStack based on the classId and subClassId
-	if info.classId and info.subClassId and not info.maxStack then
-		if info.classId == 1 then
-			info.maxStack = 1
-		elseif info.classId == 2 then
-			info.maxStack = 1
-		elseif info.classId == 4 then
-			if info.subClassId > 0 then
-				info.maxStack = 1
-			end
-		elseif info.classId == 15 then
-			if info.subClassId == 5 then
-				info.maxStack = 1
-			end
-		elseif info.classId == 16 then
-			info.maxStack = 20
-		elseif info.classId == 17 then
-			info.maxStack = 1
-		elseif info.classId == 18 then
-			info.maxStack = 1
-		end
 	end
 end
 
@@ -578,16 +532,6 @@ function private.ItemInfoThread(self)
 			numImported = numImported + 1
 			self:Yield()
 		end
-		-- get the instant item info after we load everything
-		local numLoops = 0
-		for itemString in pairs(private.loadedItemInfo) do
-			local info = private.itemInfo[itemString]
-			if not info._getInfoInstantResult then
-				private.StoreGetItemInfoInstantResult(itemString, GetItemInfoInstant(TSMAPI.Item:ToItemID(itemString)))
-			end
-			numLoops = (numLoops + 1) % 100
-			self:Yield(numLoops == 0)
-		end
 	end
 	TSM:LOG_INFO("Imported %d items worth of data", numImported)
 
@@ -601,9 +545,6 @@ function private.ItemInfoThread(self)
 		local numRemaining = 0
 		for itemString in pairs(private.newItems) do
 			local info = private.itemInfo[itemString]
-			if not info._getInfoInstantResult then
-				private.StoreGetItemInfoInstantResult(itemString, GetItemInfoInstant(TSMAPI.Item:ToItemID(itemString)))
-			end
 			if private.numPending < maxPending then
                 local itemId = TSMAPI.Item:ToItemID(itemString)
                 if itemId then
@@ -649,11 +590,6 @@ function private.GetItemInfoKey(itemString, key)
 	local info = private.GetCachedItemInfo(itemString)
 	if info then
 		if info._isInvalid then return end
-		if not info[key] and not info._getInfoInstantResult and GET_ITEM_INFO_INSTANT_KEYS[key] then
-			-- we can look up this key via GetItemInfoInstant
-			private.StoreGetItemInfoInstantResult(itemString, GetItemInfoInstant(TSMAPI.Item:ToItemID(itemString)))
-			TSMAPI:Assert(info._isInvalid or info[key], format("Failed to get instant info! (%s, %s)", itemString, key))
-		end
 		return info[key]
 	end
 end

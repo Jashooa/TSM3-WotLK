@@ -349,7 +349,7 @@ end
 function Util:getTotalItems(src, includeSoulbound)
 	local results = {}
 	if src == "bank" then
-		for _, _, itemString, quantity in TSMAPI.Inventory:BankIterator(true, includeSoulbound, false, true) do
+		for _, _, itemString, quantity in TSMAPI.Inventory:BankIterator(true, includeSoulbound, false) do
 			results[itemString] = (results[itemString] or 0) + quantity
 		end
 		return results

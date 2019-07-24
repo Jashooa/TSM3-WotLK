@@ -42,14 +42,8 @@ end
 -- Module Functions
 -- ============================================================================
 
-function TSM:GetAuctionPlayer(player, player_full)
-	if not player then return end
-	local realm = GetRealmName() or ""
-	if player_full and strjoin("-", player, realm) ~= player_full then
-		return player_full
-	else
-		return player
-	end
+function TSM:GetAuctionPlayer(player)
+	return player or "?"
 end
 
 function TSM:SetAuctionTabFlashing(moduleName, flashing)
@@ -157,7 +151,7 @@ function private:CreateTSMAHTab(moduleName, callbackShow, callbackHide)
 					local currentTotal = 0
 					local incomingTotal = 0
 					for i=1, GetNumAuctionItems("owner") do
-						local count, buyoutAmount = TSMAPI.Util:Select({3, 10}, GetAuctionItemInfo("owner", i))
+						local count, buyoutAmount = TSMAPI.Util:Select({3, 9}, GetAuctionItemInfo("owner", i))
 						if count == 0 then
 							incomingTotal = incomingTotal + buyoutAmount
 						else

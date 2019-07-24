@@ -200,11 +200,6 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 	end
 end
 
-function TSM:GetAuctionPlayer(player, player_full)
-	local realm = GetRealmName() or ""
-	if player_full and strjoin("-", player, realm) ~= player_full then
-		return player_full
-	else
-		return player
-	end
+function TSM:GetAuctionPlayer(player)
+	return player or "?"
 end

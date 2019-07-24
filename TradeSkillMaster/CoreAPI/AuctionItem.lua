@@ -58,10 +58,6 @@ private.AuctionRecord = setmetatable({}, {
 			for i, key in ipairs(self.dataKeys) do
 				self[key] = select(i, ...)
 			end
-			if self.isHighBidder then
-				-- this is to get around a bug in Blizzard's code where the minIncrement value will be inconsistent for auctions where the player is the highest bidder
-				self.minIncrement = 0
-			end
 			-- generate keys from otherKeys which we can
 			self.displayedBid = self.bid == 0 and self.minBid or self.bid
 			self.itemDisplayedBid = floor(self.displayedBid / self.stackSize)
@@ -103,7 +99,6 @@ private.AuctionRecord = setmetatable({}, {
 			local timeLeft = GetAuctionItemTimeLeft(auctionType, index)
 			local itemLink = TSMAPI.Item:GeneralizeLink(GetAuctionItemLink(auctionType, index))
 			seller = TSM:GetAuctionPlayer(seller, seller_full) or "?"
-			isHighBidder = isHighBidder and true or false
 			local testAuction = {itemLink=itemLink, texture=texture, stackSize=stackSize, minBid=minBid, minIncrement=minIncrement, buyout=buyout, bid=bid, seller=seller, timeLeft=timeLeft, isHighBidder=isHighBidder, rawItemLink=self.rawItemLink}
 			for _, key in ipairs(self.dataKeys) do
 				if self[key] ~= testAuction[key] then

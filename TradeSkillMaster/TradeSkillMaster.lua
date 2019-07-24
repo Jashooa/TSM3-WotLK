@@ -627,7 +627,7 @@ function TSM:LoadTooltip(itemString, quantity, moneyCoins, lines)
 			if playerTotal > 0 then
 				totalNum = totalNum + playerTotal
 				local classColor = type(TSM.db.factionrealm.characters[playerName]) == "string" and RAID_CLASS_COLORS[TSM.db.factionrealm.characters[playerName]]
-				local rightText = format(L["%s (%s bags, %s bank, %s AH, %s mail)"], "|cffffffff"..playerTotal.."|r", "|cffffffff"..data.bag.."|r", "|cffffffff"..data.auction.."|r", "|cffffffff"..data.mail.."|r")
+				local rightText = format(L["%s (%s bags, %s bank, %s AH, %s mail)"], "|cffffffff"..playerTotal.."|r", "|cffffffff"..data.bag.."|r", "|cffffffff"..data.bank.."|r", "|cffffffff"..data.auction.."|r", "|cffffffff"..data.mail.."|r")
 				if classColor then
 					tinsert(lines, {left="    |c"..classColor.colorStr..playerName.."|r:", right=rightText})
 				else

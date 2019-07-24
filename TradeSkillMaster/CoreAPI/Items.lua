@@ -57,14 +57,6 @@ local UPGRADE_VALUE_SHIFT = 1000000
 -- TSMAPI Functions
 -- ============================================================================
 
-function TSMAPI.Item:GetItemClassInfo(classId)
-    return select(classId, GetAuctionItemClasses())
-end
-
-function TSMAPI.Item:GetItemSubClassInfo(classId, subClassId)
-    return select(subClassId, GetAuctionItemSubClasses(classId))
-end
-
 function TSMAPI.Item:ToItemString(item)
 	if not item then return end
 	TSMAPI:Assert(type(item) == "number" or type(item) == "string", tostring(item))
@@ -249,6 +241,14 @@ end
 
 function TSMAPI.Item:GetItemSubClasses(classId)
 	return {GetAuctionItemSubClasses(classId)}
+end
+
+function TSMAPI.Item:GetItemClassInfo(classId)
+    return select(classId, GetAuctionItemClasses())
+end
+
+function TSMAPI.Item:GetItemSubClassInfo(classId, subClassId)
+    return select(subClassId, GetAuctionItemSubClasses(classId))
 end
 
 function TSMAPI.Item:GetClassIdFromClassString(class)

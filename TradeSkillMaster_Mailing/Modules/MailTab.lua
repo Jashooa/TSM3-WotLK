@@ -175,28 +175,16 @@ end
 
 function private.OnTabClick(tabFrame)
 	PanelTemplates_SetTab(MailFrame, tabFrame:GetID())
-	ButtonFrameTemplate_HideButtonBar(MailFrame)
 	InboxFrame:Hide()
 	OpenMailFrame:Hide()
 	SendMailFrame:Hide()
 	SetSendMailShowing(false)
 
-	MailFrameInset:Hide()
-	MailFramePortraitFrame:Hide()
-	MailFrameBg:Hide()
-	if MailFrameText then MailFrameText:Hide() end
-	MailFrameTitleBg:Hide()
-	MailFrameTitleText:Hide()
-	MailFrameCloseButton:Hide()
-
-	MailFrameLeftBorder:Hide()
-	MailFrameTopBorder:Hide()
-	MailFrameRightBorder:Hide()
-	MailFrameBottomBorder:Hide()
-	MailFrameTopTileStreaks:Hide()
-	MailFrameTopRightCorner:Hide()
-	MailFrameBotLeftCorner:Hide()
-	MailFrameBotRightCorner:Hide()
+    InboxCloseButton:Hide()
+    MailFrameTab1:SetPoint("BOTTOMLEFT", MailFrame, "BOTTOMLEFT", 24, -32)
+    if Postal_ModuleMenuButton then
+        Postal_ModuleMenuButton:Hide()
+    end
 
 	private.frame:Show()
 	if TSM.db.global.defaultPage == 1 then
@@ -212,22 +200,12 @@ end
 
 function private.OnOtherTabClick()
 	private.frame:Hide()
-	MailFrameLeftBorder:Show()
-	MailFrameTopBorder:Show()
-	MailFrameRightBorder:Show()
-	MailFrameBottomBorder:Show()
-	MailFrameTopTileStreaks:Show()
-	MailFrameTopRightCorner:Show()
-	MailFrameBotLeftCorner:Show()
-	MailFrameBotRightCorner:Show()
 
-	MailFrameInset:Show()
-	MailFramePortraitFrame:Show()
-	MailFrameBg:Show()
-	if MailFrameText then MailFrameText:Show() end
-	MailFrameTitleBg:Show()
-	MailFrameTitleText:Show()
-	MailFrameCloseButton:Show()
+    InboxCloseButton:Show()
+    MailFrameTab1:SetPoint("BOTTOMLEFT", MailFrame, "BOTTOMLEFT", 24, 44)
+    if Postal_ModuleMenuButton then
+        Postal_ModuleMenuButton:Show()
+    end
 end
 
 function private.OnButtonClick(self)

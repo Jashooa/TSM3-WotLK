@@ -24,7 +24,6 @@ for classId, class in pairs({GetAuctionItemClasses()}) do
     STATIC_DATA.classLookup[class]._index = classId
     for subClassId, subClass in pairs({GetAuctionItemSubClasses(classId)}) do
         STATIC_DATA.classLookup[class][subClass] = subClassId
-        print(format("%d %s %d %s", classId, class, subClassId, subClass))
     end
 end
 

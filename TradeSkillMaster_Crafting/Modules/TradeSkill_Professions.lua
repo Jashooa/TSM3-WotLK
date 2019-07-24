@@ -50,16 +50,14 @@ function private.InitializeDropdown(self, level)
 		info.isNotRadio = true
 		Lib_UIDropDownMenu_AddButton(info, level)
 
-		if not C_TradeSkillUI.IsTradeSkillGuild() and not C_TradeSkillUI.IsNPCCrafting() then
-			info.text = TRADESKILL_FILTER_HAS_SKILL_UP
-			info.func = function()
-				C_TradeSkillUI.SetOnlyShowSkillUpRecipes(not C_TradeSkillUI.GetOnlyShowSkillUpRecipes())
-			end
-			info.keepShownOnClick = true
-			info.checked = C_TradeSkillUI.GetOnlyShowSkillUpRecipes()
-			info.isNotRadio = true
-			Lib_UIDropDownMenu_AddButton(info, level)
-		end
+        info.text = TRADESKILL_FILTER_HAS_SKILL_UP
+        info.func = function()
+            C_TradeSkillUI.SetOnlyShowSkillUpRecipes(not C_TradeSkillUI.GetOnlyShowSkillUpRecipes())
+        end
+        info.keepShownOnClick = true
+        info.checked = C_TradeSkillUI.GetOnlyShowSkillUpRecipes()
+        info.isNotRadio = true
+        Lib_UIDropDownMenu_AddButton(info, level)
 
 		info.checked = 	nil
 		info.isNotRadio = nil
@@ -712,11 +710,7 @@ function private:UpdateProfessionDropdown()
 	private.frame.professionsTab.dropdown:SetList(list)
 	private.frame.professionsTab.dropdown:SetValue(currentSelection)
 	if not list[currentSelection] then
-		if C_TradeSkillUI.IsNPCCrafting() then
-			private.frame.professionsTab.dropdown:SetText(format("%s - %s", professionName, playerName))
-		else
-			private.frame.professionsTab.dropdown:SetText(format("%s %d/%d - %s", professionName, level, maxLevel, playerName))
-		end
+		private.frame.professionsTab.dropdown:SetText(format("%s %d/%d - %s", professionName, level, maxLevel, playerName))
 	end
 end
 

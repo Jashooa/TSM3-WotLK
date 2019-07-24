@@ -98,7 +98,7 @@ function Util:GetMaxAfford(index)
 
 				if costItemLink then
 					local costItemString = TSMAPI.Item:ToItemString(costItemLink)
-					costNumHave = TSMAPI.Inventory:GetBagQuantity(costItemString) + TSMAPI.Inventory:GetBankQuantity(costItemString) + TSMAPI.Inventory:GetReagentBankQuantity(costItemString)
+					costNumHave = TSMAPI.Inventory:GetBagQuantity(costItemString) + TSMAPI.Inventory:GetBankQuantity(costItemString)
 				else
 					local currency = Util.Currencies[costTexture]
 

@@ -741,9 +741,6 @@ function Gather:Update(firstRun)
 		-- query item info as early as possible
 		TSMAPI.Item:FetchInfo(itemString)
 		local numHave = TSMAPI.Inventory:GetBagQuantity(itemString, crafter)
-		if itemString ~= TSM.VELLUM_ITEM_STRING then
-			numHave = numHave + TSMAPI.Inventory:GetReagentBankQuantity(itemString, crafter)
-		end
 		if numHave < quantity then
 			shortItems[itemString] = quantity - numHave
 		end
@@ -767,7 +764,7 @@ function Gather:Update(firstRun)
 	for itemString, quantity in pairs(neededMats) do
 		local need = max(quantity - TSMAPI.Inventory:GetTotalQuantity(itemString), 0)
 		local color
-		local crafterQty = TSMAPI.Inventory:GetBagQuantity(itemString, crafter) + TSMAPI.Inventory:GetReagentBankQuantity(itemString, crafter)
+		local crafterQty = TSMAPI.Inventory:GetBagQuantity(itemString, crafter)
 
 		if crafterQty < quantity then
 			local selectedQuantity = sources[itemString] and sources[itemString]["selected"] or 0
@@ -1059,7 +1056,7 @@ function Gather:Update(firstRun)
 	local leader = "    "
 	for itemString, quantity in pairs(neededMats) do
 		local color = "|cffff0000"
-		local crafterQty = TSMAPI.Inventory:GetBagQuantity(itemString, crafter) + TSMAPI.Inventory:GetBankQuantity(itemString, crafter) + TSMAPI.Inventory:GetReagentBankQuantity(itemString, crafter) + TSMAPI.Inventory:GetMailQuantity(itemString, crafter)
+		local crafterQty = TSMAPI.Inventory:GetBagQuantity(itemString, crafter) + TSMAPI.Inventory:GetBankQuantity(itemString, crafter) + TSMAPI.Inventory:GetMailQuantity(itemString, crafter)
 		local need = max(quantity - crafterQty, 0)
 
 		if crafterQty < quantity then

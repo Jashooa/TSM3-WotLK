@@ -74,20 +74,11 @@ function BankUI:createTab(parent)
 					},
 					{
 						type = "Button",
-						key = "btnReagents",
-						text = L["Deposit Reagents"],
-						textHeight = 16,
-						size = {0, 20},
-						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 0, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", 0, -5}},
-						scripts = {"OnClick"},
-					},
-					{
-						type = "Button",
 						key = "btnEmpty",
 						text = L["Empty Bags"],
 						textHeight = 16,
 						size = {0, 20},
-						points = {{"TOPLEFT", "btnReagents", "BOTTOMLEFT", 0, -5}, {"TOPRIGHT", "btnReagents", "BOTTOM", -3, -5}},
+						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 0, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOM", -3, -5}},
 						scripts = {"OnClick"},
 					},
 					{
@@ -96,7 +87,7 @@ function BankUI:createTab(parent)
 						text = L["Restore Bags"],
 						textHeight = 16,
 						size = {0, 20},
-						points = {{"TOPLEFT", "btnReagents", "BOTTOM", 3, -5}, {"TOPRIGHT", "btnReagents", "BOTTOMRIGHT", 0, -5}},
+						points = {{"TOPLEFT", BFC.PREV, "BOTTOM", 3, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", 0, -5}},
 						scripts = {"OnClick"},
 					},
 				},
@@ -112,17 +103,6 @@ function BankUI:createTab(parent)
 				},
 				btnRestock = {
 					OnClick = function() TSM.move:restockGroup(private.frame.groupTree:GetSelectedGroupInfo(), private.currentBank) end,
-				},
-				btnReagents = {
-					OnClick = function()
-						if private.currentBank == "bank" then
-							if IsReagentBankUnlocked() then
-								DepositReagentBank()
-							else
-								TSMAPI.Util:ShowStaticPopupDialog("CONFIRM_BUY_REAGENTBANK_TAB");
-							end
-						end
-					end,
 				},
 				btnEmpty = {
 					OnClick = function() TSM.move:EmptyRestore(private.currentBank) end,

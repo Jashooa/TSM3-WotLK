@@ -735,11 +735,7 @@ function TSMAPI.Item:GetQuality(itemString)
 	if not itemString then return end
 	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
 	local info = private.GetCachedItemInfo(baseItemString)
-	if strmatch(itemString, "^p:") then
-		-- we can get the quality directly from the itemString
-		local quality = select(4, strsplit(":", itemString))
-		return tonumber(quality) or 0
-	elseif itemString ~= baseItemString and info and info._getInfoResult then
+	if itemString ~= baseItemString and info and info._getInfoResult then
 		-- we have the base item info, so should be able to call GetItemInfo() for this version of the item
 		return select(3, GetItemInfo(private.ToWoWItemString(itemString))) or info.quality
 	end
@@ -751,11 +747,7 @@ function TSMAPI.Item:GetItemLevel(itemString)
 	if not itemString then return end
 	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
 	local info = private.GetCachedItemInfo(baseItemString)
-	if strmatch(itemString, "^p:") then
-		-- we can get the level directly from the itemString
-		local itemLevel = select(3, strsplit(":", itemString))
-		return tonumber(itemLevel) or 0
-	elseif itemString ~= baseItemString and info and info._getInfoResult then
+	if itemString ~= baseItemString and info and info._getInfoResult then
 		if private.GetUpgradeValue(itemString) then
 			if private.itemLevelCache[itemString] then
 				return private.itemLevelCache[itemString]
@@ -786,9 +778,6 @@ function TSMAPI.Item:GetMinLevel(itemString)
 	if not itemString then return end
 	if private.minLevelCache[itemString] then
 		return private.minLevelCache[itemString]
-	end
-	if strmatch(itemString, "^p:") then
-		return private.GetItemInfoKey(itemString, "minLevel")
 	end
 	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
 	local info = private.GetCachedItemInfo(baseItemString)

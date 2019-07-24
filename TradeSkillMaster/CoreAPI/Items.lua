@@ -103,25 +103,13 @@ function TSMAPI.Item:ToItemString(item)
 
 	-- test if it's already (likely) an item string
 	if strmatch(item, "^i:([0-9%-:]+)$") then
-		return private:FixItemString(item)
+		return item
 	end
 
 	result = strmatch(item, "^\124cff[0-9a-z]+\124[Hh](.+)\124h%[.+%]\124h\124r$")
 	if result then
 		-- it was a full item link which we've extracted the itemString from
 		item = result
-	end
-
-	-- test if it's an old style item string
-	result = strjoin(":", strmatch(item, "^(i)tem:([0-9%-]+):[0-9%-]+:[0-9%-]+:[0-9%-]+:[0-9%-]+:[0-9%-]+:([0-9%-]+)$"))
-	if result then
-		return private:FixItemString(result)
-	end
-
-	-- test if it's a long item string
-	result = strjoin(":", strmatch(item, "(i)tem:([0-9%-]+):[0-9%-]*:[0-9%-]*:[0-9%-]*:[0-9%-]*:[0-9%-]*:([0-9%-]*):[0-9%-]*:[0-9%-]*:[0-9%-]*:[0-9%-]*:[0-9%-]*:([0-9%-:]+)"))
-	if result and result ~= "" then
-		return private:FixItemString(result)
 	end
 
 	-- test if it's a shorter item string (without bonuses)
@@ -189,8 +177,8 @@ function TSMAPI.Item:IsSoulbound(...)
 	elseif bag and slot then
 		local itemID = GetContainerItemID(bag, slot)
 		local maxCharges
-		if itemID then
-            scanTooltip:SetHyperlink("item:"..itemID)
+        if itemID then
+            scanTooltip:SetItemByID(itemID)
 			maxCharges = private:GetTooltipCharges(scanTooltip)
 		end
 		if bag == -1 then
@@ -757,7 +745,11 @@ function private.GetScanTooltip()
 	end
 	TSMScanTooltip:Show()
 	TSMScanTooltip:SetClampedToScreen(false)
-	TSMScanTooltip:SetOwner(UIParent, "ANCHOR_BOTTOMRIGHT", 1000000, 100000)
+    TSMScanTooltip:SetOwner(UIParent, "ANCHOR_BOTTOMRIGHT", 1000000, 100000)
+    TSMScanTooltip.SetItemByID = function(self, itemID)
+        if type(itemID) ~= "number" then return end
+        self:SetHyperlink("item:"..tostring(itemID))
+    end
 	return TSMScanTooltip
 end
 
@@ -782,41 +774,5 @@ end
 function private.ToWoWItemString(itemString)
     local _, itemId, rand = (":"):split(itemString)
 	local level = UnitLevel("player")
-	return "item:"..itemId..":0:0:0:0:0:"..(rand or "0")..":0:"..level..":"
-end
-
-function private.RemoveExtra(itemString)
-	local num = 1
-	while num > 0 do
-        itemString, num = gsub(itemString, ":0?$", "")
-	end
-	return itemString
-end
-
-function private:FixItemString(itemString)
-	itemString = private.RemoveExtra(itemString)
-	-- make sure we have the correct number of bonusIds
-	-- get the number of bonusIds (plus one for the count)
-	local numParts = select("#", (":"):split(itemString)) - 3
-    if numParts > 0 then
-        print(numParts)
-		-- get the number of extra parts we have
-		local count = select(4, (":"):split(itemString))
-		count = tonumber(count) or 0
-		local numExtraParts = numParts - 1 - count
-		local lastExtraPart = tonumber(strmatch(itemString, ":([0-9]+)$"))
-		for i=1, numExtraParts do
-			itemString = gsub(itemString, ":[0-9]*$", "")
-		end
-		-- we might have already applied the upgrade value shift
-		if numExtraParts == 1 and (lastExtraPart >= 98 and lastExtraPart <= 110) or (lastExtraPart - UPGRADE_VALUE_SHIFT >= 90 and lastExtraPart - UPGRADE_VALUE_SHIFT <= 110) then
-			-- this extra part is likely the upgradeValue which we want to keep so increase it by UPGRADE_VALUE_SHIFT
-			if lastExtraPart < UPGRADE_VALUE_SHIFT then
-				lastExtraPart = lastExtraPart + UPGRADE_VALUE_SHIFT
-			end
-			itemString = itemString..":"..lastExtraPart
-		end
-		itemString = private.RemoveExtra(itemString)
-	end
-	return itemString
+	return "item:"..itemId..":0:0:0:0:0:"..(rand or "0")..":0:"..level
 end

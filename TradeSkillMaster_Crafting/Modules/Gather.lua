@@ -315,13 +315,7 @@ function Gather:GetItemSources(crafter, neededMats)
 			for itemString in pairs(neededMats) do
 				if (TSMAPI.Inventory:GetBankQuantity(itemString, player) > 0) and shortItems[itemString] then
 					if shortItems[itemString] - TSMAPI.Inventory:GetMailQuantity(itemString, crafter) - (player ~= crafter and TSMAPI.Inventory:GetBagQuantity(itemString, player) or 0) > 0 then
-						if TSMAPI.Item:IsSoulboundMat(itemString) then
-							if player == crafter then
-								bankItems[itemString] = TSMAPI.Inventory:GetBankQuantity(itemString, player)
-							end
-						else
-							bankItems[itemString] = TSMAPI.Inventory:GetBankQuantity(itemString, player)
-						end
+						bankItems[itemString] = TSMAPI.Inventory:GetBankQuantity(itemString, player)
 						if bankItems[itemString] and bankItems[itemString] > 0 then
 							sources[itemString] = sources[itemString] or {}
 							sources[itemString][player] = sources[itemString][player] or {}
@@ -352,7 +346,7 @@ function Gather:GetItemSources(crafter, neededMats)
 					end
 				end
 				if TSMAPI.Inventory:GetBagQuantity(itemString, player) > 0 and shortItems[itemString] then
-					if player ~= crafter and not TSMAPI.Item:IsSoulboundMat(itemString) then
+					if player ~= crafter then
 						if shortItems[itemString] - TSMAPI.Inventory:GetMailQuantity(itemString, crafter) > 0 then
 							bagItems[itemString] = TSMAPI.Inventory:GetBagQuantity(itemString, player)
 							sources[itemString] = sources[itemString] or {}
@@ -378,7 +372,7 @@ function Gather:GetItemSources(crafter, neededMats)
 
 	-- add auction house tasks
 	for itemString, quantity in pairs(neededMats) do
-		if not TSMAPI.Item:IsSoulboundMat(itemString) and (not TSMAPI.Item:GetVendorCost(itemString) or (TSM.Cost:GetMatCost(itemString) or math.huge) < TSMAPI.Item:GetVendorCost(itemString)) then
+		if (not TSMAPI.Item:GetVendorCost(itemString) or (TSM.Cost:GetMatCost(itemString) or math.huge) < TSMAPI.Item:GetVendorCost(itemString)) then
 			local need
 			if Gather.gatherItem == itemString and Gather.gatherQuantity then
 				need = Gather.gatherQuantity

@@ -13,10 +13,6 @@ local Items = TSM:NewModule("Items", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {itemInfo={}, bonusIdCache={}, bonusIdTemp={}, scanTooltip=nil, newItems={}, numPending=0, itemLevelCache = {}, soulboundCache = {}, minLevelCache = {}, canUseCache = {}}
 local STATIC_DATA = {classLookup={}, classIdLookup={}, inventorySlotIdLookup={}}
-local ITEM_CLASS_WEAPON = 1
-local ITEM_CLASS_ARMOR = 2
-STATIC_DATA.weaponClassName = select(ITEM_CLASS_WEAPON, GetAuctionItemClasses())
-STATIC_DATA.armorClassName = select(ITEM_CLASS_ARMOR, GetAuctionItemClasses())
 
 for classId, class in pairs({GetAuctionItemClasses()}) do
     STATIC_DATA.classIdLookup[strlower(class)] = classId
@@ -27,14 +23,17 @@ for classId, class in pairs({GetAuctionItemClasses()}) do
     end
 end
 
-local invTypes = {GetAuctionInvTypes(2,1)}
-for i = 1, #invTypes, 2 do
-    TSMAPI:Assert(type(invTypes[i]) == "string")
-    local invType = invTypes[i]
-	if invType then
-		STATIC_DATA.inventorySlotIdLookup[strlower(invType)] = (i + 1) / 2
-	end
+do
+    local invTypes = {GetAuctionInvTypes(2,1)}
+    for i = 1, #invTypes, 2 do
+        TSMAPI:Assert(type(invTypes[i]) == "string")
+        local invType = invTypes[i]
+        if invType then
+            STATIC_DATA.inventorySlotIdLookup[strlower(invType)] = (i + 1) / 2
+        end
+    end
 end
+
 local GET_ITEM_INFO_KEYS = {
 	name = 1,
 	link = 2,
@@ -49,7 +48,41 @@ local GET_ITEM_INFO_KEYS = {
 	subClassId = 13
 }
 local MAX_REQUESTS_PENDING = 200
-local UPGRADE_VALUE_SHIFT = 1000000
+
+
+-- ============================================================================
+-- TSMAPI gloabl constants
+-- ============================================================================
+
+TSMAPI.Item.CLASS_WEAPON = 1
+TSMAPI.Item.CLASS_ARMOR = 2
+TSMAPI.Item.CLASS_CONTAINER = 3
+TSMAPI.Item.CLASS_CONSUMABLE = 4
+TSMAPI.Item.CLASS_GLYPH = 5
+TSMAPI.Item.CLASS_TRADEGOODS = 6
+TSMAPI.Item.CLASS_AMMO = 7
+TSMAPI.Item.CLASS_QUIVER = 8
+TSMAPI.Item.CLASS_RECIPE = 9
+TSMAPI.Item.CLASS_GEM = 10
+TSMAPI.Item.CLASS_MISCELLANEOUS = 11
+TSMAPI.Item.CLASS_QUESTITEM = 12
+
+TSMAPI.Item.TRADEGOODS_SUBCLASS_ELEMENTAL = 1
+TSMAPI.Item.TRADEGOODS_SUBCLASS_CLOTH = 2
+TSMAPI.Item.TRADEGOODS_SUBCLASS_LEATHER = 3
+TSMAPI.Item.TRADEGOODS_SUBCLASS_METAL_AND_STONE = 4
+TSMAPI.Item.TRADEGOODS_SUBCLASS_MEAT = 5
+TSMAPI.Item.TRADEGOODS_SUBCLASS_HERB = 6
+TSMAPI.Item.TRADEGOODS_SUBCLASS_ENCHANTING = 7
+TSMAPI.Item.TRADEGOODS_SUBCLASS_JEWELCRAFTING = 8
+TSMAPI.Item.TRADEGOODS_SUBCLASS_PARTS = 9
+TSMAPI.Item.TRADEGOODS_SUBCLASS_DEVICES = 10
+TSMAPI.Item.TRADEGOODS_SUBCLASS_EXPLOSIVES = 11
+TSMAPI.Item.TRADEGOODS_SUBCLASS_MATERIALS = 12
+TSMAPI.Item.TRADEGOODS_SUBCLASS_OTHER = 13
+TSMAPI.Item.TRADEGOODS_SUBCLASS_ARMOR_ENCHANTMENT = 14
+TSMAPI.Item.TRADEGOODS_SUBCLASS_WEAPON_ENCHANTMENT = 15
+
 
 
 -- ============================================================================
@@ -205,7 +238,7 @@ end
 
 function TSMAPI.Item:IsCraftingReagent(itemLink)
 	-- workaround for recipes having the item info and crafting reagent in the tooltip
-	if TSMAPI.Item:GetClassId(itemLink) == ITEM_CLASS_RECIPE then
+	if TSMAPI.Item:GetClassId(itemLink) == TSMAPI.Item.CLASS_RECIPE then
 		return false
 	end
 
@@ -231,7 +264,7 @@ function TSMAPI.Item:IsDisenchantable(itemString)
 	if not itemString or TSM.STATIC_DATA.notDisenchantable[itemString] then return end
 	local quality = TSMAPI.Item:GetQuality(itemString) or 0
 	local classId = TSMAPI.Item:GetClassId(itemString)
-	return quality >= ITEM_QUALITY_UNCOMMON and (classId == ITEM_CLASS_ARMOR or classId == ITEM_CLASS_WEAPON)
+	return quality >= ITEM_QUALITY_UNCOMMON and (classId == TSMAPI.Item.CLASS_ARMOR or classId == TSMAPI.Item.CLASS_WEAPON)
 end
 
 function TSMAPI.Item:GetItemClasses()

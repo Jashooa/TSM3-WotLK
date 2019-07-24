@@ -74,7 +74,7 @@ function AuctionTabUtil:GetConvertRate(targetItem, sourceItem, record)
 		if not TSMAPI.Item:IsDisenchantable(sourceItem) then return end
 		local quality = record and record.quality or TSMAPI.Item:GetQuality(sourceItem)
 		local ilvl = record and record.itemLevel or TSMAPI.Item:GetItemLevel(sourceItem)
-		local iType = GetItemClassInfo(TSMAPI.Item:GetClassId(sourceItem))
+		local iType = TSMAPI.Item:GetItemClassInfo(TSMAPI.Item:GetClassId(sourceItem))
 		for _, deData in ipairs(sourceItems.disenchant.sourceInfo) do
 			if deData.itemType == iType and deData.rarity == quality and ilvl >= deData.minItemLevel and ilvl <= deData.maxItemLevel then
 				private.rateCache[targetItem.."-"..sourceItem] = deData.amountOfMats

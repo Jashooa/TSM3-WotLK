@@ -194,7 +194,7 @@ function TSM:OnInitialize()
 		end
 
 		-- fix some bad variant itemStrings (fixed in 3.3.8)
-		wipe(toFix)
+        local toFix = {}
 		for itemString, groupPath in pairs(TSM.db.profile.items) do
 			local itemId = TSMAPI.Item:ToItemID(itemString)
 			if itemId and itemId < 105000 and strmatch(itemString, "^i:[0-9]+:[%-0-9]+:") then
@@ -493,7 +493,7 @@ function TSM:LoadTooltip(itemString, quantity, moneyCoins, lines)
 			if TSM.db.profile.detailedDestroyTooltip then
 				local rarity = TSMAPI.Item:GetQuality(itemString)
 				local ilvl = TSMAPI.Item:GetItemLevel(itemString)
-				local iType = GetItemClassInfo(TSMAPI.Item:GetClassId(itemString))
+				local iType = TSMAPI.Item:GetItemClassInfo(TSMAPI.Item:GetClassId(itemString))
 				for _, data in ipairs(TSM.STATIC_DATA.disenchantInfo) do
 					for targetItem, itemData in pairs(data) do
 						if targetItem ~= "desc" then

@@ -86,6 +86,9 @@ function TSM:RegisterModule()
 end
 
 -- determines if an item is millable or prospectable
+local ITEM_CLASS_TRADEGOODS = 6
+local ITEM_SUBCLASS_METAL_AND_STONE = 4
+local ITEM_SUBCLASS_HERB = 6
 local destroyCache = {}
 function TSM:IsDestroyable(itemString)
 	if destroyCache[itemString] then
@@ -101,7 +104,7 @@ function TSM:IsDestroyable(itemString)
 
 	local classId = TSMAPI.Item:GetClassId(itemString)
 	local subClassId = TSMAPI.Item:GetSubClassId(itemString)
-	if classId ~= LE_ITEM_CLASS_TRADEGOODS or (subClassId ~= 7 and subClassId ~= 9) then
+	if classId ~= ITEM_CLASS_TRADEGOODS or (subClassId ~= ITEM_SUBCLASS_METAL_AND_STONE and subClassId ~= ITEM_SUBCLASS_HERB) then
 		destroyCache[itemString] = {}
 		return unpack(destroyCache[itemString])
 	end
@@ -110,7 +113,7 @@ function TSM:IsDestroyable(itemString)
 	for _, targetItem in ipairs(TSMAPI.Conversions:GetTargetItemsByMethod("mill")) do
 		local herbs = TSMAPI.Conversions:GetData(targetItem)
 		if herbs[itemString] then
-			local isKnown = IsSpellKnown(TSM.spells.milling) or TSMAPI.Inventory:GetBagQuantity("i:114942") > 0
+			local isKnown = IsSpellKnown(TSM.spells.milling)
 			destroyCache[itemString] = { isKnown and GetSpellInfo(TSM.spells.milling), 5 }
 			return unpack(destroyCache[itemString])
 		end

@@ -32,10 +32,6 @@ function TSMAPI.Auction:GetItemQueryInfo(itemString)
 	local level = TSMAPI.Item:GetMinLevel(itemString) or 0
 	local classId = TSMAPI.Item:GetClassId(itemString) or 0
 	local subClassId = TSMAPI.Item:GetSubClassId(itemString) or 0
-	-- Ignoring level because level can now vary
-	if itemString == TSMAPI.Item:ToBaseItemString(itemString) and (classId == LE_ITEM_CLASS_WEAPON or classId == LE_ITEM_CLASS_ARMOR or (classId == LE_ITEM_CLASS_GEM and subClassId == LE_ITEM_GEM_ARTIFACTRELIC)) then
-		level = 0
-	end
 	return {
 		name = TSMAPI.Item:GetName(itemString),
 		quality = TSMAPI.Item:GetQuality(itemString),

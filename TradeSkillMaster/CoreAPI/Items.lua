@@ -13,25 +13,28 @@ local Items = TSM:NewModule("Items", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {itemInfo={}, bonusIdCache={}, bonusIdTemp={}, scanTooltip=nil, newItems={}, numPending=0, itemLevelCache = {}, soulboundCache = {}, minLevelCache = {}, canUseCache = {}}
 local STATIC_DATA = {classLookup={}, classIdLookup={}, inventorySlotIdLookup={}}
-STATIC_DATA.weaponClassName = GetItemClassInfo(LE_ITEM_CLASS_WEAPON)
-STATIC_DATA.armorClassName = GetItemClassInfo(LE_ITEM_CLASS_ARMOR)
--- Needed because NUM_LE_ITEM_CLASSS contains an erroneous value
+local ITEM_CLASS_WEAPON = 1
+local ITEM_CLASS_ARMOR = 2
+STATIC_DATA.weaponClassName = select(ITEM_CLASS_WEAPON, GetAuctionItemClasses())
+STATIC_DATA.armorClassName = select(ITEM_CLASS_ARMOR, GetAuctionItemClasses())
+-- Needed because NUM_ITEM_CLASSS contains an erroneous value
 local ITEM_CLASS_IDS = {
-	LE_ITEM_CLASS_WEAPON,
-	LE_ITEM_CLASS_ARMOR,
-	LE_ITEM_CLASS_CONTAINER,
-	LE_ITEM_CLASS_GEM,
-	LE_ITEM_CLASS_ITEM_ENHANCEMENT,
-	LE_ITEM_CLASS_CONSUMABLE,
-	LE_ITEM_CLASS_GLYPH,
-	LE_ITEM_CLASS_TRADEGOODS,
-	LE_ITEM_CLASS_RECIPE,
-	LE_ITEM_CLASS_QUESTITEM,
-	LE_ITEM_CLASS_MISCELLANEOUS
+	ITEM_CLASS_WEAPON = 1,
+	ITEM_CLASS_ARMOR = 2,
+    ITEM_CLASS_CONTAINER = 3,
+    ITEM_CLASS_CONSUMABLE = 4,
+    ITEM_CLASS_GLYPH = 5,
+    ITEM_CLASS_TRADEGOODS = 6,
+    ITEM_CLASS_PROJECTILE = 7,
+    ITEM_CLASS_QUIVER = 8,
+    ITEM_CLASS_RECIPE = 9,
+    ITEM_CLASS_GEM = 10,
+    ITEM_CLASS_MISCELLANEOUS = 11,
+    ITEM_CLASS_QUESTITEM = 12,
 }
 
 for _, classId in ipairs(ITEM_CLASS_IDS) do
-	local class = GetItemClassInfo(classId)
+	local class = TSMAPI.Item:GetItemClassInfo(classId)
 	if class then
 		STATIC_DATA.classIdLookup[strlower(class)] = classId
 		STATIC_DATA.classLookup[class] = {}
@@ -41,10 +44,11 @@ for _, classId in ipairs(ITEM_CLASS_IDS) do
 		end
 	end
 end
-for i = 0, NUM_LE_INVENTORY_TYPES do
-	local invType = GetItemInventorySlotInfo(i)
+local invTypes = {GetAuctionInvTypes(2,1)}
+for i = 1, #invTypes, 2 do
+    local invType = invTypes[i]
 	if invType then
-		STATIC_DATA.inventorySlotIdLookup[strlower(invType)] = i
+		STATIC_DATA.inventorySlotIdLookup[strlower(invType)] = (i + 1) / 2
 	end
 end
 local GET_ITEM_INFO_INSTANT_KEYS = {
@@ -76,6 +80,14 @@ local UPGRADE_VALUE_SHIFT = 1000000
 -- ============================================================================
 -- TSMAPI Functions
 -- ============================================================================
+
+function TSMAPI.Item:GetItemClassInfo(classId)
+    return select(classId, GetAuctionItemClasses())
+end
+
+function TSMAPI.Item:GetItemSubClassInfo(classId, subClassId)
+    return select(subClassId, GetAuctionItemSubClasses(classId))
+end
 
 function TSMAPI.Item:ToItemString(item)
 	if not item then return end
@@ -226,7 +238,7 @@ end
 
 function TSMAPI.Item:IsCraftingReagent(itemLink)
 	-- workaround for recipes having the item info and crafting reagent in the tooltip
-	if TSMAPI.Item:GetClassId(itemLink) == LE_ITEM_CLASS_RECIPE then
+	if TSMAPI.Item:GetClassId(itemLink) == ITEM_CLASS_RECIPE then
 		return false
 	end
 
@@ -256,7 +268,7 @@ function TSMAPI.Item:IsDisenchantable(itemString)
 	if not itemString or TSM.STATIC_DATA.notDisenchantable[itemString] then return end
 	local quality = TSMAPI.Item:GetQuality(itemString) or 0
 	local classId = TSMAPI.Item:GetClassId(itemString)
-	return quality >= LE_ITEM_QUALITY_UNCOMMON and (classId == LE_ITEM_CLASS_ARMOR or classId == LE_ITEM_CLASS_WEAPON)
+	return quality >= ITEM_QUALITY_UNCOMMON and (classId == ITEM_CLASS_ARMOR or classId == ITEM_CLASS_WEAPON)
 end
 
 function TSMAPI.Item:GetItemClasses()
@@ -269,7 +281,7 @@ function TSMAPI.Item:GetItemClasses()
 end
 
 function TSMAPI.Item:GetItemSubClasses(classId)
-	local class = GetItemClassInfo(classId)
+	local class = TSMAPI.Item:GetItemClassInfo(classId)
 	local result = {}
 	for subClass in pairs(STATIC_DATA.classLookup[class]) do
 		if subClass ~= "_index" then
@@ -286,7 +298,7 @@ end
 
 function TSMAPI.Item:GetSubClassIdFromSubClassString(subClass, classId)
 	if not classId then return end
-	local class = GetItemClassInfo(classId)
+	local class = TSMAPI.Item:GetItemClassInfo(classId)
 	if not STATIC_DATA.classLookup[class] then return end
 	for str, index in pairs(STATIC_DATA.classLookup[class]) do
 		if strlower(str) == strlower(subClass) then

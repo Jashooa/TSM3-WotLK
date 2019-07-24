@@ -134,7 +134,7 @@ local methods = {
 		tab.bottom = bottom
 		local highlight = tab:CreateTexture(nil, "HIGHLIGHT")
 		highlight:SetAllPoints()
-		highlight:SetColorTexture(1, 1, 1, .2)
+		highlight:SetTexture(1, 1, 1, .2)
 		highlight:SetBlendMode("BLEND")
 		tab.highlight = highlight
 

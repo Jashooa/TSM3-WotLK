@@ -40,7 +40,7 @@ end
 Methods
 -------------------------------------------------------------------------------]]
 local methods = {
-	["OnAcquire"] = function(self) 
+	["OnAcquire"] = function(self)
 		self:SetScroll(0)
 		self.scrollframe:SetScript("OnUpdate", FixScrollOnUpdate)
 	end,
@@ -77,7 +77,7 @@ local methods = {
 	["MoveScroll"] = function(self, value)
 		local status = self.status or self.localstatus
 		local height, viewheight = self.scrollframe:GetHeight(), self.content:GetHeight()
-		
+
 		if self.scrollBarShown then
 			local diff = height - viewheight
 			local delta = 1
@@ -176,7 +176,7 @@ local function Constructor()
 
 	local scrollbg = scrollbar:CreateTexture(nil, "BACKGROUND")
 	scrollbg:SetAllPoints(scrollbar)
-	scrollbg:SetColorTexture(0, 0, 0, 0.4)
+	scrollbg:SetTexture(0, 0, 0, 0.4)
 
 	--Container Support
 	local content = CreateFrame("Frame", nil, scrollframe)

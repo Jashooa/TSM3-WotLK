@@ -185,7 +185,7 @@ local methods = {
 
 		local dark = btn:CreateTexture(nil, "OVERLAY")
 		dark:SetAllPoints(image)
-		dark:SetColorTexture(0, 0, 0, .3)
+		dark:SetTexture(0, 0, 0, .3)
 		dark:SetBlendMode("BLEND")
 		btn.dark = dark
 		btn:SetScript("OnEnter", Icon_OnEnter)
@@ -206,7 +206,7 @@ local methods = {
 
 		local highlight = btn:CreateTexture(nil, "HIGHLIGHT")
 		highlight:SetAllPoints(image)
-		highlight:SetColorTexture(1, 1, 1, .2)
+		highlight:SetTexture(1, 1, 1, .2)
 		highlight:SetBlendMode("ADD")
 		btn.highlight = highlight
 

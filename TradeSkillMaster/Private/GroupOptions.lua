@@ -978,7 +978,6 @@ function private.ImportGroupHelperThread(self, importStr, groupPath)
 			if not TSMAPI.Item:IsSoulbound(itemString, true) then
                 local isValid = false
                 if strmatch(itemString, "^i:") then
-					itemString = gsub(itemString, ":0:", "::") -- remove empty parts from before patch 7.0.x
 					isValid = TSMAPI.Item:ToItemString(itemString) == itemString
 				end
 				if isValid then

@@ -696,27 +696,8 @@ function TSMAPI.Item:GetItemLevel(itemString)
 	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
 	local info = private.GetCachedItemInfo(baseItemString)
 	if itemString ~= baseItemString and info and info._getInfoResult then
-		if private.GetUpgradeValue(itemString) then
-			if private.itemLevelCache[itemString] then
-				return private.itemLevelCache[itemString]
-			end
-			-- we need to do tooltip scanning to get the correct item level
-			local scanTooltip = private.GetScanTooltip()
-			scanTooltip:SetHyperlink(private.ToWoWItemString(itemString))
-			for id = 1, scanTooltip:NumLines() do
-				local text = private.GetTooltipText(_G[scanTooltip:GetName().."TextLeft"..id])
-				local itemLevel = text and strmatch(text, gsub(ITEM_LEVEL, "%%d", "([0-9]+)"))
-				if itemLevel then
-					private.itemLevelCache[itemString] = tonumber(itemLevel)
-					return private.itemLevelCache[itemString]
-				end
-			end
-			-- failed to get the item level from the tooltip
-			return
-		else
-			-- we have the base item info, so should be able to call GetItemInfo() for this version of the item
-			return select(4, GetItemInfo(private.ToWoWItemString(itemString))) or info.itemLevel
-		end
+		-- we have the base item info, so should be able to call GetItemInfo() for this version of the item
+		return select(4, GetItemInfo(private.ToWoWItemString(itemString))) or info.itemLevel
 	end
 	return info and info.itemLevel
 end
@@ -799,33 +780,26 @@ function private.GetTooltipText(text)
 end
 
 function private.ToWoWItemString(itemString)
-	local _, itemId, rand, numBonus = (":"):split(itemString)
+    local _, itemId, rand = (":"):split(itemString)
 	local level = UnitLevel("player")
-	local spec = GetSpecialization()
-	spec = spec and GetSpecializationInfo(spec) or ""
-	local upgradeValue = private.GetUpgradeValue(itemString)
-	if upgradeValue and numBonus then
-		local bonusIds = strmatch(itemString, "i:[0-9]+:[0-9%-]*:[0-9]+:(.+):"..upgradeValue.."$")
-		return "item:"..itemId.."::::::"..(rand or "").."::"..level..":"..spec..":512::"..numBonus..":"..bonusIds..":"..(upgradeValue-UPGRADE_VALUE_SHIFT)..":::"
-	end
-	return "item:"..itemId.."::::::"..(rand or "").."::"..level..":"..spec..":::"..(numBonus and strmatch(itemString, "i:[0-9]+:[0-9%-]*:(.*)") or "")..":::"
+	return "item:"..itemId..":0:0:0:0:0:"..(rand or "0")..":0:"..level..":"
 end
 
 function private.RemoveExtra(itemString)
 	local num = 1
 	while num > 0 do
-		itemString, num = gsub(itemString, ":0?$", "")
+        itemString, num = gsub(itemString, ":0?$", "")
 	end
 	return itemString
 end
 
 function private:FixItemString(itemString)
-	itemString = gsub(itemString, ":0:", "::")-- remove 0s which are in the middle
 	itemString = private.RemoveExtra(itemString)
 	-- make sure we have the correct number of bonusIds
 	-- get the number of bonusIds (plus one for the count)
 	local numParts = select("#", (":"):split(itemString)) - 3
-	if numParts > 0 then
+    if numParts > 0 then
+        print(numParts)
 		-- get the number of extra parts we have
 		local count = select(4, (":"):split(itemString))
 		count = tonumber(count) or 0
@@ -843,53 +817,6 @@ function private:FixItemString(itemString)
 			itemString = itemString..":"..lastExtraPart
 		end
 		itemString = private.RemoveExtra(itemString)
-		-- filter out bonusIds we don't care about
-		return private:FilterImportantBonsuIds(itemString)
 	end
 	return itemString
-end
-
-function private.GetUpgradeValue(itemString)
-	local bonusIds = strmatch(itemString, "i:[0-9]+:[0-9%-]*:[0-9]*:(.+)$")
-	if not bonusIds then return end
-	for id in gmatch(bonusIds, "[0-9]+") do
-		id = tonumber(id)
-		if id > UPGRADE_VALUE_SHIFT then
-			return id
-		end
-	end
-end
-
-function private:FilterImportantBonsuIds(itemString)
-	local itemId, rand, bonusIds = strmatch(itemString, "i:([0-9]+):([0-9%-]*):[0-9]*:(.+)$")
-	if not bonusIds then return itemString end
-	if not private.bonusIdCache[bonusIds] then
-		wipe(private.bonusIdTemp)
-		local adjust = 0
-		for id in gmatch(bonusIds, "[0-9]+") do
-			id = tonumber(id)
-			if id > UPGRADE_VALUE_SHIFT then
-				if not tContains(private.bonusIdTemp, id) then
-					tinsert(private.bonusIdTemp, id)
-					adjust = adjust + 1
-				end
-			else
-				id = TSM.STATIC_DATA.importantBonusIdMap[id]
-				if id and not tContains(private.bonusIdTemp, id) then
-					tinsert(private.bonusIdTemp, id)
-				end
-			end
-		end
-		sort(private.bonusIdTemp)
-		private.bonusIdCache[bonusIds] = { num = #private.bonusIdTemp - adjust, value = strjoin(":", unpack(private.bonusIdTemp)) }
-	end
-	if private.bonusIdCache[bonusIds].num == 0 then
-		if rand == "" or tonumber(rand) == 0 then
-			return strjoin(":", "i", itemId)
-		else
-			return strjoin(":", "i", itemId, rand)
-		end
-	else
-		return strjoin(":", "i", itemId, rand, private.bonusIdCache[bonusIds].num, private.bonusIdCache[bonusIds].value)
-	end
 end

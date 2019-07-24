@@ -403,7 +403,8 @@ function private:CreateHelperFrame()
 			},
 		},
 	}
-	private.frame = TSMAPI.GUI:BuildFrame(frameInfo)
+    private.frame = TSMAPI.GUI:BuildFrame(frameInfo)
+    private.frame:EnableMouse(true)
 	private.frame:SetMovable(true)
 	private.frame:SetScale(UIParent:GetScale())
 	TSMAPI.Design:SetFrameBackdropColor(private.frame)

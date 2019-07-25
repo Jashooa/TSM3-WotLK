@@ -37,7 +37,7 @@ function TradeSkill:OnInitialize()
 	TSMAPI.Threading:StartImmortal(private.LinkedProfessionScanThread, 0.5)
 
 	-- we'll implement UIParent's event handler directly when necessary for TRADE_SKILL_SHOW
-	UIParent:UnregisterEvent("TRADE_SKILL_SHOW")
+    UIParent:UnregisterEvent("TRADE_SKILL_SHOW")
 end
 
 
@@ -48,10 +48,10 @@ end
 
 function TradeSkill:EventHandler(event, ...)
 	-- deal with TRADE_SKILL_SHOW / TRADE_SKILL_CLOSE specially
-	if event == "TRADE_SKILL_SHOW" then
+    if event == "TRADE_SKILL_SHOW" then
 		TSMAPI.Threading:SendMsg(private.managerThreadId, "SHOW")
 		return
-	elseif event == "TRADE_SKILL_CLOSE" then
+    elseif event == "TRADE_SKILL_CLOSE" then
 		TSMAPI.Threading:SendMsg(private.managerThreadId, "HIDE")
 		return
 	end
@@ -60,13 +60,13 @@ function TradeSkill:EventHandler(event, ...)
 	if not private.currentProfession or not TradeSkill:GetVisibilityInfo().frame or TSM:GetCurrentProfessionName() ~= private.currentProfession then return end
 
     if event == "TRADE_SKILL_UPDATE" or event == "TRADE_SKILL_FILTER_UPDATE" then
-		local currentSelection = GetTradeSkillSelectionIndex()
+		--[[local currentSelection = GetTradeSkillSelectionIndex()
 		if event ~= "TRADE_SKILL_FILTER_UPDATE" and currentSelection > 1 and currentSelection <= GetNumTradeSkills() then
 			TradeSkillFrame_SetSelection(currentSelection)
 		else
 			TradeSkillFrame_SetSelection(GetFirstTradeSkill())
 		end
-		TradeSkillFrame_Update()
+		TradeSkillFrame_Update()]]--
 		private:OnProfessionUpdate()
 		private:UpdateCooldownsFrame()
 	elseif event == "UPDATE_TRADESKILL_RECAST" then
@@ -534,20 +534,20 @@ end
 -- ============================================================================
 
 function private.BlizzardProfessionFrameOnHide()
-	if private.noHide then return end
+    if private.noHide then return end
 	private.CloseProfession()
 end
 
 function private.SetBlizzardProfessionFrameVisible(visible)
-	if visible and not (TradeSkillFrame and TradeSkillFrame:IsVisible()) then
+    if visible and not (TradeSkillFrame and TradeSkillFrame:IsVisible()) then
 		TradeSkillFrame_LoadUI()
 		TradeSkillFrame:SetScript("OnHide", private.BlizzardProfessionFrameOnHide)
 		ShowUIPanel(TradeSkillFrame)
-		--TradeSkillFrame:OnDataSourceChanged()
 		private:CreateSwitchButton()
 		private.switchBtn:Show()
 		private.switchBtn:Update()
-	elseif not visible and TradeSkillFrame then
+    elseif not visible and TradeSkillFrame then
+        print("SetBlizzardProfessionFrameVisible false")
 		private.noHide = true
 		HideUIPanel(TradeSkillFrame)
 		private.noHide = nil
@@ -555,7 +555,8 @@ function private.SetBlizzardProfessionFrameVisible(visible)
 end
 
 function private.SetTSMCraftingProfessionFrameVisible(visible)
-	if visible and not (private.frame and private.frame:IsVisible()) then
+    if visible and not (private.frame and private.frame:IsVisible()) then
+        print("SetTSMCraftingProfessionFrameVisible true")
 		private:Create()
 		private:CreateSwitchButton()
 		private.frame:Show()
@@ -573,7 +574,7 @@ function private.SetTSMCraftingProfessionFrameVisible(visible)
 			private.frame.cooldowns:Show()
 			private:UpdateCooldownsFrame()
 		end
-	elseif not visible and private.frame then
+    elseif not visible and private.frame then
 		private.noHide = true
 		private.frame:Hide()
 		private.noHide = nil
@@ -581,8 +582,8 @@ function private.SetTSMCraftingProfessionFrameVisible(visible)
 end
 
 function private.CloseProfession()
-	if not GetTradeSkillLine() then return end
-	CloseTradeSkill()
+    if GetTradeSkillLine() == "UNKNOWN" then return end
+    CloseTradeSkill()
 end
 
 function private.ProfessionScanCompleteCallback()
@@ -650,7 +651,7 @@ function private.ProfessionWindowManagerHandleShowThread(self)
 		-- show our profession window
 		TSM:LOG_INFO("Showing our profession frame")
 		private.SetTSMCraftingProfessionFrameVisible(true)
-	end
+    end
 	private.currentProfession = TSM:GetCurrentProfessionName()
 end
 
@@ -659,13 +660,13 @@ function private.ProfessionWindowManagerThread(self)
 
 	while true do
 		local event = self:ReceiveMsg()
-		if event == "SHOW" then
+        if event == "SHOW" then
 			private.ProfessionWindowManagerHandleShowThread(self)
-		elseif event == "SWITCH" then
+        elseif event == "SWITCH" then
 			TradeSkill:ClearFilters()
 			private.SetBlizzardProfessionFrameVisible(TSM.db.global.showingDefaultFrame)
 			private.SetTSMCraftingProfessionFrameVisible(not TSM.db.global.showingDefaultFrame)
-		elseif event == "HIDE" then
+        elseif event == "HIDE" then
 			-- hide any currently-visible frames
 			private.SetBlizzardProfessionFrameVisible(false)
 			private.SetTSMCraftingProfessionFrameVisible(false)

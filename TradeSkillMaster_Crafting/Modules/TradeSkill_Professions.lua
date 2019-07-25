@@ -25,16 +25,20 @@ function Professions:OnInitialize()
 	Professions:RegisterEvent("TRADE_SKILL_LIST_UPDATE", private.UpdateProfessionDropdown)
 end
 
-function private.SetSlotFilter(inventorySlotIndex, categoryId, subCategoryId)
-	C_TradeSkillUI.ClearInventorySlotFilter()
-	C_TradeSkillUI.ClearRecipeCategoryFilter()
+function private.SetSlotFilter(inventorySlotIndex, categoryId)
+    UIDropDownMenu_SetSelectedID(TradeSkillInvSlotDropDown, 1);
+    SetTradeSkillInvSlotFilter(0, 1, 1);
+    UIDropDownMenu_SetSelectedID(TradeSkillSubClassDropDown, 1);
+    SetTradeSkillSubClassFilter(0, 1, 1);
 
-	if inventorySlotIndex then
-		C_TradeSkillUI.SetInventorySlotFilter(inventorySlotIndex, true, true)
+    if inventorySlotIndex then
+        UIDropDownMenu_SetSelectedID(TradeSkillInvSlotDropDown, inventorySlotIndex);
+        SetTradeSkillInvSlotFilter(inventorySlotIndex, 1, 1);
 	end
 
-	if categoryId or subCategoryId then
-		C_TradeSkillUI.SetRecipeCategoryFilter(categoryId, subCategoryId)
+	if categoryId then
+        UIDropDownMenu_SetSelectedID(TradeSkillSubClassDropDown, categoryId);
+        SetTradeSkillSubClassFilter(categoryId, 1, 1);
 	end
 end
 
@@ -42,20 +46,24 @@ function private.InitializeDropdown(self, level)
 	local info = Lib_UIDropDownMenu_CreateInfo()
 	if level == 1 then
 		info.text = CRAFT_IS_MAKEABLE
-		info.func = function()
-			C_TradeSkillUI.SetOnlyShowMakeableRecipes(not C_TradeSkillUI.GetOnlyShowMakeableRecipes())
+        info.func = function()
+			TradeSkillFrame.filterTbl.hasMaterials = not TradeSkillFrame.filterTbl.hasMaterials
+			TradeSkillOnlyShowMakeable(TradeSkillFrame.filterTbl.hasMaterials)
+			TradeSkillUpdateFilterBar()
 		end
 		info.keepShownOnClick = true
-		info.checked = C_TradeSkillUI.GetOnlyShowMakeableRecipes()
+		info.checked = TradeSkillFrame.filterTbl.hasMaterials
 		info.isNotRadio = true
 		Lib_UIDropDownMenu_AddButton(info, level)
 
         info.text = TRADESKILL_FILTER_HAS_SKILL_UP
         info.func = function()
-            C_TradeSkillUI.SetOnlyShowSkillUpRecipes(not C_TradeSkillUI.GetOnlyShowSkillUpRecipes())
+            TradeSkillFrame.filterTbl.hasSkillUp  = not TradeSkillFrame.filterTbl.hasSkillUp
+            TradeSkillOnlyShowSkillUps(TradeSkillFrame.filterTbl.hasSkillUp)
+            TradeSkillUpdateFilterBar()
         end
         info.keepShownOnClick = true
-        info.checked = C_TradeSkillUI.GetOnlyShowSkillUpRecipes()
+        info.checked = TradeSkillFrame.filterTbl.hasSkillUp
         info.isNotRadio = true
         Lib_UIDropDownMenu_AddButton(info, level)
 
@@ -79,7 +87,7 @@ function private.InitializeDropdown(self, level)
 		Lib_UIDropDownMenu_AddButton(info, level)
 	elseif level == 2 then
 		if LIB_UIDROPDOWNMENU_MENU_VALUE == 1 then
-			local inventorySlots = {C_TradeSkillUI.GetAllFilterableInventorySlots()}
+			local inventorySlots = {GetTradeSkillInvSlots()}
 			for i, inventorySlot in ipairs(inventorySlots) do
 				info.text = inventorySlot
 				info.func = function() private.SetSlotFilter(i) end
@@ -88,14 +96,13 @@ function private.InitializeDropdown(self, level)
 				Lib_UIDropDownMenu_AddButton(info, level)
 			end
 		elseif LIB_UIDROPDOWNMENU_MENU_VALUE == 2 then
-			local categories = {C_TradeSkillUI.GetCategories()}
-			for i, categoryId in ipairs(categories) do
-				local categoryData = C_TradeSkillUI.GetCategoryInfo(categoryId)
-				info.text = categoryData.name
-				info.func = function() private.SetSlotFilter(nil, categoryId) end
+			local categories = {GetTradeSkillSubClasses()}
+			for i, category in ipairs(categories) do
+				info.text = category
+				info.func = function() private.SetSlotFilter(nil, i) end
 				info.notCheckable = true
-				info.hasArrow = select("#", C_TradeSkillUI.GetSubCategories(categoryId)) > 0
-				info.value = categoryId
+				info.hasArrow = false
+				info.value = i
 				Lib_UIDropDownMenu_AddButton(info, level)
 			end
 		elseif LIB_UIDROPDOWNMENU_MENU_VALUE == 3 then
@@ -118,14 +125,6 @@ function private.InitializeDropdown(self, level)
 			Lib_UIDropDownMenu_AddButton(info, level)
 
 			info.notCheckable = false
-		end
-	elseif level == 3 then
-		for _, subCategoryId in ipairs({C_TradeSkillUI.GetSubCategories(LIB_UIDROPDOWNMENU_MENU_VALUE)}) do
-			info.text = C_TradeSkillUI.GetCategoryInfo(subCategoryId).name
-			info.func = function() private.SetSlotFilter(nil, LIB_UIDROPDOWNMENU_MENU_VALUE, subCategoryId) end
-			info.notCheckable = true
-			info.value = subCategoryId
-			Lib_UIDropDownMenu_AddButton(info, level)
 		end
 	end
 end
@@ -436,7 +435,7 @@ function Professions:GetFrameInfo()
 					if text == SEARCH then
 						text = ""
 					end
-					C_TradeSkillUI.SetRecipeItemNameFilter(strlower(text))
+					SetTradeSkillItemNameFilter(strlower(text))
 				end,
 				OnEnterPressed = function(self)
 					self:ClearFocus()

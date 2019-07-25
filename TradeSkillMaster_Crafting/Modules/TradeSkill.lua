@@ -683,14 +683,13 @@ end
 
 function TradeSkill:ClearFilters()
 	Lib_CloseDropDownMenus()
-	C_TradeSkillUI.ClearInventorySlotFilter()
-	C_TradeSkillUI.ClearRecipeCategoryFilter()
-	C_TradeSkillUI.SetRecipeItemNameFilter(nil)
-	C_TradeSkillUI.ClearRecipeSourceTypeFilter()
-	C_TradeSkillUI.SetOnlyShowMakeableRecipes(false)
-	C_TradeSkillUI.SetOnlyShowSkillUpRecipes(false)
-	C_TradeSkillUI.SetOnlyShowLearnedRecipes(true)
-	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(false)
+    UIDropDownMenu_SetSelectedID(TradeSkillSubClassDropDown, 1);
+    SetTradeSkillSubClassFilter(0, 1, 1);
+    UIDropDownMenu_SetSelectedID(TradeSkillInvSlotDropDown, 1);
+    SetTradeSkillInvSlotFilter(0, 1, 1);
+	SetTradeSkillItemNameFilter("")
+	TradeSkillOnlyShowMakeable(false)
+	TradeSkillOnlyShowSkillUps(false)
 	PanelTemplates_SetTab(TradeSkillFrame.RecipeList, 1)
 	if private.frame then
 		-- reset the search bar

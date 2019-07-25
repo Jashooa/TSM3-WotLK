@@ -253,11 +253,18 @@ end
 
 function TradeSkillScanner:GetProfessionList()
 	local list = {}
-	local playerName = UnitName("player")
+	--[[local playerName = UnitName("player")
 	if not TSM.db.factionrealm.playerProfessions[playerName] then return list end
 	for name, data in pairs(TSM.db.factionrealm.playerProfessions[playerName]) do
 		list[playerName .. "~" .. name] = format("%s %d/%d - %s", name, data.level or "?", data.maxLevel or "?", playerName)
-	end
+    end]]
+    for playerName, professionData in pairs(TSM.db.factionrealm.playerProfessions) do
+        for name, data in pairs(TSM.db.factionrealm.playerProfessions[playerName]) do
+            if data.link then
+                list[playerName .. "~" .. name] = format("%s %d/%d - %s", name, data.level or "?", data.maxLevel or "?", playerName)
+            end
+        end
+    end
 	return list
 end
 

@@ -10,7 +10,7 @@ local TSM = select(2, ...)
 local TradeSkill = TSM:GetModule("TradeSkill")
 local Professions = TradeSkill:NewModule("Professions", "AceHook-3.0", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
-local private = { priceTextCache = { lastClear = 0 }, craftTimeInfo = { timeout = 0, endTime = 0 }, collapsedCategories = {} }
+local private = { priceTextCache = { lastClear = 0 }, craftTimeInfo = { timeout = 0, endTime = 0 } }
 
 
 -- ============================================================================
@@ -22,7 +22,7 @@ function Professions:OnInitialize()
 	Professions:RawHook("ChatEdit_InsertLink", private.InsertLinkHook, true)
 	TSMAPI.Delay:AfterTime("craftTimeText", 0.5, private.UpdateCraftTimeText, 0.5)
 	TSMAPI.Delay:AfterTime("craftingUpdateTradeSkill", 1, function() Professions:UpdateSelectedTradeSkill() end, 0.1)
-	Professions:RegisterEvent("TRADE_SKILL_LIST_UPDATE", private.UpdateProfessionDropdown)
+	Professions:RegisterEvent("TRADE_SKILL_UPDATE", private.UpdateProfessionDropdown)
 end
 
 function private.SetSlotFilter(inventorySlotIndex, categoryId)
@@ -337,7 +337,7 @@ function Professions:GetFrameInfo()
 							{
 								type = "Button",
 								key = "createBtn",
-								text = CREATE_PROFESSION,
+								text = CREATE,
 								textHeight = 15,
 								size = { 0, 20 },
 								points = { { "BOTTOMLEFT" }, { "BOTTOMRIGHT", BFC.PARENT, "BOTTOM", -2, 0 } },
@@ -441,7 +441,7 @@ function Professions:GetFrameInfo()
 						TradeSkillCollapseAllButton:Click()
 					elseif button == "LeftButton" then
 						if IsModifiedClick() then
-							HandleModifiedItemClick(GetTradeSkillItemLink(data.index))
+							HandleModifiedItemClick(GetTradeSkillRecipeLink(data.index))
                         else
                             TradeSkillFrame_SetSelection(data.index)
                             TradeSkillFrame_Update()
@@ -482,7 +482,8 @@ function Professions:GetFrameInfo()
 								GameTooltip:SetTradeSkillItem(index)
 							end
 						end,
-						OnLeave = function(self)
+                        OnLeave = function(self)
+                            if not self:GetParent():GetParent().index then return end
 							GameTooltip:Hide()
 						end,
 					},
@@ -600,7 +601,7 @@ end
 
 function private:UpdateCraftTimeText()
 	if not TradeSkill:GetVisibilityInfo().professionsTab then return end
-	local startTime, endTime, isTradeSkill = select(4, UnitCastingInfo("player"))
+	local startTime, endTime, isTradeSkill = select(5, UnitCastingInfo("player"))
 	if isTradeSkill then
 		local timePerCraft = endTime - startTime
 		endTime = endTime + (timePerCraft * (GetTradeskillRepeatCount() - 1))
@@ -640,7 +641,7 @@ function private:UpdateProfessionDropdown()
 	local list = TSM.TradeSkillScanner:GetProfessionList()
 	local playerName = select(2, IsTradeSkillLinked()) or UnitName("player")
 	local professionName = TSM:GetCurrentProfessionName()
-	local level, maxLevel = select(3, GetTradeSkillLine())
+	local level, maxLevel = select(2, GetTradeSkillLine())
 	local currentSelection = playerName .. "~" .. professionName
 	private.frame.professionsTab.dropdown:SetList(list)
 	private.frame.professionsTab.dropdown:SetValue(currentSelection)
@@ -677,13 +678,13 @@ function Professions:UpdateST()
     for i = 1, GetNumTradeSkills() do
         local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
         TSMAPI:Assert(skillName, "No skill name found for index " .. i)
-		local spellId = TSM:GetSpellId(i)
+        local spellId = TSM:GetSpellId(i)
+        local numAvailableAll, priceText = nil, nil
+        local craft = TSM.db.factionrealm.crafts[spellId]
         local name = skillName
         if spellId then
-            local craft = TSM.db.factionrealm.crafts[spellId]
 
             -- calculate the total we are able to craft including other inventory
-			local numAvailableAll = nil
 			if craft then
 				local vendorMatCount = nil
 				for itemString, quantity in pairs(craft.mats) do
@@ -714,6 +715,27 @@ function Professions:UpdateST()
 					craft.cooldownTimes[playerName].endTime = 0
 				end
             end
+
+			-- get the price text
+			priceText = private.priceTextCache[spellId]
+			if not priceText then
+				local cost, buyout, profit = TSM.Cost:GetSpellCraftPrices(spellId)
+				if TSM.db.global.priceColumn == 1 and cost and cost > 0 then
+					cost = cost * craft.numResult
+					priceText = TSMAPI:MoneyToString(cost, TSMAPI.Design:GetInlineColor("link"))
+				elseif TSM.db.global.priceColumn == 2 and buyout and buyout > 0 then
+					buyout = buyout * craft.numResult
+					priceText = TSMAPI:MoneyToString(buyout, TSMAPI.Design:GetInlineColor("link"))
+				elseif TSM.db.global.priceColumn == 3 and profit then
+					profit = profit * craft.numResult
+					priceText = (profit < 0) and ("|cffff0000-|r" .. TSMAPI:MoneyToString(-profit, "|cffff0000")) or TSMAPI:MoneyToString(profit, "|cff00ff00")
+				end
+				if priceText then
+					private.priceTextCache[spellId] = priceText
+				else
+					priceText = "---"
+				end
+			end
 
 			if numAvailable > 0 or (numAvailableAll and numAvailableAll > 0) then
 				local availableText = numAvailable .. " (" .. (numAvailableAll or 0) .. ")"
@@ -757,18 +779,11 @@ function Professions:UpdateSelectedTradeSkill(forceUpdate)
 		TradeSkillFrame.selectedSkill = GetTradeSkillSelectionIndex()
     end
 
-    local spellId = TSM:GetSpellId(TradeSkillFrame.selectedSkill)
-
-	if not spellId then
-		frame.craftInfoFrame:Hide()
-		return
-	end
-    frame.craftInfoFrame:Show()
-
     forceUpdate = forceUpdate or (frame.st:GetSelection() or 0) - 1 ~= TradeSkillFrame.selectedSkill
 	if forceUpdate then
         frame.st:SetSelection(TradeSkillFrame.selectedSkill + 1)
         local skillIndex = TradeSkillFrame.selectedSkill
+        local spellId = TSM:GetSpellId(TradeSkillFrame.selectedSkill)
         local name, _, numAvailable, _, alternateVerb = GetTradeSkillInfo(skillIndex)
 		-- Enable display of items created
 		local lNum, hNum = GetTradeSkillNumMade(skillIndex)
@@ -779,7 +794,7 @@ function Professions:UpdateSelectedTradeSkill(forceUpdate)
 		if numMade > 1 then
 			name = numMade .. " x " .. name
 		end
-		frame.craftInfoFrame.spellId = spellId
+		frame.craftInfoFrame.index = skillIndex
 		frame.craftInfoFrame.infoFrame.icon:SetTexture(GetTradeSkillIcon(skillIndex))
 		frame.craftInfoFrame.infoFrame.nameText:SetText(TSMAPI.Design:GetInlineColor("link") .. (name or "") .. "|r")
 		frame.craftInfoFrame.infoFrame.descText:SetText(GetTradeSkillDescription(skillIndex))
@@ -822,7 +837,7 @@ function Professions:UpdateSelectedTradeSkill(forceUpdate)
 		local isUnavailable = false
 		if numAvailable > 0 and not IsTradeSkillLinked() then
 			local num = frame.craftInfoFrame.buttonsFrame.inputBox:GetNumber()
-			frame.craftInfoFrame.buttonsFrame.inputBox:SetNumber(max(min(num, info.numAvailable), 1))
+			frame.craftInfoFrame.buttonsFrame.inputBox:SetNumber(max(min(num, numAvailable), 1))
 		else
 			frame.craftInfoFrame.buttonsFrame.inputBox:SetNumber(1)
 			isUnavailable = true

@@ -22,9 +22,9 @@ function TradeSkill:OnInitialize()
 		TradeSkill[name] = module
 	end
 	TradeSkill:RegisterEvent("TRADE_SKILL_SHOW", "EventHandler")
-	TradeSkill:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGED", "EventHandler")
 	TradeSkill:RegisterEvent("TRADE_SKILL_CLOSE", "EventHandler")
-	TradeSkill:RegisterEvent("TRADE_SKILL_LIST_UPDATE", "EventHandler")
+    TradeSkill:RegisterEvent("TRADE_SKILL_UPDATE", "EventHandler")
+    TradeSkill:RegisterEvent("TRADE_SKILL_FILTER_UPDATE", "EventHandler")
 	TradeSkill:RegisterEvent("UPDATE_TRADESKILL_RECAST", "EventHandler")
 	TradeSkill:RegisterEvent("CHAT_MSG_SKILL", "EventHandler")
 	TradeSkill:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "EventHandler")
@@ -48,7 +48,7 @@ end
 
 function TradeSkill:EventHandler(event, ...)
 	-- deal with TRADE_SKILL_SHOW / TRADE_SKILL_CLOSE specially
-	if event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_DATA_SOURCE_CHANGED" then
+	if event == "TRADE_SKILL_SHOW" then
 		TSMAPI.Threading:SendMsg(private.managerThreadId, "SHOW")
 		return
 	elseif event == "TRADE_SKILL_CLOSE" then
@@ -59,7 +59,14 @@ function TradeSkill:EventHandler(event, ...)
 	-- if we are changing professions or not currently shown, just ignore this event
 	if not private.currentProfession or not TradeSkill:GetVisibilityInfo().frame or TSM:GetCurrentProfessionName() ~= private.currentProfession then return end
 
-	if event == "TRADE_SKILL_LIST_UPDATE" then
+    if event == "TRADE_SKILL_UPDATE" or event == "TRADE_SKILL_FILTER_UPDATE" then
+		local currentSelection = GetTradeSkillSelectionIndex()
+		if event ~= "TRADE_SKILL_FILTER_UPDATE" and currentSelection > 1 and currentSelection <= GetNumTradeSkills() then
+			TradeSkillFrame_SetSelection(currentSelection)
+		else
+			TradeSkillFrame_SetSelection(GetFirstTradeSkill())
+		end
+		TradeSkillFrame_Update()
 		private:OnProfessionUpdate()
 		private:UpdateCooldownsFrame()
 	elseif event == "UPDATE_TRADESKILL_RECAST" then
@@ -67,7 +74,7 @@ function TradeSkill:EventHandler(event, ...)
 	elseif event == "CHAT_MSG_SKILL" then
 		-- update the skill level of the player's tradeskill
 		local skillName = TSM:GetCurrentProfessionName()
-		local level, maxLevel = select(3, GetTradeSkillLine())
+		local level, maxLevel = select(2, GetTradeSkillLine())
 		local isLinked, linkedPlayer = IsTradeSkillLinked()
 		local playerName = linkedPlayer or UnitName("player")
 		if skillName and skillName ~= "UNKNOWN" and not isLinked and TSM.db.factionrealm.playerProfessions[playerName] and TSM.db.factionrealm.playerProfessions[playerName][skillName] then
@@ -76,7 +83,8 @@ function TradeSkill:EventHandler(event, ...)
 			TSMAPI.Sync:KeyUpdated(TSM.db.factionrealm.playerProfessions, playerName)
 		end
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
-		local unit, _, spellId = ...
+        local unit, spellName = ...
+        local spellId = TSM:GetSpellIdFromName(spellName)
 		if unit ~= "player" or not TSM.db.factionrealm.crafts[spellId] then return end
 		if not TradeSkill.isCrafting or TradeSkill.isCrafting.spellId ~= spellId then return end
 		-- remove one from the queue
@@ -86,7 +94,8 @@ function TradeSkill:EventHandler(event, ...)
 		end
 		TradeSkill.isCrafting.quantity = TradeSkill.isCrafting.quantity - 1
 	elseif event == "UNIT_SPELLCAST_INTERRUPTED" or event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_FAILED_QUIET" then
-		local unit, _, spellId = ...
+        local unit, spellName = ...
+        local spellId = TSM:GetSpellIdFromName(spellName)
 		if unit ~= "player" then return end
 
 		if TradeSkill.isCrafting and spellId == TradeSkill.isCrafting.spellId then
@@ -478,13 +487,13 @@ function private:UpdateCooldownsFrame()
 	end
 
     for i = 1, GetNumTradeSkills() do
-        local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
+        local skillName, _, numAvailable = GetTradeSkillInfo(i)
         local spellId = TSM:GetSpellId(i)
 		local craft = TSM.db.factionrealm.crafts[spellId]
 		local cooldown, isDaily = GetTradeSkillCooldown(i)
 		if not cooldown and isDaily and craft and craft.cooldownTimes and craft.cooldownTimes[currentPlayer] and craft.cooldownTimes[currentPlayer].prompt then
 			if numAvailable > 0 then
-				tinsert(stData, {cols={{value="|cff00ff00"..skillName.."|r"}}, spellId = spellId, quantity = 1})
+				tinsert(stData, {cols={{value="|cff00ff00"..skillName.."|r"}}, index = i, quantity = 1})
 				numAvailable = numAvailable - 1
 			else
 				-- we don't have the mats on-hand, so add it to the queue
@@ -501,7 +510,7 @@ function private:UpdateCooldownsFrame()
 
 		if totalNeeded > 0 then
 			if numAvailable >= totalNeeded then
-				tinsert(stData, {cols={{value=format("|cff00ff00%s|r%s", skillName, totalNeeded == 1 and '' or ' ('..tostring(totalNeeded)..')') }}, spellId = spellId, quantity = totalNeeded})
+				tinsert(stData, {cols={{value=format("|cff00ff00%s|r%s", skillName, totalNeeded == 1 and '' or ' ('..tostring(totalNeeded)..')') }}, index = i, quantity = totalNeeded})
 			else
 				TSM.Queue:SetNumQueued(spellId, totalNeeded)
 			end

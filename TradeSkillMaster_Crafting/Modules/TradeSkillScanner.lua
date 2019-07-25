@@ -38,7 +38,7 @@ end
 function private.ScanCurrentProfessionThread(self, args)
 	self:SetThreadName("CRAFTING_PROFESSION_SCAN")
 	local professionName, playerName, isLinked = unpack(args)
-	local numTradeSkills = GetNumTradeSkills()
+    local numTradeSkills = GetNumTradeSkills()
 
 	-- whenever we yield there's a chance that the profession may change
 	-- set a yield invariant so that the thread will be killed if it does
@@ -58,7 +58,7 @@ function private.ScanCurrentProfessionThread(self, args)
 
 	-- check if we've scanned this profession successfully within the past 2 hours and it hasn't changed
 	local cacheInfo = TSM.db.factionrealm.professionScanCache[playerName .. professionName]
-	if cacheInfo and cacheInfo.hash == hash and cacheInfo.scanTime > time() - 2 * 60 * 60 then
+	if cacheInfo and cacheInfo.numTradeSkills == numTradeSkills and cacheInfo.scanTime > time() - 2 * 60 * 60 then
 		if private.scanThreadCallback then
 			private.scanThreadCallback()
 		end
@@ -99,10 +99,6 @@ function private.ScanCurrentProfessionThread(self, args)
 			local itemLink, spellLink, itemString, spellId, craftName, mats = unpack(data)
 			scanResult.crafts[spellId] = { name = craftName, itemString = itemString, mats = {}, profession = professionName }
 			local lNum, hNum = GetTradeSkillNumMade(index)
-			-- workaround for incorrect values returned for Temporal Crystal
-			if spellId == 169092 and itemString == "i:113588" then
-				lNum, hNum = 1, 1
-			end
 			scanResult.crafts[spellId].numResult = floor(((lNum or 1) + (hNum or 1)) / 2)
 			scanResult.crafts[spellId].hasCD = select(2, GetTradeSkillCooldown(index)) and true or nil
 
@@ -202,7 +198,7 @@ function private.ScanCurrentProfessionThread(self, args)
 	for itemString, fixedCustomPrice in pairs(fixedMatCosts) do
 		TSM.db.factionrealm.mats[itemString].customValue = fixedCustomPrice
 	end
-	TSM.db.factionrealm.professionScanCache[playerName .. professionName] = { hash = hash, scanTime = time() }
+	TSM.db.factionrealm.professionScanCache[playerName .. professionName] = { numTradeSkills = numTradeSkills, scanTime = time() }
 	if private.scanThreadCallback then
 		private.scanThreadCallback()
 	end

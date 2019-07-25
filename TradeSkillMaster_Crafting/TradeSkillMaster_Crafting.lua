@@ -340,6 +340,23 @@ function TSM:GetSpellId(linkOrIndex)
 	return type(linkOrIndex) == "string" and tonumber(strmatch(linkOrIndex, ":(%d+)\124h")) or nil
 end
 
+function TSM:GetSpellIdFromName(spellName)
+    if spellName == GetSpellInfo(TSM.SMELTING_SPELLID) then
+        spellName = GetSpellInfo(TSM.MINING_SPELLID)
+    end
+    for i = 1, GetNumTradeSkills() do
+        local link = GetTradeSkillRecipeLink(i)
+        if link and link:match(spellName) then
+            local spellId = tonumber(link:match("enchant:(%d+)"))
+            if spellId then
+                return spellId
+            end
+        end
+    end
+
+    return nil
+end
+
 function TSM:GetCurrentProfessionName()
 	local name = GetTradeSkillLine()
 	return name

@@ -79,7 +79,7 @@ function private.ScanCurrentProfessionThread(self, args)
         end
 		if numMissing == 0 then
 			break
-		elseif numYields >= MAX_SCAN_YIELDS then
+        elseif numYields >= MAX_SCAN_YIELDS then
 			return
 		end
 		numYields = numYields + 1
@@ -223,9 +223,10 @@ function private:GetCraftInfo(index)
 			return "skip"
 		end
 	elseif strfind(itemLink, "item:") then
-		-- result of craft is item
+        -- result of craft is item
+        spellId = TSM:GetSpellId(itemLink)
 		itemString = TSMAPI.Item:ToItemString(itemLink)
-		craftName = TSMAPI.Item:GetName(itemLink)
+        craftName = TSMAPI.Item:GetName(itemLink)
 	else
 		TSMAPI:Assert(false, "Invalid profession spell.")
 	end

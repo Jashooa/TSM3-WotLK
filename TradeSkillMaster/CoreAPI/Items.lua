@@ -102,7 +102,7 @@ function TSMAPI.Item:ToItemString(item)
 	end
 
 	-- test if it's already (likely) an item string
-	if strmatch(item, "^i:([0-9%-:]+)$") then
+    if strmatch(item, "^i:([0-9%-:]+)$") then
 		return item
 	end
 
@@ -110,11 +110,12 @@ function TSMAPI.Item:ToItemString(item)
 	if result then
 		-- it was a full item link which we've extracted the itemString from
 		item = result
-	end
+    end
 
 	-- test if it's a shorter item string (without bonuses)
 	result = strjoin(":", strmatch(item, "(i)tem:([0-9%-]+):[0-9%-]*:[0-9%-]*:[0-9%-]*:[0-9%-]*:[0-9%-]*:([0-9%-]*)"))
-	if result and result ~= "" then
+    if result and result ~= "" then
+        result = gsub(gsub(result, ":0$", ""), ":0$", "") -- remove extra zeroes
 		return result
 	end
 end

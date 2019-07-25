@@ -224,7 +224,7 @@ function private:GetCraftInfo(index)
 		end
 	elseif strfind(itemLink, "item:") then
         -- result of craft is item
-        spellId = TSM:GetSpellId(itemLink)
+        spellId = TSM:GetSpellId(spellLink)
 		itemString = TSMAPI.Item:ToItemString(itemLink)
         craftName = TSMAPI.Item:GetName(itemLink)
 	else

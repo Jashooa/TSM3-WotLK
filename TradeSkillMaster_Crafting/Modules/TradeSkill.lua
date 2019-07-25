@@ -702,7 +702,7 @@ function TradeSkill:ClearFilters()
 end
 
 function TradeSkill:CastTradeSkill(index, quantity, vellum)
-	TradeSkill.Professions:SetSelectedTradeSkill(index)
+	SelectTradeSkill(index)
 	quantity = vellum and 1 or quantity
 	DoTradeSkill(index, quantity)
 	TradeSkill.isCrafting = {quantity=quantity, spellId=TSM:GetSpellId(index)}

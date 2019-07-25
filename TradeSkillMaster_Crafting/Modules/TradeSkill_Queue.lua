@@ -136,8 +136,10 @@ function Queue:GetFrameInfo()
 				end,
 				OnClick = function(self, data, _, button)
 					if button == "RightButton" and data.index then
-						if data.profession == TSM:GetCurrentProfessionName() then
-							TradeSkill.Professions:SetSelectedTradeSkill(data.index)
+                        if data.profession == TSM:GetCurrentProfessionName() then
+                            TradeSkillFrame_SetSelection(data.index)
+                            TradeSkillFrame_Update()
+							TradeSkill.Professions:UpdateSelectedTradeSkill(true)
 							private.frame.professionsTab.st:SetScrollOffset(max(0, data.index - 1))
 						end
 					else

@@ -137,9 +137,10 @@ function private.reverseSpellLookups(itemString, boughtItemString)
 end
 
 function Gather:CraftNext(spellList)
-	local bagTotals = TSM:GetInventoryTotals()
-	for _, spellId in ipairs(C_TradeSkillUI.GetFilteredRecipeIDs()) do
-		if spellList[spellId] then
+    local bagTotals = TSM:GetInventoryTotals()
+    for i = 1, GetNumTradeSkills() do
+        local spellId = TSM:GetSpellId(i)
+		if spellId and spellList[spellId] then
 			local spellQuantity = spellList[spellId]
 			local craft = TSM.db.factionrealm.crafts[spellId]
 			-- figure out how many we can craft with mats in our bags
@@ -150,11 +151,11 @@ function Gather:CraftNext(spellList)
 			numCanCraft = min(spellQuantity, floor(numCanCraft / craft.numResult))
 			if numCanCraft > 0 then
 				local velName = craft.mats[TSM.VELLUM_ITEM_STRING] and (TSMAPI.Item:GetName(TSM.VELLUM_ITEM_STRING) or TSM.db.factionrealm.mats[TSM.VELLUM_ITEM_STRING].name) or nil
-				TradeSkill:CastTradeSkill(spellId, numCanCraft, velName)
+				TradeSkill:CastTradeSkill(i, numCanCraft, velName)
 				return
 			end
 		end
-	end
+    end
 end
 
 function private.ShoppingCallback(boughtItem, boughtQty)

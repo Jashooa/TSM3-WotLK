@@ -10,7 +10,7 @@ local TSM = select(2, ...)
 local TradeSkill = TSM:GetModule("TradeSkill")
 local Professions = TradeSkill:NewModule("Professions", "AceHook-3.0", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
-local private = { priceTextCache = { lastClear = 0 }, craftTimeInfo = { timeout = 0, endTime = 0 }, selectedTradeSkill = nil, stIndexLookup = {}, collapsedCategories = {} }
+local private = { priceTextCache = { lastClear = 0 }, craftTimeInfo = { timeout = 0, endTime = 0 }, selectedTradeSkill = nil, collapsedCategories = {} }
 
 
 -- ============================================================================
@@ -47,25 +47,13 @@ function private.InitializeDropdown(self, level)
 	if level == 1 then
 		info.text = CRAFT_IS_MAKEABLE
         info.func = function()
-			TradeSkillFrame.filterTbl.hasMaterials = not TradeSkillFrame.filterTbl.hasMaterials
-			TradeSkillOnlyShowMakeable(TradeSkillFrame.filterTbl.hasMaterials)
-			TradeSkillUpdateFilterBar()
+			TradeSkillOnlyShowMakeable(TradeSkillFrameAvailableFilterCheckButton:GetChecked())
+			--TradeSkillUpdateFilterBar()
 		end
 		info.keepShownOnClick = true
-		info.checked = TradeSkillFrame.filterTbl.hasMaterials
+		info.checked = TradeSkillFrameAvailableFilterCheckButton:GetChecked()
 		info.isNotRadio = true
 		Lib_UIDropDownMenu_AddButton(info, level)
-
-        info.text = TRADESKILL_FILTER_HAS_SKILL_UP
-        info.func = function()
-            TradeSkillFrame.filterTbl.hasSkillUp  = not TradeSkillFrame.filterTbl.hasSkillUp
-            TradeSkillOnlyShowSkillUps(TradeSkillFrame.filterTbl.hasSkillUp)
-            TradeSkillUpdateFilterBar()
-        end
-        info.keepShownOnClick = true
-        info.checked = TradeSkillFrame.filterTbl.hasSkillUp
-        info.isNotRadio = true
-        Lib_UIDropDownMenu_AddButton(info, level)
 
 		info.checked = 	nil
 		info.isNotRadio = nil
@@ -74,16 +62,12 @@ function private.InitializeDropdown(self, level)
 		info.keepShownOnClick = false
 		info.hasArrow = true
 
-		info.text = TRADESKILL_FILTER_SLOTS
+		info.text = "Filter Slot"
 		info.value = 1
 		Lib_UIDropDownMenu_AddButton(info, level)
 
-		info.text = TRADESKILL_FILTER_CATEGORY
+		info.text = "Filter Category"
 		info.value = 2
-		Lib_UIDropDownMenu_AddButton(info, level)
-
-		info.text = SOURCES
-		info.value = 3
 		Lib_UIDropDownMenu_AddButton(info, level)
 	elseif level == 2 then
 		if LIB_UIDROPDOWNMENU_MENU_VALUE == 1 then
@@ -199,7 +183,7 @@ function Professions:GetFrameInfo()
 				key = "st",
 				stCols = { { name = L["Name"], width = 0.8 }, { name = private:GetProfessionsTabPriceColumnText(), width = 0.2 } },
 				points = { { "TOPLEFT", 5, -70 }, { "BOTTOMRIGHT", -5, 177 } },
-				scripts = { "OnClick", "OnColumnClick", "OnEnter", "OnLeave" },
+				scripts = { "OnClick", "OnColumnClick" },
 			},
 			{
 				type = "Frame",
@@ -458,9 +442,9 @@ function Professions:GetFrameInfo()
 						Professions:UpdateST()
 					elseif button == "LeftButton" then
 						if IsModifiedClick() then
-							HandleModifiedItemClick(C_TradeSkillUI.GetRecipeItemLink(data.spellId))
+							HandleModifiedItemClick(GetTradeSkillItemLink(data.index))
 						else
-							Professions:SetSelectedTradeSkill(data.spellId, true)
+							Professions:SetSelectedTradeSkill(data.index, true)
 						end
 					end
 				end,
@@ -474,38 +458,27 @@ function Professions:GetFrameInfo()
 						Professions:UpdateST()
 					end
 				end,
-				OnEnter = function(self, data, col)
-					if not data.spellId then return end
-					local info = C_TradeSkillUI.GetRecipeInfo(data.spellId)
-					TradeSkillFrame_GenerateRankLinks(info)
-					local totalRanks, currentRank = TradeSkillFrame_CalculateRankInfoFromRankLinks(info);
-					if totalRanks == 1 or not currentRank then return end
-					GameTooltip:SetOwner(col, "ANCHOR_RIGHT")
-					GameTooltip:SetRecipeRankInfo(data.spellId, currentRank);
-				end,
-				OnLeave = function(self)
-					GameTooltip:Hide()
-				end,
 			},
 			-- craft info frame handlers
 			craftInfoFrame = {
 				infoFrame = {
 					icon = {
 						OnClick = function(self)
-							local spellId = self:GetParent():GetParent().spellId
-							if not spellId then return end
-							HandleModifiedItemClick(C_TradeSkillUI.GetRecipeItemLink(spellId))
+							local index = self:GetParent():GetParent().index
+							if not index then return end
+							HandleModifiedItemClick(GetTradeSkillItemLink(index))
 						end,
 						OnEnter = function(self)
-							local spellId = self:GetParent():GetParent().spellId
-							if not spellId then return end
+							local index = self:GetParent():GetParent().index
+                            if not index then return end
+                            local spellId = TSM:GetSpellId(index)
 							local itemString = spellId and TSM.db.factionrealm.crafts[spellId] and TSM.db.factionrealm.crafts[spellId].itemString
 							if itemString then
 								GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 								TSMAPI.Util:SafeTooltipLink(itemString)
 							else
 								GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-								GameTooltip:SetRecipeResultItem(spellId)
+								GameTooltip:SetTradeSkillItem(index)
 							end
 						end,
 						OnLeave = function(self)
@@ -542,14 +515,15 @@ function Professions:GetFrameInfo()
 						end,
 					},
 					queueBtn = {
-						OnClick = function(self, button)
-							local spellId = self:GetParent():GetParent().spellId
+                        OnClick = function(self, button)
+                            local index = self:GetParent():GetParent().index
+							local spellId = TSM:GetSpellId(index)
 							if not spellId or not TSM.db.factionrealm.crafts[spellId] then return end
 							local inputBoxNum = max(floor(self:GetParent().inputBox:GetNumber()), 1)
 
 							if button == "LeftButton" and IsModifiedClick() then
 								-- queue all that can be crafted
-								local numCanCraft = C_TradeSkillUI.GetRecipeInfo(spellId).numAvailable
+								local numCanCraft = select(3, GetTradeSkillInfo(index))
 								TSM.Queue:SetNumQueued(spellId, numCanCraft)
 							elseif button == "LeftButton" then
 								TSM.Queue:Add(spellId, inputBoxNum)
@@ -563,15 +537,15 @@ function Professions:GetFrameInfo()
 					},
 					createBtn = {
 						OnClick = function(self)
-							local spellId = self:GetParent():GetParent().spellId
-							TradeSkill:CastTradeSkill(spellId, self:GetParent().inputBox:GetNumber())
+							local index = self:GetParent():GetParent().index
+							TradeSkill:CastTradeSkill(index, self:GetParent().inputBox:GetNumber())
 						end
 					},
 					createAllBtn = {
-						OnClick = function(self)
-							local spellId = self:GetParent():GetParent().spellId
-							local quantity = C_TradeSkillUI.GetRecipeInfo(spellId).numAvailable
-							TradeSkill:CastTradeSkill(spellId, quantity, self.vellum)
+                        OnClick = function(self)
+							local index = self:GetParent():GetParent().index
+							local quantity = select(3, GetTradeSkillInfo(index))
+							TradeSkill:CastTradeSkill(index, quantity, self.vellum)
 							self:GetParent().inputBox:SetNumber(GetTradeskillRepeatCount())
 						end
 					},
@@ -665,7 +639,7 @@ function private:UpdateProfessionDropdown()
 	local list = TSM.TradeSkillScanner:GetProfessionList()
 	local playerName = select(2, IsTradeSkillLinked()) or UnitName("player")
 	local professionName = TSM:GetCurrentProfessionName()
-	local level, maxLevel = select(3, C_TradeSkillUI.GetTradeSkillLine())
+	local level, maxLevel = select(3, GetTradeSkillLine())
 	local currentSelection = playerName .. "~" .. professionName
 	private.frame.professionsTab.dropdown:SetList(list)
 	private.frame.professionsTab.dropdown:SetValue(currentSelection)
@@ -685,62 +659,10 @@ function private.IsCategoryCollapsed(categoryId)
 	return private.collapsedCategories[categoryId]
 end
 
-function private.GetRecipeList()
-	local dataList = {}
-	local currentCategoryID, currentParentCategoryID
-	local isCurrentCategoryEnabled, isCurrentParentCategoryEnabled = true, true
-	local starRankLinks = {}
-
-	for i, recipeID in ipairs(C_TradeSkillUI.GetFilteredRecipeIDs()) do
-		if not starRankLinks[recipeID] then
-			local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
-			TradeSkillFrame_GenerateRankLinks(recipeInfo, starRankLinks)
-
-			-- find the best recipe
-			while recipeInfo.previousRecipeInfo do
-				recipeInfo = recipeInfo.previousRecipeInfo
-			end
-			while recipeInfo.nextRecipeInfo and recipeInfo.nextRecipeInfo.learned do
-				recipeInfo = recipeInfo.nextRecipeInfo
-			end
-
-			if recipeInfo.categoryID ~= currentCategoryID then
-				local categoryData = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
-				isCurrentCategoryEnabled = categoryData.enabled
-
-				if categoryData.parentCategoryID ~= currentParentCategoryID then
-					currentParentCategoryID = categoryData.parentCategoryID
-					if currentParentCategoryID then
-						local parentCategoryData = C_TradeSkillUI.GetCategoryInfo(currentParentCategoryID)
-						isCurrentParentCategoryEnabled = parentCategoryData.enabled
-						if isCurrentParentCategoryEnabled then
-							tinsert(dataList, parentCategoryData)
-						end
-					else
-						isCurrentParentCategoryEnabled = true
-					end
-				end
-
-				if isCurrentCategoryEnabled and isCurrentParentCategoryEnabled and (not currentParentCategoryID or not private.IsCategoryCollapsed(currentParentCategoryID)) then
-					tinsert(dataList, categoryData)
-					currentCategoryID = recipeInfo.categoryID
-				end
-			end
-
-			if isCurrentCategoryEnabled and isCurrentParentCategoryEnabled and (not currentParentCategoryID or not private.IsCategoryCollapsed(currentParentCategoryID)) and not private.IsCategoryCollapsed(currentCategoryID) then
-				tinsert(dataList, recipeInfo)
-			end
-		end
-	end
-
-	return dataList
-end
-
 function Professions:UpdateST()
-	if not TradeSkill:GetVisibilityInfo().professionsTab then return end
+	if not TradeSkill:GetVisibilityInfo().professionsTab or not GetTradeSkillInfo(1) then return end
 	TSM:UpdateCraftReverseLookup()
 	local stData = {}
-	wipe(private.stIndexLookup)
 
 	if private.priceTextCache.lastClear + 60 < time() then
 		wipe(private.priceTextCache)
@@ -751,17 +673,11 @@ function Professions:UpdateST()
 	local numAvailableAllCache = {}
 	local inventoryTotals = select(4, TSM:GetInventoryTotals())
 	local playerName = UnitName("player")
-	for _, info in ipairs(private.GetRecipeList()) do
-		local spellId = info.recipeID
-		local name = info.name
-		if info.type == "header" then
-			name = "|cff" .. private:RGBPercToHex(TradeSkillTypeColor.header) .. name .. " [" .. (private.IsCategoryCollapsed(info.categoryID) and "+" or "-") .. "]|r"
-			tinsert(stData, { cols = { { value = name }, { value = "" } }, category = info.categoryID })
-		elseif info.type == "subheader" then
-			name = "|cff" .. private:RGBPercToHex(TradeSkillTypeColor.subheader) .. name .. " [" .. (private.IsCategoryCollapsed(info.categoryID) and "+" or "-") .. "]|r"
-			name = strrep("  ", info.numIndents) .. name
-			tinsert(stData, { cols = { { value = name }, { value = "" } }, category = info.categoryID })
-		elseif info.type == "recipe" then
+    for i = 1, GetNumTradeSkills() do
+        local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
+		local spellId = TSM:GetSpellId(i)
+        local name = skillName
+        if spellId then
 			local craft = TSM.db.factionrealm.crafts[spellId]
 
 			-- calculate the total we are able to craft including other inventory
@@ -782,7 +698,7 @@ function Professions:UpdateST()
 			end
 
 			-- update cooldown end time
-			local cooldown = C_TradeSkillUI.GetRecipeCooldown(spellId)
+			local cooldown = GetTradeSkillCooldown(spellId)
 			if not info.disabled and craft and craft.hasCD then
 				if not craft.cooldownTimes then
 					craft.cooldownTimes = {}
@@ -797,7 +713,7 @@ function Professions:UpdateST()
 				end
 			end
 
---[[
+            local leader = ""
 			-- set the leader for this row
 			if skillType == "header" then
 				leader = ""
@@ -807,28 +723,21 @@ function Professions:UpdateST()
 			end
 
 			-- add text for header
-			if skillType == "header" or skillType == "subheader" then
-				if showProgressBar then
-					skillName = skillName .. " (" .. currentRank .. "/" .. maxRank .. ") " .. (isExpanded and " [-]" or " [+]")
-				else
-					skillName = skillName .. (isExpanded and " [-]" or " [+]")
-				end
-			end
-]]
+            if skillType == "header" or skillType == "subheader" then
+                name = "|cff" .. private:RGBPercToHex(TradeSkillTypeColor["header"]) .. name .. " [" .. (isExpanded and "-" or "+") .. "]|r"
+            end
 
-			-- add text for multiple skill-ups
-			if info.numSkillUps > 1 and info.difficulty == "optimal" then
-				name = name .. " <" .. info.numSkillUps .. ">"
-			end
-
-			-- set the text for the number available if necessary, add color, and all the leader
-			local leader = strrep("  ", info.numIndents + 1)
-			if info.numAvailable > 0 or (numAvailableAll and numAvailableAll > 0) then
-				local availableText = info.numAvailable .. " (" .. (numAvailableAll or 0) .. ")"
-				name = leader .. "|cff" .. private:RGBPercToHex(TradeSkillTypeColor[info.difficulty]) .. name .. " [" .. availableText .. "]|r"
+			if numAvailable > 0 or (numAvailableAll and numAvailableAll > 0) then
+				local availableText = numAvailable .. " (" .. (numAvailableAll or 0) .. ")"
+				name = leader .. "|cff" .. private:RGBPercToHex(TradeSkillTypeColor[skillType]) .. name .. " [" .. availableText .. "]|r"
 			else
-				name = leader .. "|cff" .. private:RGBPercToHex(TradeSkillTypeColor[info.difficulty]) .. name .. "|r"
-			end
+				name = leader .. "|cff" .. private:RGBPercToHex(TradeSkillTypeColor[skillType]) .. name .. "|r"
+            end
+
+            -- set the leader for the next row after a header/subheader to be indented one extra
+            if skillType == "header" or skillType == "subheader" then
+                leader = leader .. "  "
+            end
 
 			-- get the price text
 			local priceText = private.priceTextCache[spellId]
@@ -853,9 +762,6 @@ function Professions:UpdateST()
 
 
 			tinsert(stData, { cols = { { value = name }, { value = priceText } }, spellId = spellId })
-			private.stIndexLookup[spellId] = #stData
-		else
-			TSMAPI:Assert(false, "Invalid type: "..info.type)
 		end
 	end
 
@@ -864,63 +770,47 @@ function Professions:UpdateST()
 	private.frame.professionsTab.craftInfoFrame.buttonsFrame.inputBox:SetNumber(GetTradeskillRepeatCount())
 end
 
-function private.ValidateTradeSkill(spellId)
-	local firstVisibleSpellId = nil
-	for _, recipeId in ipairs(C_TradeSkillUI.GetFilteredRecipeIDs()) do
-		if recipeId == spellId then
-			return spellId
-		end
-		firstVisibleSpellId = firstVisibleSpellId or recipeId
-	end
-	return firstVisibleSpellId
-end
-
-function Professions:SetSelectedTradeSkill(spellId, forceUpdate)
+function Professions:SetSelectedTradeSkill(skillIndex, forceUpdate)
 	if not TradeSkill:GetVisibilityInfo().professionsTab then return end
 
-	-- verify that the spellId is valid
-	spellId = private.ValidateTradeSkill(spellId)
-	forceUpdate = forceUpdate or spellId ~= private.selectedTradeSkill
-	private.selectedTradeSkill = spellId
+    local frame = private.frame.professionsTab
+	if GetTradeSkillSelectionIndex() == 0 then
+		private.selectedTradeSkill = GetFirstTradeSkill()
+	else
+		private.selectedTradeSkill = GetTradeSkillSelectionIndex()
+    end
 
-	local frame = private.frame.professionsTab
+    local spellId = TSM:GetSpellId(private.selectedTradeSkill)
+
 	if not spellId then
 		frame.craftInfoFrame:Hide()
 		return
 	end
-	frame.craftInfoFrame:Show()
+    frame.craftInfoFrame:Show()
 
+    forceUpdate = forceUpdate or (frame.st:GetSelection() or 0) - 1 ~= private.selectedTradeSkill
 	if forceUpdate then
-		frame.st:SetSelection(private.stIndexLookup[spellId])
-		local info = C_TradeSkillUI.GetRecipeInfo(spellId)
-		local name = info.name
+        frame.st:SetSelection(private.selectedTradeSkill + 1)
+        local skillIndex = private.selectedTradeSkill
+        local name, _, numAvailable, _, alternateVerb = GetTradeSkillInfo(skillIndex)
 		-- Enable display of items created
-		local lNum, hNum = GetTradeSkillNumMade(spellId)
-		-- workaround for incorrect values returned for Temporal Crystal
-		if TSM:IsCurrentProfessionEnchanting() and spellId == 169092 then
-			local itemString = TSM.db.factionrealm.crafts[spellId] and TSM.db.factionrealm.crafts[spellId].itemString
-			if itemString == "i:113588" then
-				lNum, hNum = 1, 1
-			end
-		end
+		local lNum, hNum = GetTradeSkillNumMade(skillIndex)
 		local numMade = floor(((lNum or 1) + (hNum or 1)) / 2)
-		if info.alternateVerb == ENSCRIBE then
+		if alternateVerb == ENSCRIBE then
 			numMade = 1
 		end
 		if numMade > 1 then
 			name = numMade .. " x " .. name
 		end
 		frame.craftInfoFrame.spellId = spellId
-		frame.craftInfoFrame.infoFrame.icon:SetTexture(info.icon)
+		frame.craftInfoFrame.infoFrame.icon:SetTexture(GetTradeSkillIcon(skillIndex))
 		frame.craftInfoFrame.infoFrame.nameText:SetText(TSMAPI.Design:GetInlineColor("link") .. (name or "") .. "|r")
-		frame.craftInfoFrame.infoFrame.descText:SetText(C_TradeSkillUI.GetRecipeDescription(spellId))
+		frame.craftInfoFrame.infoFrame.descText:SetText(GetTradeSkillDescription(skillIndex))
 
-		local toolsInfo = BuildColoredListString(C_TradeSkillUI.GetRecipeTools(spellId))
+		local toolsInfo = BuildColoredListString(GetTradeSkillTools(skillIndex))
 		frame.craftInfoFrame.infoFrame.toolsText:SetText(toolsInfo and REQUIRES_LABEL .. " " .. toolsInfo or "")
-		local cooldown, isDaily = C_TradeSkillUI.GetRecipeCooldown(spellId)
-		if info.disabled then
-			frame.craftInfoFrame.infoFrame.cooldownText:SetText("|cffff0000" .. info.disabledReason .. "|r")
-		elseif not cooldown then
+		local cooldown, isDaily = GetTradeSkillCooldown(skillIndex)
+		if not cooldown then
 			frame.craftInfoFrame.infoFrame.cooldownText:SetText("")
 		elseif cooldown > 60 * 60 * 24 then -- cooldown is greater than 1 day
 			frame.craftInfoFrame.infoFrame.cooldownText:SetText("|cffff0000" .. COOLDOWN_REMAINING .. " " .. SecondsToTime(cooldown, true, false, 1, true) .. "|r")
@@ -931,10 +821,10 @@ function Professions:SetSelectedTradeSkill(spellId, forceUpdate)
 		end
 
 		for i, btn in ipairs(frame.craftInfoFrame.matsFrame.reagentButtons) do
-			local name, texture, needed, player = GetTradeSkillReagentInfo(spellId, i)
+			local name, texture, needed, player = GetTradeSkillReagentInfo(skillIndex, i)
 			if player ~= nil then
 				btn:Show()
-				btn.link = GetTradeSkillReagentItemLink(spellId, i)
+				btn.link = GetTradeSkillReagentItemLink(skillIndex, i)
 				local linkText = (texture and "|T" .. texture .. ":0|t" or "") .. " " .. (btn.link or name)
 				local color = (needed > player) and "|cffff0000" or "|cff00ff00"
 				btn:SetText(format("%s(%d/%d) %s|r", color, player, needed, linkText))
@@ -952,8 +842,8 @@ function Professions:SetSelectedTradeSkill(spellId, forceUpdate)
 			frame.craftInfoFrame.buttonsFrame.createAllBtn.vellum = nil
 		end
 
-		local isUnavailable = info.disabled
-		if info.numAvailable > 0 and not IsTradeSkillLinked() then
+		local isUnavailable = false
+		if numAvailable > 0 and not IsTradeSkillLinked() then
 			local num = frame.craftInfoFrame.buttonsFrame.inputBox:GetNumber()
 			frame.craftInfoFrame.buttonsFrame.inputBox:SetNumber(max(min(num, info.numAvailable), 1))
 		else

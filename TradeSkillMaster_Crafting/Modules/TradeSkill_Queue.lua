@@ -135,17 +135,17 @@ function Queue:GetFrameInfo()
 					GameTooltip:Hide()
 				end,
 				OnClick = function(self, data, _, button)
-					if button == "RightButton" and data.spellId then
+					if button == "RightButton" and data.index then
 						if data.profession == TSM:GetCurrentProfessionName() then
-							TradeSkill.Professions:SetSelectedTradeSkill(data.spellId)
-							--private.frame.professionsTab.st:SetScrollOffset(max(0, data.index - 1)) -- FIXME
+							TradeSkill.Professions:SetSelectedTradeSkill(data.index)
+							private.frame.professionsTab.st:SetScrollOffset(max(0, data.index - 1))
 						end
 					else
 						if data.isTitle then
 							TSM.db.factionrealm.queueStatus.collapsed[data.profession] = not TSM.db.factionrealm.queueStatus.collapsed[data.profession]
 							Queue.Update()
-						elseif data.spellId then
-							TradeSkill:CastTradeSkill(data.spellId, min(data.canCraft, data.numQueued), data.velName)
+						elseif data.index then
+							TradeSkill:CastTradeSkill(data.index, min(data.canCraft, data.numQueued), data.velName)
 						end
 					end
 				end,
@@ -278,10 +278,13 @@ function Queue:Update()
 	if not TradeSkill:GetVisibilityInfo().queue then return end
 	TSM:UpdateCraftReverseLookup()
 
-	local visibleSpellIds = {}
-	for _, spellId in ipairs(C_TradeSkillUI.GetFilteredRecipeIDs()) do
-		visibleSpellIds[spellId] = true
-	end
+    local skillIndexLookup = {}
+    for i = 1, GetNumTradeSkills() do
+        local spellId = TSM:GetSpellId(i)
+        if spellId then
+            skillIndexLookup[spellId] = i
+        end
+    end
 
 	local stData = {}
 	local bagTotals = TSM:GetInventoryTotals()
@@ -331,19 +334,20 @@ function Queue:Update()
 					numCanCraft = max(min(numCanCraft, floor((bagTotals[itemString] or 0) / quantity)), 0)
 				end
 
-				local leader, craftStatus
+                local leader, craftStatus
+                local craftIndex = skillIndexLookup[spellId]
 				if numCanCraft >= numQueued then
 					-- green (can craft all)
-					leader = visibleSpellIds[spellId] and "|cff00ff00" or "|cff008800"
+					leader = craftIndex and "|cff00ff00" or "|cff008800"
 				elseif numCanCraft > 0 then
 					-- blue (can craft some)
-					leader = visibleSpellIds[spellId] and "|cff5599ff" or "|cff224488"
+					leader = craftIndex and "|cff5599ff" or "|cff224488"
 				else
 					-- orange (can't craft any)
-					leader = visibleSpellIds[spellId] and "|cffff7700" or "|cff883300"
+					leader = craftIndex and "|cffff7700" or "|cff883300"
 				end
 
-				if not visibleSpellIds[spellId] and craft.players[UnitName("player")] and craft.profession == currentProfession then
+				if not craftIndex and craft.players[UnitName("player")] and craft.profession == currentProfession then
 					leader = L["|cffff0000[Filtered]|r "] .. leader
 				end
 
@@ -353,7 +357,7 @@ function Queue:Update()
 				local rowText = format("%s[%d] %s|r", leader, numQueued, TSM.db.factionrealm.crafts[spellId].name or "?")
 				local velName = craft.mats[TSM.VELLUM_ITEM_STRING] and (GetItemInfo(TSM.VELLUM_ITEM_STRING) or TSM.db.factionrealm.mats[TSM.VELLUM_ITEM_STRING].name) or nil
 				local craftProfit = select(3, TSM.Cost:GetSpellCraftPrices(spellId))
-				tinsert(stData, { cols = { { value = rowText } }, spellId = spellId, canCraft = numCanCraft, numQueued = numQueued, velName = velName, profit = craftProfit, profession = profession })
+				tinsert(stData, { cols = { { value = rowText } }, spellId = spellId, canCraft = numCanCraft, numQueued = numQueued, index = craftIndex, velName = velName, profit = craftProfit, profession = profession })
 			end
 		end
 	end
@@ -361,8 +365,8 @@ function Queue:Update()
 	private.craftNextInfo = nil
 	for _, row in ipairs(stData) do
 		-- set the craftNextInfo to the first thing we can craft in the queue
-		if row.spellId and row.canCraft > 0 then
-			private.craftNextInfo = { spellId = row.spellId, quantity = min(row.numQueued, row.canCraft), velName = row.velName }
+		if row.index and row.canCraft > 0 then
+			private.craftNextInfo = { index = row.index, quantity = min(row.numQueued, row.canCraft), velName = row.velName }
 			break
 		end
 	end

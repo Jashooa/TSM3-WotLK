@@ -332,9 +332,12 @@ function TSM:RestockHelp(link)
 	print(L["This item will be added to the queue when you restock its group. If this isn't happening, make a post on the TSM forums with a screenshot of the item's tooltip, operation settings, and your general TSM_Crafting options."])
 end
 
-function TSM:GetSpellId(link)
-	TSMAPI:Assert(type(linkOrIndex) == "string")
-	return tonumber(strmatch(linkOrIndex, ":(%d+)\124h"))
+function TSM:GetSpellId(linkOrIndex)
+	if type(linkOrIndex) == "number" then
+		-- it's an index
+		linkOrIndex = GetTradeSkillRecipeLink(linkOrIndex)
+	end
+	return type(linkOrIndex) == "string" and tonumber(strmatch(linkOrIndex, ":(%d+)\124h")) or nil
 end
 
 function TSM:GetCurrentProfessionName()

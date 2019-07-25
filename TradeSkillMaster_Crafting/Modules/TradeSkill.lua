@@ -10,7 +10,7 @@
 local TSM = select(2, ...)
 local TradeSkill = TSM:NewModule("TradeSkill", "AceEvent-3.0", "AceHook-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
-local private = {frame=nil, switchBtn=nil, currentProfession=nil, currentProfessionId=nil, managerThreadId=nil, noHide=nil, noShow=nil, scanSuccess=nil}
+local private = {frame=nil, switchBtn=nil, currentProfession=nil, managerThreadId=nil, noHide=nil, noShow=nil, scanSuccess=nil}
 
 
 -- ============================================================================
@@ -67,7 +67,7 @@ function TradeSkill:EventHandler(event, ...)
 	elseif event == "CHAT_MSG_SKILL" then
 		-- update the skill level of the player's tradeskill
 		local skillName = TSM:GetCurrentProfessionName()
-		local level, maxLevel = select(3, C_TradeSkillUI.GetTradeSkillLine())
+		local level, maxLevel = select(3, GetTradeSkillLine())
 		local isLinked, linkedPlayer = IsTradeSkillLinked()
 		local playerName = linkedPlayer or UnitName("player")
 		if skillName and skillName ~= "UNKNOWN" and not isLinked and TSM.db.factionrealm.playerProfessions[playerName] and TSM.db.factionrealm.playerProfessions[playerName][skillName] then
@@ -366,7 +366,7 @@ function private:Create()
 				},
 				craftST = {
 					OnClick = function(self, data, _, button)
-						TradeSkill:CastTradeSkill(data.spellId, data.quantity)
+						TradeSkill:CastTradeSkill(data.index, data.quantity)
 					end,
 				},
 			},
@@ -477,14 +477,14 @@ function private:UpdateCooldownsFrame()
 		end
 	end
 
-	for _, spellId in ipairs(C_TradeSkillUI.GetFilteredRecipeIDs()) do
-		local info = C_TradeSkillUI.GetRecipeInfo(spellId)
-		local numAvailable = info.numAvailable
+    for i = 1, GetNumTradeSkills() do
+        local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
+        local spellId = TSM:GetSpellId(i)
 		local craft = TSM.db.factionrealm.crafts[spellId]
-		local cooldown, isDaily = C_TradeSkillUI.GetRecipeCooldown(spellId)
+		local cooldown, isDaily = GetTradeSkillCooldown(i)
 		if not cooldown and isDaily and craft and craft.cooldownTimes and craft.cooldownTimes[currentPlayer] and craft.cooldownTimes[currentPlayer].prompt then
 			if numAvailable > 0 then
-				tinsert(stData, {cols={{value="|cff00ff00"..info.name.."|r"}}, spellId = spellId, quantity = 1})
+				tinsert(stData, {cols={{value="|cff00ff00"..skillName.."|r"}}, spellId = spellId, quantity = 1})
 				numAvailable = numAvailable - 1
 			else
 				-- we don't have the mats on-hand, so add it to the queue
@@ -494,14 +494,14 @@ function private:UpdateCooldownsFrame()
 
 		local totalNeeded = 0
 		for _, pc in pairs(potentialCrafts) do
-			if craft and pc.item == info.name then
+			if craft and pc.item == skillName then
 				totalNeeded = totalNeeded + pc.need
 			end
 		end
 
 		if totalNeeded > 0 then
 			if numAvailable >= totalNeeded then
-				tinsert(stData, {cols={{value=format("|cff00ff00%s|r%s",info.name,totalNeeded == 1 and '' or ' ('..tostring(totalNeeded)..')') }}, spellId = spellId, quantity = totalNeeded})
+				tinsert(stData, {cols={{value=format("|cff00ff00%s|r%s", skillName, totalNeeded == 1 and '' or ' ('..tostring(totalNeeded)..')') }}, spellId = spellId, quantity = totalNeeded})
 			else
 				TSM.Queue:SetNumQueued(spellId, totalNeeded)
 			end
@@ -534,7 +534,7 @@ function private.SetBlizzardProfessionFrameVisible(visible)
 		TradeSkillFrame_LoadUI()
 		TradeSkillFrame:SetScript("OnHide", private.BlizzardProfessionFrameOnHide)
 		ShowUIPanel(TradeSkillFrame)
-		TradeSkillFrame:OnDataSourceChanged()
+		--TradeSkillFrame:OnDataSourceChanged()
 		private:CreateSwitchButton()
 		private.switchBtn:Show()
 		private.switchBtn:Update()
@@ -572,7 +572,7 @@ function private.SetTSMCraftingProfessionFrameVisible(visible)
 end
 
 function private.CloseProfession()
-	if not C_TradeSkillUI.GetTradeSkillLine() then return end
+	if not GetTradeSkillLine() then return end
 	CloseTradeSkill()
 end
 
@@ -597,14 +597,13 @@ function private.ScanOpenProfessionThread(self)
 end
 
 function private.ProfessionWindowManagerHandleShowThread(self)
-	if C_TradeSkillUI.GetTradeSkillLine() == private.currentProfessionId then return end
+	if GetTradeSkillLine() == private.currentProfession then return end
 
 	if not TradeSkillFrame then
 		-- need to make sure Blizzard_TradeSkillUI is loaded cause we rely on some of its tables
 		TradeSkillFrame_LoadUI()
 		TradeSkillFrame:SetScript("OnHide", nil)
 		HideUIPanel(TradeSkillFrame)
-		TradeSkillFrame.RecipeList.collapsedCategories = {}
 	end
 
 	-- hide any currently-visible frames
@@ -613,7 +612,7 @@ function private.ProfessionWindowManagerHandleShowThread(self)
 
 	-- wait for the the profession to actually load
 	while TSM:GetCurrentProfessionName() == "UNKNOWN" or InCombatLockdown() do self:Yield(true) end
-	private.currentProfessionId = C_TradeSkillUI.GetTradeSkillLine()
+	private.currentProfession = GetTradeSkillLine()
 
 	-- check if it's a profession we don't support showing our frame for (runeforging, guild profession, or random linked profession)
 	local isLinked, linkedPlayer = IsTradeSkillLinked()
@@ -662,7 +661,6 @@ function private.ProfessionWindowManagerThread(self)
 			private.SetBlizzardProfessionFrameVisible(false)
 			private.SetTSMCraftingProfessionFrameVisible(false)
 			private.CloseProfession()
-			private.currentProfessionId = nil
 			private.currentProfession = nil
 		else
 			TSMAPI:Assert(false, "Unexpected event: "..tostring(event))
@@ -689,8 +687,12 @@ function TradeSkill:ClearFilters()
     SetTradeSkillInvSlotFilter(0, 1, 1);
 	SetTradeSkillItemNameFilter("")
 	TradeSkillOnlyShowMakeable(false)
-	TradeSkillOnlyShowSkillUps(false)
-	PanelTemplates_SetTab(TradeSkillFrame.RecipeList, 1)
+    TradeSkillOnlyShowSkillUps(false)
+	if TradeSkillCollapseAllButton.collapsed then
+		TradeSkillCollapseAllButton:Click()
+	end
+	ExpandTradeSkillSubClass(0)
+	TradeSkillFrame_Update()
 	if private.frame then
 		-- reset the search bar
 		private.frame.professionsTab.searchBar:SetTextColor(1, 1, 1, 0.5)
@@ -699,11 +701,11 @@ function TradeSkill:ClearFilters()
 	end
 end
 
-function TradeSkill:CastTradeSkill(spellId, quantity, vellum)
-	TradeSkill.Professions:SetSelectedTradeSkill(spellId)
+function TradeSkill:CastTradeSkill(index, quantity, vellum)
+	TradeSkill.Professions:SetSelectedTradeSkill(index)
 	quantity = vellum and 1 or quantity
-	C_TradeSkillUI.CraftRecipe(spellId, quantity)
-	TradeSkill.isCrafting = {quantity=quantity, spellId=spellId}
+	DoTradeSkill(index, quantity)
+	TradeSkill.isCrafting = {quantity=quantity, spellId=TSM:GetSpellId(index)}
 	if vellum then
 		UseItemByName(vellum)
 	end

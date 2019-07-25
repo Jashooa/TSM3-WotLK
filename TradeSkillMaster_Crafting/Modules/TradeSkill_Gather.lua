@@ -1122,21 +1122,22 @@ function Gather:Update(firstRun)
 			TSM.db.factionrealm.gathering.availableMats = availableMats[private.currentSource]["bags"]
 		elseif private.currentSource == "crafting" and availableMats["crafting"] and availableMats["crafting"][TSM:GetCurrentProfessionName()] then
 			local craftingMats = {}
-			local bagTotals = TSM:GetInventoryTotals()
-			for _, spellID in ipairs(C_TradeSkillUI.GetFilteredRecipeIDs()) do
-				if availableMats["crafting"][TSM:GetCurrentProfessionName()][spellID] then
+            local bagTotals = TSM:GetInventoryTotals()
+            for i = 1, GetNumTradeSkills() do
+                local spellId = TSM:GetSpellId(i)
+				if spellId and  availableMats["crafting"][TSM:GetCurrentProfessionName()][spellId] then
 					local bagTotals = TSM:GetInventoryTotals()
-					local craft = TSM.db.factionrealm.crafts[spellID]
+					local craft = TSM.db.factionrealm.crafts[spellId]
 					-- figure out how many we can craft with mats in our bags
 					local numCanCraft = math.huge
 					for itemString, quantity in pairs(craft.mats) do
 						numCanCraft = max(min(numCanCraft, floor((bagTotals[itemString] or 0) / quantity)), 0)
 					end
-					if numCanCraft > 0 and TSM.db.factionrealm.gathering.selectedSourceStatus[spellID] then
-						craftingMats[spellID] = availableMats[private.currentSource][TSM:GetCurrentProfessionName()][spellID]
+					if numCanCraft > 0 and TSM.db.factionrealm.gathering.selectedSourceStatus[spellId] then
+						craftingMats[spellId] = availableMats[private.currentSource][TSM:GetCurrentProfessionName()][spellId]
 					end
 				end
-			end
+            end
 			if next(craftingMats) then
 				TSM.db.factionrealm.gathering.availableMats = craftingMats
 			end

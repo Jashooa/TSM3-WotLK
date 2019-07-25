@@ -547,7 +547,6 @@ function private.SetBlizzardProfessionFrameVisible(visible)
 		private.switchBtn:Show()
 		private.switchBtn:Update()
     elseif not visible and TradeSkillFrame then
-        print("SetBlizzardProfessionFrameVisible false")
 		private.noHide = true
 		HideUIPanel(TradeSkillFrame)
 		private.noHide = nil
@@ -556,7 +555,6 @@ end
 
 function private.SetTSMCraftingProfessionFrameVisible(visible)
     if visible and not (private.frame and private.frame:IsVisible()) then
-        print("SetTSMCraftingProfessionFrameVisible true")
 		private:Create()
 		private:CreateSwitchButton()
 		private.frame:Show()

@@ -11,7 +11,7 @@
 local TSM = select(2, ...)
 local Items = TSM:NewModule("Items", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
-local private = {itemInfo={}, bonusIdCache={}, bonusIdTemp={}, scanTooltip=nil, newItems={}, numPending=0, itemLevelCache = {}, soulboundCache = {}, minLevelCache = {}, canUseCache = {}}
+local private = {itemInfo={}, scanTooltip=nil, newItems={}, numPending=0, itemLevelCache = {}, soulboundCache = {}, minLevelCache = {}, canUseCache = {}}
 local STATIC_DATA = {classLookup={}, classIdLookup={}, inventorySlotIdLookup={}}
 
 for classId, class in pairs({GetAuctionItemClasses()}) do

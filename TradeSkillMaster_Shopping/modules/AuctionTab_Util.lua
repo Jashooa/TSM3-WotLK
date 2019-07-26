@@ -108,7 +108,7 @@ local function GetItemInventoryType(str)
 end
 
 local function GetItemRarity(str)
-	for i=0, 4 do
+	for i=0, getn(ITEM_QUALITY_COLORS)-2 do
 		local text =  _G["ITEM_QUALITY"..i.."_DESC"]
 		if strlower(str) == strlower(text) then
 			return i
@@ -223,7 +223,7 @@ local function GetSearchFilterOptions(searchTerm)
 		minILevel = oldMaxILevel
 	end
 
-	return true, queryString or "", class or nil, subClass or nil, invType or nil, minLevel or 0, maxLevel or 0, minILevel or 0, maxILevel or 0, rarity or 0, usableOnly or nil, exactOnly or nil, evenOnly or nil, maxQuantity or math.huge, maxPrice
+	return true, queryString or "", class or nil, subClass or nil, invType or nil, minLevel or nil, maxLevel or nil, minILevel or nil, maxILevel or nil, rarity or -1, usableOnly and 1 or nil, exactOnly or nil, evenOnly or nil, maxQuantity or math.huge, maxPrice
 end
 
 -- gets all the filters for a given search term (possibly semicolon-deliminated list of search terms)
@@ -274,9 +274,9 @@ function AuctionTabUtil:GetMatchingFilter(queries, auctionRecord)
 		isValid = isValid and (not query.quality or query.quality == 0 or quality >= query.quality)
 		isValid = isValid and (not query.minLevel or query.minLevel == 0 or level >= query.minLevel)
 		isValid = isValid and (not query.maxLevel or query.maxLevel == 0 or level <= query.maxLevel)
-		isValid = isValid and (query.class == nil or classId == query.class)
-		isValid = isValid and (query.subClass == nil or subClassId == query.subClass)
-		isValid = isValid and (query.invType == nil or invType == query.invType)
+		isValid = isValid and (query.class == 0 or classId == query.class)
+		isValid = isValid and (query.subClass == 0 or subClassId == query.subClass)
+		isValid = isValid and (query.invType == 0 or invType == query.invType)
 		if isValid then
 			return query
 		end

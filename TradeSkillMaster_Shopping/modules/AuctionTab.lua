@@ -37,7 +37,7 @@ function AuctionTab:OnEnable()
 	end
 
 	AuctionTab:RawHook("HandleModifiedItemClick", function(link) return SearchItemLink(AuctionTab.hooks.HandleModifiedItemClick, link) end, true)
-	AuctionTab:RawHook("ChatEdit_InsertLink", function(link) return SearchItemLink(AuctionTab.hooks.ChatEdit_InsertLink, link) end, true)
+    AuctionTab:RawHook("ChatEdit_InsertLink", function(link) return SearchItemLink(AuctionTab.hooks.ChatEdit_InsertLink, link) end, true)
 	TSM.AuctionTabFrame:SetPrivate(private)
 end
 
@@ -54,10 +54,6 @@ function AuctionTab:Hide()
 end
 
 function AuctionTab:StartSearch(searchInfo)
-	-- fix a bug in Blizzard's code as of 7.0.x caused by auctions missing from the AH pages
-	if not ITEM_QUALITY_COLORS[-1] then
-		ITEM_QUALITY_COLORS[-1] = {r=0, b=0, g=0}
-	end
 	if private.searchInProgress then return end
 	private:ShowAHTab()
 	TSMAPI:Assert(TSMAPI.Auction:IsTabVisible("Shopping"))
@@ -801,7 +797,7 @@ function private.ValidateDatabaseRecord(record, auctionInfo)
 	end
 
 	-- filter by items which were searched for
-	if auctionInfo.searchItemsLookup and not auctionInfo.searchItemsLookup[record.itemString] and not auctionInfo.searchItemsLookup[record.baseItemString] then
+    if auctionInfo.searchItemsLookup and not auctionInfo.searchItemsLookup[record.itemString] and not auctionInfo.searchItemsLookup[record.baseItemString] then
 		return
 	end
 
@@ -823,36 +819,41 @@ function private.ValidateDatabaseRecord(record, auctionInfo)
 		query = TSM.AuctionTabUtil:GetMatchingFilter(private.extraInfo.queries, record)
 
 		if not query then
-			private.extraInfo.queryCache[record.itemString] = false
+            private.extraInfo.queryCache[record.itemString] = false
 			return
 		else
 			private.extraInfo.queryCache[record.itemString] = query
 		end
-	elseif query == false then
+    elseif query == false then
 		return
-	end
+    end
+
+    -- filter items that aren't exact
+    if query.exact and strlower(record.name) ~= strlower(query.name) then
+        return
+    end
 
 	-- filter uneven stacks when evenOnly was specified
-	if query.evenOnly and record.stackSize % 5 ~= 0 then
+    if query.evenOnly and record.stackSize % 5 ~= 0 then
 		return
 	end
 
 	-- check the item level
-	if (query.minILevel or 0) > 0 and record.itemLevel < query.minILevel then
+    if (query.minILevel or 0) > 0 and record.itemLevel < query.minILevel then
 		return
 	end
-	if (query.maxILevel or 0) > 0 and record.itemLevel > query.maxILevel then
+    if (query.maxILevel or 0) > 0 and record.itemLevel > query.maxILevel then
 		return
 	end
 
 	-- filter by max price
 	maxPrice = maxPrice or query.maxPrice
-	if maxPrice and ((record.itemBuyout > 0) and record.itemBuyout or record.itemDisplayedBid) > maxPrice then
+    if maxPrice and ((record.itemBuyout > 0) and record.itemBuyout or record.itemDisplayedBid) > maxPrice then
 		return
 	end
 
 	-- filter by max quantity
-	if private:GetMaxQuantity(record) <= 0 then
+    if private:GetMaxQuantity(record) <= 0 then
 		return
 	end
 
@@ -914,21 +915,8 @@ function private.AuctionTabThread(self)
 					self:SendMsgToSelf("SCAN_DONE", true)
 				elseif searchInfo.item then
 					TSMAPI:Assert(not searchInfo.filter) -- only one type of search is allowed
-					TSMAPI:Assert(type(searchInfo.item) == "table" or type(searchInfo.item) == "string")
-					for i = 1, 30 do
-						if type(searchInfo.item) == "table" then
-							local isValid = true
-							for _, itemString in pairs(searchInfo.item) do
-								if not TSMAPI.Item:GetName(itemString) then
-									isValid = false
-								end
-							end
-							if isValid then break end
-						else
-							if TSMAPI.Item:GetName(searchInfo.item) then break end
-						end
-						self:Sleep(0.1)
-					end
+                    TSMAPI:Assert(type(searchInfo.item) == "table" or type(searchInfo.item) == "string")
+                    self:WaitForItemInfo(searchInfo.item)
 					if type(searchInfo.item) ~= "table" then
 						searchInfo.item = { searchInfo.item }
 					end
@@ -979,17 +967,7 @@ function private.AuctionTabThread(self)
 						end
 					end
 				end
-				local isValidTargetItem = true
-				if not targetItem then
-					isValidTargetItem = false
-				else
-					for i = 1, 30 do
-						isValidTargetItem = TSMAPI.Item:GetName(targetItem)
-						if isValidTargetItem then break end
-						self:Sleep(0.1)
-					end
-				end
-				if not isValidTargetItem then
+				if not targetItem or not self:WaitForItemInfo(targetItem) then
 					TSM:Print(L["This is not a valid target item."])
 				else
 					searchFilter = TSM.AuctionTabUtil:GetCraftingFilterString(targetItem, private.extraInfo.ignoreDisenchant)

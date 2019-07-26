@@ -286,6 +286,16 @@ private.ThreadPrototype = {
 	SetYieldInvariant = function(self, func)
 		local thread = private.threads[self._threadId]
 		thread.yieldInvariant = func
+    end,
+
+	-- Waits for item info to be available for the passed item or list of items
+	WaitForItemInfo = function(self, items, numTries)
+		for i=1, (numTries or 10) do
+			if TSMAPI.Item:HasInfo(items) then
+				return true
+			end
+			self:Sleep(0.1)
+		end
 	end,
 
 	-- Causes the thread to exit immediately and call the callback if isGraceful is true

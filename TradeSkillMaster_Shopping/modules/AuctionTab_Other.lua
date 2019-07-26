@@ -58,7 +58,8 @@ function private:StartFilterSearch()
 	end
 
 	local rarity = private.frame.filter.rarityDropdown:GetValue()
-	if rarity then
+    if rarity then
+        rarity = rarity - 1
 		filter = format("%s/%s", filter,  _G["ITEM_QUALITY"..rarity.."_DESC"])
 	end
 
@@ -95,16 +96,7 @@ function private.StartSearchThread(self, mode)
 	for itemString in pairs(lastScanData) do
 		TSMAPI.Item:FetchInfo(itemString)
 	end
-	for i = 1, 30 do
-		local haveInfo = true
-		for itemString in pairs(lastScanData) do
-			if not TSMAPI.Item:GetName(itemString) then
-				haveInfo = false
-			end
-		end
-		if haveInfo then break end
-		self:Sleep(0.1)
-	end
+	self:WaitForItemInfo(lastScanData)
 
 	local itemList = {}
 	local searchBoxText = nil
@@ -176,7 +168,7 @@ end
 function AuctionTabOther:GetFrameInfo()
 	local rarityList = {}
     local itemClasses = TSMAPI.Item:GetItemClasses()
-	for i = 1, 4 do tinsert(rarityList, _G["ITEM_QUALITY"..i.."_DESC"]) end
+	for i = 0, getn(ITEM_QUALITY_COLORS)-2  do tinsert(rarityList, _G["ITEM_QUALITY"..i.."_DESC"]) end
 	local BFC = TSMAPI.GUI:GetBuildFrameConstants()
 	local frameInfo = {
 		type = "Frame",

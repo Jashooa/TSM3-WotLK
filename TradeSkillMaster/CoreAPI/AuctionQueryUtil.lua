@@ -189,18 +189,7 @@ function private.GenerateQueriesThread(self, itemList)
 
 	-- get all the item info into the game's cache
 	self:Yield()
-	local hasItemInfo = nil
-	for i = 1, 30 do
-		hasItemInfo = true
-		for _, itemString in ipairs(itemList) do
-			if not private.HasInfo(itemString) then
-				hasItemInfo = false
-			end
-			self:Yield()
-		end
-		if hasItemInfo then break end
-		self:Sleep(0.1)
-	end
+    local hasItemInfo = self:WaitForItemInfo(itemList, 30)
 
 	-- convert to new itemStrings and remove duplicates
 	local itemStrings = {}
@@ -208,7 +197,7 @@ function private.GenerateQueriesThread(self, itemList)
 	local missingItemInfo = 0
 	for i=1, #itemList do
 		local itemString = TSMAPI.Item:ToItemString(itemList[i])
-		if not private.HasInfo(itemString) then
+        if not TSMAPI.Item:HasInfo(itemString) then
 			missingItemInfo = missingItemInfo + 1
 		elseif not usedItems[itemString] then
 			usedItems[itemString] = true
@@ -246,7 +235,7 @@ function private.GenerateQueriesThread(self, itemList)
 			itemListByClass[classId] = itemListByClass[classId] or {}
 			tinsert(itemListByClass[classId], itemString)
 		else
-			TSMAPI:Assert(private.HasInfo(itemString), "Invalid item info for "..tostring(itemString))
+			TSMAPI:Assert(TSMAPI.Item:HasInfo(itemString), "Invalid item info for "..tostring(itemString))
 			local query = TSMAPI.Auction:GetItemQueryInfo(itemString)
 			query.items = {itemString}
 			tinsert(queries, query)
@@ -399,8 +388,4 @@ function private:GetCommonName(items)
 		end
 	end
 	return commonStr
-end
-
-function private.HasInfo(itemString)
-	return TSMAPI.Item:GetName(itemString) and TSMAPI.Item:GetQuality(itemString)
 end

@@ -587,6 +587,25 @@ function TSMAPI.Item:FetchInfo(itemString)
 	private.GetCachedItemInfo(TSMAPI.Item:ToBaseItemString(itemString))
 end
 
+function TSMAPI.Item:HasInfo(info)
+	if type(info) == "string" then
+		return TSMAPI.Item:GetName(info) and TSMAPI.Item:GetQuality(info)
+	elseif type(info) == "table" then
+		TSMAPI:Assert(#info > 0)
+		local result = true
+		-- don't stop when we find one that doesn't have info so that we
+		-- still query the info from the server for every item
+		for _, itemString in ipairs(info) do
+			if not TSMAPI.Item:HasInfo(itemString) then
+				result = false
+			end
+		end
+		return result
+	else
+		TSMAPI:Assert(false, "Invalid argument")
+	end
+end
+
 function TSMAPI.Item:GetName(itemString)
 	local origItemString = itemString
 	itemString = TSMAPI.Item:ToItemString(itemString)

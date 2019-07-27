@@ -11,16 +11,16 @@
 local TSM = select(2, ...)
 local Items = TSM:NewModule("Items", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
-local private = {itemInfo={}, scanTooltip=nil, newItems={}, numPending=0, itemLevelCache = {}, soulboundCache = {}, minLevelCache = {}, canUseCache = {}}
+local private = {itemInfo={}, scanTooltip=nil, pendingItems={}}
 local STATIC_DATA = {classLookup={}, classIdLookup={}, inventorySlotIdLookup={}}
 
 for classId, class in pairs({GetAuctionItemClasses()}) do
-    STATIC_DATA.classIdLookup[strlower(class)] = classId
-    STATIC_DATA.classLookup[class] = {}
-    STATIC_DATA.classLookup[class]._index = classId
-    for subClassId, subClass in pairs({GetAuctionItemSubClasses(classId)}) do
-        STATIC_DATA.classLookup[class][subClass] = subClassId
-    end
+	STATIC_DATA.classIdLookup[strlower(class)] = classId
+	STATIC_DATA.classLookup[class] = {}
+	STATIC_DATA.classLookup[class]._index = classId
+	for subClassId, subClass in pairs({GetAuctionItemSubClasses(classId)}) do
+		STATIC_DATA.classLookup[class][subClass] = subClassId
+	end
 end
 
 do
@@ -39,15 +39,14 @@ local GET_ITEM_INFO_KEYS = {
 	link = 2,
 	quality = 3,
 	itemLevel = 4,
-	minLevel = 5,
+    minLevel = 5,
+    class = 6,
+    subClass = 7,
 	maxStack = 8,
 	equipSlot = 9,
 	texture = 10,
-	vendorPrice = 11,
-	classId = 12,
-	subClassId = 13
+	vendorPrice = 11
 }
-local MAX_REQUESTS_PENDING = 200
 
 
 -- ============================================================================
@@ -103,6 +102,7 @@ function TSMAPI.Item:ToItemString(item)
 
 	-- test if it's already (likely) an item string
     if strmatch(item, "^i:([0-9%-:]+)$") then
+        item = gsub(gsub(item, ":0$", ""), ":0$", "") -- remove extra zeroes
 		return item
 	end
 
@@ -125,7 +125,7 @@ function TSMAPI.Item:ToBaseItemString(itemString, doGroupLookup)
 	itemString = TSMAPI.Item:ToItemString(itemString)
 	if not itemString then return end
 
-	local baseItemString = strmatch(itemString, "([ip]:%d+)")
+	local baseItemString = strmatch(itemString, "(i:%d+)")
 
 	if not doGroupLookup or (TSM.db.profile.items[baseItemString] and not TSM.db.profile.items[itemString]) then
 		-- either we're not doing a group lookup, or the base item is in a group and the specific item is not, so return the base item
@@ -251,8 +251,8 @@ end
 
 function TSMAPI.Item:IsDisenchantable(itemString)
 	if not itemString or TSM.STATIC_DATA.notDisenchantable[itemString] then return end
-	local quality = TSMAPI.Item:GetQuality(itemString) or 0
-	local classId = TSMAPI.Item:GetClassId(itemString)
+    local quality = TSMAPI.Item:GetQuality(itemString) or 0
+    local classId = TSMAPI.Item:GetClassId(itemString)
 	return quality >= ITEM_QUALITY_UNCOMMON and (classId == TSMAPI.Item.CLASS_ARMOR or classId == TSMAPI.Item.CLASS_WEAPON)
 end
 
@@ -307,13 +307,8 @@ function Items:OnEnable()
 
 	for itemString, cost in pairs(TSM.STATIC_DATA.preloadedVendorCosts) do
 		TSM.db.global.vendorItems[itemString] = TSM.db.global.vendorItems[itemString] or cost
-	end
-	TSMAPI.Threading:Start(private.ItemInfoThread, 0.1)
-	private.loadedItemInfo = private.LoadItemCache()
-end
-
-function Items:OnLogout()
-	private.SaveItemCache()
+    end
+    TSMAPI.Threading:Start(private.ItemInfoThread, 0.1)
 end
 
 function Items:ScanMerchant(event)
@@ -336,260 +331,79 @@ end
 
 
 -- ============================================================================
--- ItemCacheDB Helper Functions
--- ============================================================================
-
-function private.EncodeNumber(value, length)
-	if value == nil then
-		value = 2 ^ (8 * length) - 1
-	end
-	if length == 1 then
-		return strchar(value)
-	elseif length == 2 then
-		return strchar(value % 256, value / 256)
-	elseif length == 3 then
-		return strchar(value % 256, (value % 65536) / 256, value / 65536)
-	elseif length == 4 then
-		return strchar(value % 256, (value % 65536) / 256, (value % 16777216) / 65536, value / 16777216)
-	else
-		TSMAPI:Assert(false, "Invalid length: "..tostring(length))
-	end
-end
-
-function private.SaveItemCache()
-	local resultRows = {}
-	local resultNames = {}
-	for itemString, data in pairs(private.itemInfo) do
-		local itemId = strmatch(itemString, "^i:([0-9]+)")
-		if itemId and not data._isInvalid then
-			local row = nil
-			if data._getInfoResult then
-				row = strjoin("",
-					private.EncodeNumber(tonumber(itemId), 3), -- 3 bytes of itemId
-					private.EncodeNumber(data.quality, 1), -- 1 byte of quality
-					private.EncodeNumber(data.itemLevel, 2), -- 2 bytes of itemLevel
-					private.EncodeNumber(data.minLevel, 1), -- 1 byte of minLevel
-					private.EncodeNumber(data.maxStack, 2), -- 2 bytes of maxStack
-					private.EncodeNumber(data.vendorPrice, 4) -- 4 bytes of vendorPrice
-				)
-			elseif data._encodedData then
-				row = data._encodedData
-			end
-			if row then
-				tinsert(resultNames, data.name)
-				tinsert(resultRows, row)
-			end
-		end
-	end
-	local result = table.concat(resultRows)
-	TSMAPI:Assert(#result % 13 == 0)
-	-- prepend the binary data length and append the names
-	result = private.EncodeNumber(#result, 4) .. result .. table.concat(resultNames, "\0")
-	-- prepend the hash
-	result = private.EncodeNumber(TSMAPI.Util:CalculateHash(result), 4)..result
-	-- store the result
-	TSMItemCacheDB = result
-	TSM.db.global.locale = GetLocale()
-	-- store the current interface version to know whether the cache should be reset
-	TSM.db.global.clientVersion = GetBuildInfo()
-end
-
-function private.DecodeNumber(str, length, offset)
-	offset = (offset or 0) + 1
-	local value = nil
-	if length == 1 then
-		value = strbyte(str, offset)
-	elseif length == 2 then
-		value = strbyte(str, offset) + strbyte(str, offset + 1) * 256
-	elseif length == 3 then
-		value = strbyte(str, offset) + strbyte(str, offset + 1) * 256 + strbyte(str, offset + 2) * 65536
-	elseif length == 4 then
-		value = strbyte(str, offset) + strbyte(str, offset + 1) * 256 + strbyte(str, offset + 2) * 65536 + strbyte(str, offset + 3) * 16777216
-	else
-		TSMAPI:Assert(false, "Invalid length: "..tostring(length))
-	end
-	-- a mmax value indiciates nil
-	if value == 2 ^ (8 * length) - 1 then
-		return nil
-	end
-	return value
-end
-
-function private.LoadItemCache()
-	-- check if the locale changed, in which case we won't load the cache
-	if TSM.db.global.locale ~= "" and TSM.db.global.locale ~= GetLocale() then return end
-
-	-- check if the interface version changed, in which case we won't load the cache
-	local clientVersion = GetBuildInfo()
-	if TSM.db.global.clientVersion ~= clientVersion then return end
-
-	local str = TSMItemCacheDB
-	if type(str) ~= "string" or #str < 4 then return end
-
-	-- check the hash
-	local hash = private.DecodeNumber(str, 4)
-	str = strsub(str, 5)
-	if hash ~= TSMAPI.Util:CalculateHash(str) then
-		TSM:LOG_ERR("Invalid hash (%s, %s)", tostring(hash), tostring(TSMAPI.Util:CalculateHash(str)))
-		return
-	end
-
-	-- calculate and check the length of the binary data section
-	local binDataLength = private.DecodeNumber(str, 4)
-	str = strsub(str, 5)
-	if binDataLength % 13 ~= 0 or binDataLength > #str then
-		TSM:LOG_ERR("Invalid bin data length (%s, %s)", tostring(binDataLength), tostring(#str))
-		return
-	end
-	local binDataEntries = binDataLength / 13
-
-	-- load the names
-	local names = TSMAPI.Util:SafeStrSplit(strsub(str, 1 + binDataLength), "\0")
-	if #names ~= binDataEntries then
-		TSM:LOG_ERR("Invalid names (%s, %s)", tostring(#names), tostring(binDataEntries))
-		return
-	end
-
-	local result = {}
-	for i = 0, binDataEntries - 1 do
-		local rowData = strsub(str, i * 13 + 1, (i + 1) * 13)
-		local itemString = "i:"..private.DecodeNumber(rowData, 3) -- 3 bytes of itemId
-		if result[itemString] then
-			TSM:LOG_ERR("Duplicate entry (%s)", itemString)
-			return
-		end
-		result[itemString] = {
-			name = names[i + 1],
-			quality = private.DecodeNumber(rowData, 1, 3),  -- 1 byte of quality
-			itemLevel = private.DecodeNumber(rowData, 2, 4),  -- 2 bytes of itemLevel
-			minLevel = private.DecodeNumber(rowData, 1, 6),  -- 1 byte of minLevel
-			maxStack = private.DecodeNumber(rowData, 2, 7),  -- 2 bytes of maxStack
-			vendorPrice = private.DecodeNumber(rowData, 4, 9),  -- 4 bytes of vendorPrice
-			_encodedData = rowData
-		}
-	end
-
-	TSM:LOG_INFO("Loaded item data")
-	return result
-end
-
--- ============================================================================
 -- Item Info Thread
+-- ============================================================================
+
+function private.ItemInfoThread(self)
+	self:SetThreadName("QUERY_ITEM_INFO")
+	self:Sleep(10)
+	local yieldPeriod = 10
+	local targetItemInfo = {}
+	while true do
+		for i=#private.pendingItems, 1, -1 do
+			if private.GetCachedItemInfo(private.pendingItems[i]) then
+				tremove(private.pendingItems, i)
+			end
+			if i % yieldPeriod == 0 then
+				self:Yield(true)
+				yieldPeriod = min(yieldPeriod + 10, 50)
+			else
+				self:Yield()
+			end
+		end
+		self:Sleep(1)
+	end
+end
+
+
+
+-- ============================================================================
+-- Item Cache Helper Functions
 -- ============================================================================
 
 function private.GetCachedItemInfo(itemString)
 	if not itemString then return end
-	if not private.itemInfo[itemString] then
-		private.itemInfo[itemString] = {}
-		private.newItems[itemString] = 1
+    if not private.itemInfo[itemString] then
+        if strmatch(itemString, "^i:") then
+            local _, itemId, rand = (":"):split(itemString)
+            if rand then
+                private.StoreGetItemInfoResult(itemString, GetItemInfo(strjoin(":", "item", itemId, 0, 0, 0, 0, 0, rand)))
+            else
+                private.StoreGetItemInfoResult(itemString, GetItemInfo(itemId))
+            end
+        else
+            TSMAPI:Assert(false, format("Invalid item string: '%s'", tostring(itemString)))
+        end
 	end
 	return private.itemInfo[itemString]
 end
 
 function private.StoreGetItemInfoResult(itemString, ...)
 	TSMAPI:Assert(type(itemString) == "string")
-	if select('#', ...) == 0 then return end
-	local info = private.GetCachedItemInfo(itemString)
-	for key, index in pairs(GET_ITEM_INFO_KEYS) do
-		info[key] = select(index, ...)
-	end
-	private.itemInfo[itemString]._getInfoResult = true
-	if private.itemInfo[itemString]._isPending then
-		private.itemInfo[itemString]._isPending = nil
-		private.numPending = private.numPending - 1
-	end
-end
-
-function private.ItemInfoThread(self)
-	self:SetThreadName("ITEM_INFO")
-	self:RegisterEvent("GET_ITEM_INFO_RECEIVED", function(event, itemId)
-		if itemId == 0 then
-			return
-		end
-		private.StoreGetItemInfoResult("i:"..itemId, GetItemInfo(itemId))
-	end)
-
-	-- import the loaded item data
-	local numImported = 0
-	if private.loadedItemInfo then
-		for itemString, data in pairs(private.loadedItemInfo) do
-			private.itemInfo[itemString] = data
-			private.itemInfo[itemString].link = TSMAPI.Item:GetLink(itemString)
-			if private.newItems[itemString] == 1 then
-				private.newItems[itemString] = nil
-			end
-			numImported = numImported + 1
-			self:Yield()
-		end
-	end
-	TSM:LOG_INFO("Imported %d items worth of data", numImported)
-
-	local doneStatusMessage = false
-	local lastStatusMessage = 0
-	local maxPending = 0
-	local lastStatusPending = -1
-	local toRemove = {}
-	while true do
-		-- count the number which are pending
-		local numRemaining = 0
-		for itemString in pairs(private.newItems) do
-			local info = private.itemInfo[itemString]
-			if private.numPending < maxPending then
-                local itemId = TSMAPI.Item:ToItemID(itemString)
-                if itemId then
-					private.StoreGetItemInfoResult(itemString, GetItemInfo(itemId))
-				else
-					TSMAPI:Assert(false, "Invalid item: "..tostring(itemString))
-				end
-				if not info._getInfoResult then
-					info._isPending = true
-					private.numPending = private.numPending + 1
-				end
-				tinsert(toRemove, itemString)
-			end
-			numRemaining = numRemaining + 1
-			self:Yield()
-		end
-		while #toRemove > 0 do
-			private.newItems[tremove(toRemove)] = nil
-		end
-		if numRemaining ~= lastStatusPending and GetTime() - lastStatusMessage > 2 then
-			if numRemaining > 0 then
-				TSM:LOG_INFO("%d items pending info", numRemaining)
-				doneStatusMessage = false
-				lastStatusMessage = GetTime()
-				lastStatusPending = numRemaining
-			elseif not doneStatusMessage then
-				TSM:LOG_INFO("done fetching info")
-				doneStatusMessage = true
-				lastStatusMessage = GetTime()
-				lastStatusPending = numRemaining
-			end
-		end
-		maxPending = min(maxPending + 1, MAX_REQUESTS_PENDING)
-		self:Sleep(0.1)
-	end
+    if select('#', ...) == 0 then return end
+    private.itemInfo[itemString] = {}
+    for key, index in pairs(GET_ITEM_INFO_KEYS) do
+        private.itemInfo[itemString][key] = select(index, ...)
+    end
 end
 
 function private.GetItemInfoKey(itemString, key)
 	TSMAPI:Assert(GET_ITEM_INFO_KEYS[key])
-	itemString = TSMAPI.Item:ToBaseItemString(itemString)
+	itemString = TSMAPI.Item:ToItemString(itemString)
 	if not itemString then return end
 
 	local info = private.GetCachedItemInfo(itemString)
-	if info then
-		if info._isInvalid then return end
-		return info[key]
-	end
+	return info and info[key]
 end
 
 function TSMAPI.Item:FetchInfo(itemString)
-	private.GetCachedItemInfo(TSMAPI.Item:ToBaseItemString(itemString))
+    --private.GetCachedItemInfo(TSMAPI.Item:ToItemString(itemString))
+    tinsert(private.pendingItems, itemString)
 end
 
 function TSMAPI.Item:HasInfo(info)
 	if type(info) == "string" then
-		return TSMAPI.Item:GetName(info) and TSMAPI.Item:GetQuality(info)
+		return TSMAPI.Item:GetName(info)
 	elseif type(info) == "table" then
 		TSMAPI:Assert(#info > 0)
 		local result = true
@@ -607,45 +421,13 @@ function TSMAPI.Item:HasInfo(info)
 end
 
 function TSMAPI.Item:GetName(itemString)
-	local origItemString = itemString
-	itemString = TSMAPI.Item:ToItemString(itemString)
-	if not itemString then return end
-	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
-	local info = private.GetCachedItemInfo(baseItemString)
-	if info and itemString ~= baseItemString and not info._getInfoResult then
-		private.newItems[baseItemString] = true
-	end
-	local name = nil
-	if (info and itemString == baseItemString) then
-		-- This is a base item, just return what we have.
-		name = info.name
-	elseif info and info._getInfoResult then
-		-- we have the base item info, so should be able to call GetItemInfo() for this version of the item
-		name = GetItemInfo(private.ToWoWItemString(itemString))
-	end
-	if not name then
-		-- if we got passed an item link or this is a base item and we have the item link, we can maybe extract the name from it
-		name = strmatch(origItemString, "^\124cff[0-9a-z]+\124[Hh].+\124h%[(.+)%]\124h\124r$")
-		if name == "" then
-			name = nil
-		end
-		if not name and itemString == baseItemString and info and info.link then
-			name = strmatch(info.link, "^\124cff[0-9a-z]+\124[Hh].+\124h%[(.+)%]\124h\124r$")
-			if name == "" then
-				name = nil
-			end
-		end
-		if name == "Unknown Item" then
-			name = nil
-		end
-	end
-	return name
+    return private.GetItemInfoKey(itemString, "name")
 end
 
 function TSMAPI.Item:GeneralizeLink(itemLink)
 	local itemString = TSMAPI.Item:ToItemString(itemLink)
 	if not itemString then return end
-	if not strmatch(itemString, "p:") and not strmatch(itemString, "i:[0-9]+:[0-9%-]*:[0-9]*") then
+	if not strmatch(itemString, "i:[0-9]+:[0-9%-]*:[0-9]*") then
 		-- swap out the itemString part of the link
 		local leader, quality, _, name, trailer, trailer2, extra = ("\124"):split(itemLink)
 		if trailer2 and not extra then
@@ -656,77 +438,19 @@ function TSMAPI.Item:GeneralizeLink(itemLink)
 end
 
 function TSMAPI.Item:GetLink(itemString)
-	itemString = TSMAPI.Item:ToItemString(itemString)
-	if not itemString then return "?" end
-	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
-	local info = private.GetCachedItemInfo(baseItemString)
-	if info and itemString ~= baseItemString and not info._getInfoResult then
-		private.newItems[baseItemString] = true
-	end
-	local name, link = nil, nil
-	if info then
-		if itemString == baseItemString then
-			link = info.link
-			name = info.name
-		elseif info._getInfoResult and strmatch(itemString, "^i:") then
-			link = select(2, GetItemInfo(private.ToWoWItemString(itemString)))
-		end
-	end
-	if link then
-		return link
-	elseif strmatch(itemString, "i:") then
-		name = name or "Unknown Item"
-		local color = "|cffff0000"
-		if info and info.quality and info.quality >= 0 and ITEM_QUALITY_COLORS[info.quality] and (itemString == baseItemString or not strmatch(itemString, "i:[0-9]+:[0-9%-]*:[0-9]*")) then
-			color = ITEM_QUALITY_COLORS[info.quality].hex
-		end
-		itemString = private.ToWoWItemString(itemString)
-		return color.."|H"..itemString.."|h["..name.."]|h|r"
-	end
-	return "?"
+	return private.GetItemInfoKey(itemString, "link") or "?"
 end
 
 function TSMAPI.Item:GetQuality(itemString)
-	itemString = TSMAPI.Item:ToItemString(itemString)
-	if not itemString then return end
-	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
-	local info = private.GetCachedItemInfo(baseItemString)
-	if itemString ~= baseItemString and info and info._getInfoResult then
-		-- we have the base item info, so should be able to call GetItemInfo() for this version of the item
-		return select(3, GetItemInfo(private.ToWoWItemString(itemString))) or info.quality
-	end
-	return info and info.quality
+	return private.GetItemInfoKey(itemString, "quality")
 end
 
 function TSMAPI.Item:GetItemLevel(itemString)
-	itemString = TSMAPI.Item:ToItemString(itemString)
-	if not itemString then return end
-	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
-	local info = private.GetCachedItemInfo(baseItemString)
-	if itemString ~= baseItemString and info and info._getInfoResult then
-		-- we have the base item info, so should be able to call GetItemInfo() for this version of the item
-		return select(4, GetItemInfo(private.ToWoWItemString(itemString))) or info.itemLevel
-	end
-	return info and info.itemLevel
+	return private.GetItemInfoKey(itemString, "itemLevel")
 end
 
 function TSMAPI.Item:GetMinLevel(itemString)
-	itemString = TSMAPI.Item:ToItemString(itemString)
-	if not itemString then return end
-	if private.minLevelCache[itemString] then
-		return private.minLevelCache[itemString]
-	end
-	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
-	local info = private.GetCachedItemInfo(baseItemString)
-	if itemString ~= baseItemString and info and info._getInfoResult then
-		-- we have the base item info, so should be able to call GetItemInfo() for this version of the item
-		local minLevel = select(5, GetItemInfo(private.ToWoWItemString(itemString)))
-		if minLevel then
-			private.minLevelCache[itemString] = minLevel
-		end
-		return private.minLevelCache[itemString] or info.minLevel
-	end
-	return info and info.minLevel
+	return private.GetItemInfoKey(itemString, "minLevel")
 end
 
 function TSMAPI.Item:GetMaxStack(itemString)
@@ -746,11 +470,11 @@ function TSMAPI.Item:GetVendorPrice(itemString)
 end
 
 function TSMAPI.Item:GetClassId(itemString)
-	return private.GetItemInfoKey(itemString, "classId")
+	return TSMAPI.Item:GetClassIdFromClassString(private.GetItemInfoKey(itemString, "class"))
 end
 
 function TSMAPI.Item:GetSubClassId(itemString)
-	return private.GetItemInfoKey(itemString, "subClassId")
+	return TSMAPI.Item:GetSubClassIdFromSubClassString(private.GetItemInfoKey(itemString, "subClass"), TSMAPI.Item:GetClassId(itemString))
 end
 
 

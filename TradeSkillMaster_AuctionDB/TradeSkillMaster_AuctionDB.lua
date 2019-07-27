@@ -164,10 +164,9 @@ function private.GetItemDataHelper(tbl, key, itemString)
 		value = tbl[itemString][key]
 	else
 		local quality = TSMAPI.Item:GetQuality(itemString)
-		local itemLevel = TSMAPI.Item:GetItemLevel(itemString)
         local classId = TSMAPI.Item:GetClassId(itemString)
-		if quality and quality >= 2 and itemLevel and itemLevel >= 680 and (classId == TSMAPI.Item.CLASS_WEAPON or classId == TSMAPI.Item.CLASS_GEM or classId == TSMAPI.Item.CLASS_ARMOR) then
-			if strmatch(itemString, "^i:[0-9]+:[0-9%-]*:") then return end
+		if quality and quality >= 2 and (classId == TSMAPI.Item.CLASS_WEAPON or classId == TSMAPI.Item.CLASS_GEM or classId == TSMAPI.Item.CLASS_ARMOR) then
+			if strmatch(itemString, "^i:[0-9]+:[0-9%-]+:") then return end
 		end
 		local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
 		if not baseItemString then return end

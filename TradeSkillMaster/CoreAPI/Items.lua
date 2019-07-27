@@ -24,13 +24,10 @@ for classId, class in pairs({GetAuctionItemClasses()}) do
 end
 
 do
-    local invTypes = {GetAuctionInvTypes(2,0)}
+    local invTypes = {GetAuctionInvTypes(2,1)}
     for i = 1, #invTypes, 2 do
         TSMAPI:Assert(type(invTypes[i]) == "string")
-        local invType = invTypes[i]
-        if invType then
-            STATIC_DATA.inventorySlotIdLookup[strlower(invType)] = (i + 1) / 2
-        end
+        STATIC_DATA.inventorySlotIdLookup[strlower(_G[invTypes[i]])] = (i + 1) / 2
     end
 end
 

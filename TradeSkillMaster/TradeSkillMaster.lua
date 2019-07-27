@@ -78,7 +78,6 @@ local settingsInfo = {
 		auctionSaleEnabled = { type = "boolean", default = true, lastModifiedVersion = 1 },
 		auctionSaleSound = { type = "string", default = TSM.NO_SOUND_KEY, lastModifiedVersion = 1 },
 		auctionBuyEnabled = { type = "boolean", default = true, lastModifiedVersion = 1 },
-		tsmItemTweetEnabled = { type = "boolean", default = false, lastModifiedVersion = 7 },
 		moveDelay = { type = "number", default = 0, lastModifiedVersion = 1 },
 		locale = { type = "string", default = "", lastModifiedVersion = 6 },
 		clientVersion = { type = "string", default = "", lastModifiedVersion = 9 },
@@ -754,9 +753,4 @@ function TSMAPI:GetConnectedRealms()
 		private.cachedConnectedRealms = connectedRealms
 	end
 	return private.cachedConnectedRealms
-end
-
-function TSMAPI:GetRegion()
-	local cVar = GetCVar("Portal")
-	return LibStub("LibRealmInfo"):GetCurrentRegion() or (cVar ~= "public-test" and cVar) or "PTR"
 end

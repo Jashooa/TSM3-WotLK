@@ -11,7 +11,7 @@ local TSM = select(2, ...)
 TSM = LibStub("AceAddon-3.0"):NewAddon(TSM, "TSM_AuctionDB", "AceEvent-3.0", "AceConsole-3.0")
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_AuctionDB") -- loads the localization table
-local private = {region=nil, globalKeyLookup={}}
+local private = {}
 
 TSM.MAX_AVG_DAY = 1
 local SECONDS_PER_DAY = 60 * 60 * 24
@@ -78,18 +78,6 @@ function TSM:RegisterModule()
 end
 
 function TSM:OnEnable()
-	if TSMAPI.GetRegion then
-		private.region = TSMAPI:GetRegion()
-	else
-		StaticPopupDialogs["TSM_AUCTIONDB_TSM_UPDATE"] = {
-			text = "|cffff0000WARNING:|r TradeSkillMaster v3.3.18 or higher is required for TSM_AuctionDB to function properly. Please update your addons.",
-			button1 = OKAY,
-			timeout = 0,
-			hideOnEscape = false,
-		}
-		TSMAPI.Util:ShowStaticPopupDialog("TSM_AUCTIONDB_TSM_UPDATE")
-	end
-
 	TSM.Compress:LoadRealmData()
 
 	for itemString in pairs(TSM.realmData) do
@@ -116,12 +104,8 @@ local function TooltipX100Format(value)
 end
 local function InsertTooltipValueLine(itemString, quantity, key, scope, lines, options, formatter, ...)
 	if not options[key] then return end
-	local value = nil
-	if scope == "global" then
-		value = TSM:GetGlobalItemData(itemString, key)
-	elseif scope == "region" then
-		value = TSM:GetRegionItemData(itemString, key)
-	elseif scope == "realm" then
+    local value = nil
+    if scope == "realm" then
 		value = TSM:GetRealmItemData(itemString, key)
 	else
 		TSMAPI:Assert(false, "Invalid scope: "..tostring(scope))
@@ -195,36 +179,4 @@ end
 
 function TSM:GetRealmItemData(itemString, key)
 	return private.GetItemDataHelper(TSM.realmData, key, itemString)
-end
-
-function TSM:GetRegionItemData(itemString, key)
-	if private.region == "US" then
-		return private.GetItemDataHelper(TSM.regionDataUS, key, itemString)
-	elseif private.region == "EU" then
-		return private.GetItemDataHelper(TSM.regionDataEU, key, itemString)
-	else
-		-- unsupported region (or PTR)
-		return
-	end
-end
-
-function TSM:GetGlobalItemData(itemString, key)
-	-- translate to region keys
-	if not private.globalKeyLookup[key] then
-		private.globalKeyLookup[key] = gsub(key, "^global", "region")
-	end
-	key = private.globalKeyLookup[key]
-	local valueUS = private.GetItemDataHelper(TSM.regionDataUS, key, itemString)
-	local valueEU = private.GetItemDataHelper(TSM.regionDataEU, key, itemString)
-	if valueUS and valueEU then
-		-- average the regions to get the global value
-		return TSMAPI.Util:Round((valueUS + valueEU) / 2)
-	elseif valueUS then
-		return valueUS
-	elseif valueEU then
-		return valueEU
-	else
-		-- neither region has a valid price
-		return
-	end
 end

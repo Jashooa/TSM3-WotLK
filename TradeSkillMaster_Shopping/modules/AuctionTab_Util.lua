@@ -263,20 +263,20 @@ function AuctionTabUtil:GetMatchingFilter(queries, auctionRecord)
 	-- figure out which query this item matches
 	local name = auctionRecord.name
 	if not name then return end
-	name = strlower(name)
-	local quality = auctionRecord.quality
-	local level = auctionRecord.minLevel
-	local classId = TSMAPI.Item:GetClassId(auctionRecord.itemString)
-	local subClassId = TSMAPI.Item:GetSubClassId(auctionRecord.itemString)
-	local invType = GetItemInventoryType(_G[TSMAPI.Item:GetEquipSlot(auctionRecord.itemString)])
-	for _, query in ipairs(queries) do
-		local isValid = strfind(name, TSMAPI.Util:StrEscape(strlower(query.name))) and true or false
-		isValid = isValid and (not query.quality or query.quality == 0 or quality >= query.quality)
-		isValid = isValid and (not query.minLevel or query.minLevel == 0 or level >= query.minLevel)
-		isValid = isValid and (not query.maxLevel or query.maxLevel == 0 or level <= query.maxLevel)
-		isValid = isValid and (query.class == 0 or classId == query.class)
-		isValid = isValid and (query.subClass == 0 or subClassId == query.subClass)
-		isValid = isValid and (query.invType == 0 or invType == query.invType)
+    name = strlower(name)
+    local quality = auctionRecord.quality
+    local level = auctionRecord.minLevel
+    local classId = TSMAPI.Item:GetClassId(auctionRecord.itemString)
+    local subClassId = TSMAPI.Item:GetSubClassId(auctionRecord.itemString)
+    local invType = GetItemInventoryType(_G[TSMAPI.Item:GetEquipSlot(auctionRecord.itemString)])
+    for _, query in ipairs(queries) do
+        local isValid = strfind(name, TSMAPI.Util:StrEscape(strlower(query.name))) and true or false
+        isValid = isValid and (not query.quality or query.quality == 0 or quality >= query.quality)
+        isValid = isValid and (not query.minLevel or query.minLevel == 0 or level >= query.minLevel)
+        isValid = isValid and (not query.maxLevel or query.maxLevel == 0 or level <= query.maxLevel)
+        isValid = isValid and (not query.class or query.class == 0 or classId == query.class)
+        isValid = isValid and (not query.subClass or query.subClass == 0 or subClassId == query.subClass)
+        isValid = isValid and (not query.invType or query.invType == 0 or invType == query.invType)
 		if isValid then
 			return query
 		end

@@ -24,7 +24,7 @@ for classId, class in pairs({GetAuctionItemClasses()}) do
 end
 
 do
-    local invTypes = {GetAuctionInvTypes(2,1)}
+    local invTypes = {GetAuctionInvTypes(2,0)}
     for i = 1, #invTypes, 2 do
         TSMAPI:Assert(type(invTypes[i]) == "string")
         local invType = invTypes[i]
@@ -389,7 +389,7 @@ end
 
 function private.GetItemInfoKey(itemString, key)
 	TSMAPI:Assert(GET_ITEM_INFO_KEYS[key])
-	itemString = TSMAPI.Item:ToItemString(itemString)
+	itemString = TSMAPI.Item:ToBaseItemString(itemString)
 	if not itemString then return end
 
 	local info = private.GetCachedItemInfo(itemString)

@@ -93,10 +93,12 @@ function private.StartSearchThread(self, mode)
 		return
 	end
 
+    local items = {}
 	for itemString in pairs(lastScanData) do
-		TSMAPI.Item:FetchInfo(itemString)
+        tinsert(items, TSMAPI.Item:ToItemString(itemString))
+        self:Yield()
 	end
-	self:WaitForItemInfo(lastScanData)
+	self:WaitForItemInfo(items)
 
 	local itemList = {}
 	local searchBoxText = nil

@@ -180,7 +180,7 @@ function Queue:GetFrameInfo()
 					if GetShapeshiftForm(true) > 0 then
 						CancelShapeshiftForm()
 					end
-					TradeSkill:CastTradeSkill(private.craftNextInfo.spellId, private.craftNextInfo.quantity, private.craftNextInfo.velName)
+					TradeSkill:CastTradeSkill(private.craftNextInfo.index, private.craftNextInfo.quantity, private.craftNextInfo.velName)
 				end,
 				OnUpdate = function(self)
 					if UnitCastingInfo("player") or not private.craftNextInfo then

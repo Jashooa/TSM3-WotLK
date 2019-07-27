@@ -601,7 +601,7 @@ function private.MailThread(self)
 		for i = 1, ATTACHMENTS_MAX_SEND do
 			local itemString = TSMAPI.Item:ToBaseItemString(GetInboxItemLink(index, i))
 			if itemString then
-				items[itemString] = (items[itemString] or 0) + (select(4, GetInboxItem(index, i)) or 0)
+				items[itemString] = (items[itemString] or 0) + (select(3, GetInboxItem(index, i)) or 0)
 			end
 		end
 		private:InsertPendingMail(altName, "return_mail", items, time())
@@ -765,7 +765,7 @@ function private:ScanMail(dataTbl)
 			for j = 1, ATTACHMENTS_MAX_RECEIVE do
 				local itemString = TSMAPI.Item:ToBaseItemString(GetInboxItemLink(i, j))
 				if itemString then
-					local quantity = select(4, GetInboxItem(i, j)) or 0
+					local quantity = select(3, GetInboxItem(i, j)) or 0
 					dataTbl[itemString] = (dataTbl[itemString] or 0) + quantity
 				end
 			end

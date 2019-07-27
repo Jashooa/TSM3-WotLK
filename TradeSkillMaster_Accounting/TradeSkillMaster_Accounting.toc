@@ -24,6 +24,7 @@ Locale\ptBR.lua
 TradeSkillMaster_Accounting.lua
 Modules\ItemCache.lua
 Modules\GoldTracker.lua
+Modules\Auctions.lua
 Modules\Mail.lua
 Modules\Merchant.lua
 Modules\Trade.lua
@@ -31,6 +32,7 @@ Modules\Data.lua
 Modules\Options.lua
 Modules\Viewer.lua
 Modules\ViewerUtil.lua
+Modules\Viewer_ActiveAuctions.lua
 Modules\Viewer_Auction.lua
 Modules\Viewer_Expense.lua
 Modules\Viewer_Gold.lua

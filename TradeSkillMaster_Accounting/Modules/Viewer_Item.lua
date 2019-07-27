@@ -53,21 +53,23 @@ function Item:DrawSummary(container)
 end
 
 function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
-	container:ReleaseChildren()
-	local link = TSMAPI.Item:GetLink(itemString)
+    container:ReleaseChildren()
+    local link = TSMAPI.Item:GetLink(itemString)
 	local itemData = private:GetItemDetailData(itemString)
 
 	local color, color2 = TSMAPI.Design:GetInlineColor("link2"), TSMAPI.Design:GetInlineColor("category2")
 
-	local buyers, sellers = {}, {}
-	for name, quantity in pairs(itemData.sales.players) do
-		tinsert(buyers, { name = name, quantity = quantity })
-	end
-	for name, quantity in pairs(itemData.buys.players) do
-		tinsert(sellers, { name = name, quantity = quantity })
-	end
-	sort(buyers, function(a, b) return a.quantity > b.quantity end)
-	sort(sellers, function(a, b) return a.quantity > b.quantity end)
+    local buyers, sellers = {}, {}
+    if itemData then
+        for name, quantity in pairs(itemData.sales.players) do
+            tinsert(buyers, { name = name, quantity = quantity })
+        end
+        for name, quantity in pairs(itemData.buys.players) do
+            tinsert(sellers, { name = name, quantity = quantity })
+        end
+        sort(buyers, function(a, b) return a.quantity > b.quantity end)
+        sort(sellers, function(a, b) return a.quantity > b.quantity end)
+    end
 
 	local buyersText, sellersText = "", ""
 	for i = 1, min(#buyers, 5) do
@@ -240,7 +242,7 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 	}
 
 	local sellWidgets, buyWidgets
-	if itemData.sales.hasData then
+	if itemData and itemData.sales.hasData then
 		sellWidgets = {
 			{
 				type = "MultiLabel",
@@ -273,7 +275,7 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 		}
 	end
 
-	if itemData.buys.hasData then
+	if itemData and itemData.buys.hasData then
 		buyWidgets = {
 			{
 				type = "MultiLabel",
@@ -321,8 +323,12 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 		tinsert(page[1].children[index + 1].children, buyWidgets[i])
 	end
 
-	TSMAPI.GUI:BuildOptions(container, page)
-	TSMAPI.GUI:UpdateTSMScrollingTableData("TSM_ACCOUNTING_ITEM", itemData.stData)
+    TSMAPI.GUI:BuildOptions(container, page)
+    if itemData then
+        TSMAPI.GUI:UpdateTSMScrollingTableData("TSM_ACCOUNTING_ITEM", itemData.stData)
+    else
+        TSMAPI.GUI:UpdateTSMScrollingTableData("TSM_ACCOUNTING_ITEM", {})
+    end
 end
 
 

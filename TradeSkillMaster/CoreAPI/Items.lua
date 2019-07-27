@@ -474,6 +474,14 @@ function TSMAPI.Item:GetSubClassId(itemString)
 	return TSMAPI.Item:GetSubClassIdFromSubClassString(private.GetItemInfoKey(itemString, "subClass"), TSMAPI.Item:GetClassId(itemString))
 end
 
+function TSMAPI.Item:GetStringFromName(itemName)
+    TSMAPI:Assert(type(itemName) == "string")
+    local itemLink = select(2, GetItemInfo(itemName))
+    local itemString = ISMAPI.Item:ToItemString(itemLink)
+    private.GetCachedItemInfo(itemString)
+
+    return itemString
+end
 
 
 -- ============================================================================

@@ -748,13 +748,8 @@ function private:GetFirstInboxItemLink(index)
 	end
 	TSMMailingInboxTooltip:SetOwner(UIParent, "ANCHOR_NONE")
 	TSMMailingInboxTooltip:ClearLines()
-	local _, speciesId, level, breedQuality, maxHealth, power, speed, name = TSMMailingInboxTooltip:SetInboxItem(index)
-	local link = nil
-	if (speciesId or 0) > 0 then
-		link = TSMAPI.Item:GetLink(strjoin(":", "p", speciesId, level, breedQuality, maxHealth, power, speed))
-	else
-		link = GetInboxItemLink(index, 1)
-	end
+	TSMMailingInboxTooltip:SetInboxItem(index)
+	local link = GetInboxItemLink(index, 1)
 	TSMMailingInboxTooltip:Hide()
 	return link
 end

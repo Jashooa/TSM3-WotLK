@@ -281,13 +281,8 @@ function private:GetFirstInboxItemLink(index)
 	end
 	TSMAccountingMailTooltip:SetOwner(UIParent, "ANCHOR_NONE")
 	TSMAccountingMailTooltip:ClearLines()
-	local _, speciesId, level, breedQuality, maxHealth, power, speed, name = TSMAccountingMailTooltip:SetInboxItem(index)
-	local link = nil
-	if (speciesId or 0) > 0 then
-		link = TSMAPI.Item:GetLink(strjoin(":", "p", speciesId, level, breedQuality, maxHealth, power, speed))
-	else
-		link = GetInboxItemLink(index, 1)
-	end
+	TSMAccountingMailTooltip:SetInboxItem(index)
+	local link = GetInboxItemLink(index, 1)
 	TSMAccountingMailTooltip:Hide()
 	return link
 end

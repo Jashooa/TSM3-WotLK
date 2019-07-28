@@ -78,7 +78,7 @@ function BankUI:createTab(parent)
 						text = L["Empty Bags"],
 						textHeight = 16,
 						size = {0, 20},
-						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 0, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOM", -3, -5}},
+						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 0, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", 0, -5}},
 						scripts = {"OnClick"},
 					},
 					{
@@ -87,7 +87,7 @@ function BankUI:createTab(parent)
 						text = L["Restore Bags"],
 						textHeight = 16,
 						size = {0, 20},
-						points = {{"TOPLEFT", BFC.PREV, "BOTTOM", 3, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", 0, -5}},
+						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 0, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", 0, -5}},
 						scripts = {"OnClick"},
 					},
 				},

@@ -60,15 +60,8 @@ function TradeSkill:EventHandler(event, ...)
 	if not private.currentProfession or not TradeSkill:GetVisibilityInfo().frame or TSM:GetCurrentProfessionName() ~= private.currentProfession then return end
 
     if event == "TRADE_SKILL_UPDATE" or event == "TRADE_SKILL_FILTER_UPDATE" then
-		--[[local currentSelection = GetTradeSkillSelectionIndex()
-		if event ~= "TRADE_SKILL_FILTER_UPDATE" and currentSelection > 1 and currentSelection <= GetNumTradeSkills() then
-			TradeSkillFrame_SetSelection(currentSelection)
-		else
-			TradeSkillFrame_SetSelection(GetFirstTradeSkill())
-		end
-		TradeSkillFrame_Update()]]--
-		private:OnProfessionUpdate()
-		private:UpdateCooldownsFrame()
+        private:OnProfessionUpdate()
+        private:UpdateCooldownsFrame()
 	elseif event == "UPDATE_TRADESKILL_RECAST" then
 		private.frame.professionsTab.craftInfoFrame.buttonsFrame.inputBox:SetNumber(GetTradeskillRepeatCount())
 	elseif event == "CHAT_MSG_SKILL" then
@@ -489,8 +482,9 @@ function private:UpdateCooldownsFrame()
     for i = 1, GetNumTradeSkills() do
         local skillName, _, numAvailable = GetTradeSkillInfo(i)
         local spellId = TSM:GetSpellId(i)
-		local craft = TSM.db.factionrealm.crafts[spellId]
-		local cooldown, isDaily = GetTradeSkillCooldown(i)
+        local craft = TSM.db.factionrealm.crafts[spellId]
+        local isDaily = craft and craft.hasCD
+		local cooldown = GetTradeSkillCooldown(i)
 		if not cooldown and isDaily and craft and craft.cooldownTimes and craft.cooldownTimes[currentPlayer] and craft.cooldownTimes[currentPlayer].prompt then
 			if numAvailable > 0 then
 				tinsert(stData, {cols={{value="|cff00ff00"..skillName.."|r"}}, index = i, quantity = 1})

@@ -132,7 +132,7 @@ function TSM:OnInitialize()
 			sourceItem = itemString
 			rate = data.numResult / num
 		end
-		if numMats == 1 and not data.hasCD then
+		if data.itemString and numMats == 1 and not data.hasCD then
 			TSMAPI.Conversions:Add(data.itemString, sourceItem, rate, "craft")
 		end
 	end
@@ -252,9 +252,11 @@ function TSM:UpdateCraftReverseLookup()
 	reverseLookupUpdate = time()
 	TSM.craftReverseLookup = {}
 
-	for spellID, data in pairs(TSM.db.factionrealm.crafts) do
-		TSM.craftReverseLookup[data.itemString] = TSM.craftReverseLookup[data.itemString] or {}
-		tinsert(TSM.craftReverseLookup[data.itemString], spellID)
+    for spellID, data in pairs(TSM.db.factionrealm.crafts) do
+        if data.itemString then
+            TSM.craftReverseLookup[data.itemString] = TSM.craftReverseLookup[data.itemString] or {}
+            tinsert(TSM.craftReverseLookup[data.itemString], spellID)
+        end
 	end
 end
 

@@ -11,6 +11,14 @@ local TradeSkillScanner = TSM:NewModule("TradeSkillScanner", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
 local private = { priceTextCache = { lastClear = 0 }, scanThreadId = nil, scanThreadCallback = nil, updateThreadId = nil }
 local MAX_SCAN_YIELDS = 20
+local STATIC_DATA = {}
+STATIC_DATA.tradeskillHasCD = {
+    [47280] = true, -- Brilliant Glass
+    [62242] = true, -- Icy Prism
+    [60893] = true, -- Northrend Alchemy Research
+    [61177] = true, -- Northrend Inscription Research
+    [61288] = true, -- Minor Inscription Research
+}
 
 
 function TradeSkillScanner:OnEnable()
@@ -100,7 +108,7 @@ function private.ScanCurrentProfessionThread(self, args)
 			scanResult.crafts[spellId] = { name = craftName, itemString = itemString, mats = {}, profession = professionName }
 			local lNum, hNum = GetTradeSkillNumMade(index)
 			scanResult.crafts[spellId].numResult = floor(((lNum or 1) + (hNum or 1)) / 2)
-			scanResult.crafts[spellId].hasCD = select(2, GetTradeSkillCooldown(index)) and true or nil
+			scanResult.crafts[spellId].hasCD = STATIC_DATA.tradeskillHasCD[spellId]
 
 			-- add the mat info to this craft
 			for matItemString, matData in pairs(mats) do
@@ -218,10 +226,6 @@ function private:GetCraftInfo(index)
         spellId = TSM:GetSpellId(spellLink)
 		itemString = TSM.enchantingItemIDs[spellId]
 		craftName = GetSpellInfo(spellId)
-		if not itemString then
-			-- this craft does not result in an item but we need to return something that evalulates to true
-			return "skip"
-		end
 	elseif strfind(itemLink, "item:") then
         -- result of craft is item
         spellId = TSM:GetSpellId(spellLink)
@@ -230,7 +234,7 @@ function private:GetCraftInfo(index)
 	else
 		TSMAPI:Assert(false, "Invalid profession spell.")
 	end
-	if not itemString or not spellId then return end
+	if not spellId then return end
 
 	local mats = {}
 	local haveInvalidMats = false
@@ -356,7 +360,7 @@ function TradeSkillScanner:CreatePresetGroups()
 	local craftsGroupPath = TSMAPI.Groups:JoinPath("Professions", professionName, "Crafts")
 	local matsGroupPath = TSMAPI.Groups:JoinPath("Professions", professionName, "Materials")
 	for _, data in pairs(TSM.db.factionrealm.crafts) do
-		if data.profession == professionName and data.players[playerName] then
+		if data.itemString and data.profession == professionName and data.players[playerName] then
 			-- prefer items being materials over crafts
 			groupInfo[data.itemString] = groupInfo[data.itemString] or craftsGroupPath
 			for itemString in pairs(data.mats) do

@@ -702,7 +702,7 @@ function Professions:UpdateST()
 
 			-- update cooldown end time
 			local cooldown = GetTradeSkillCooldown(i)
-			if not info.disabled and craft and craft.hasCD then
+			if not info.disabled and craft and craft.hasCD and craft["players"][playerName] then
 				if not craft.cooldownTimes then
 					craft.cooldownTimes = {}
 				end
@@ -801,15 +801,13 @@ function Professions:UpdateSelectedTradeSkill(forceUpdate)
 
 		local toolsInfo = BuildColoredListString(GetTradeSkillTools(skillIndex))
 		frame.craftInfoFrame.infoFrame.toolsText:SetText(toolsInfo and REQUIRES_LABEL .. " " .. toolsInfo or "")
-		local cooldown, isDaily = GetTradeSkillCooldown(skillIndex)
+		local cooldown = GetTradeSkillCooldown(skillIndex)
 		if not cooldown then
-			frame.craftInfoFrame.infoFrame.cooldownText:SetText("")
+            frame.craftInfoFrame.infoFrame.cooldownText:SetText("")
 		elseif cooldown > 60 * 60 * 24 then -- cooldown is greater than 1 day
-			frame.craftInfoFrame.infoFrame.cooldownText:SetText("|cffff0000" .. COOLDOWN_REMAINING .. " " .. SecondsToTime(cooldown, true, false, 1, true) .. "|r")
-		elseif isDaily then
-			frame.craftInfoFrame.infoFrame.cooldownText:SetText("|cffff0000" .. COOLDOWN_EXPIRES_AT_MIDNIGHT .. "|r")
+            frame.craftInfoFrame.infoFrame.cooldownText:SetText("|cffff0000" .. COOLDOWN_REMAINING .. " " .. SecondsToTime(cooldown, true, false, 1, true) .. "|r")
 		else
-			frame.craftInfoFrame.infoFrame.cooldownText:SetText("|cffff0000" .. COOLDOWN_REMAINING .. " " .. SecondsToTime(cooldown) .. "|r")
+            frame.craftInfoFrame.infoFrame.cooldownText:SetText("|cffff0000" .. COOLDOWN_REMAINING .. " " .. SecondsToTime(cooldown) .. "|r")
 		end
 
 		for i, btn in ipairs(frame.craftInfoFrame.matsFrame.reagentButtons) do

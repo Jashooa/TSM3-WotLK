@@ -187,7 +187,7 @@ function Queue:GetFrameInfo()
 						self:Disable()
 					elseif TradeSkill.isCrafting and TradeSkill.isCrafting.quantity > 0 then
 						self:Disable()
-					else
+                    else
 						if not self:IsEnabled() then
 							Queue.Update()
 						end
@@ -329,12 +329,17 @@ function Queue:Update()
 
 		if not professionIsCollapsed then
 			for spellId, numQueued in pairs(crafts) do
-				local craft = TSM.db.factionrealm.crafts[spellId]
+                local craft = TSM.db.factionrealm.crafts[spellId]
+                local playerName = UnitName("player")
 				-- figure out how many we can craft with mats in our bags
 				local numCanCraft = math.huge
 				for itemString, quantity in pairs(craft.mats) do
 					numCanCraft = max(min(numCanCraft, floor((bagTotals[itemString] or 0) / quantity)), 0)
-				end
+                end
+
+                if craft.hasCD and craft.cooldownTimes[playerName] and craft.cooldownTimes[playerName]["endTime"] > time() then
+                    numCanCraft = 0
+                end
 
                 local leader, craftStatus
                 local craftIndex = skillIndexLookup[spellId]
@@ -349,7 +354,7 @@ function Queue:Update()
 					leader = craftIndex and "|cffff7700" or "|cff883300"
 				end
 
-				if not craftIndex and craft.players[UnitName("player")] and craft.profession == currentProfession then
+				if not craftIndex and craft.players[playerName] and craft.profession == currentProfession then
 					leader = L["|cffff0000[Filtered]|r "] .. leader
 				end
 

@@ -90,7 +90,7 @@ local methods = {
 	["OnAcquire"] = function(self)
 		self.frame:SetParent(UIParent)
 	end,
-	
+
 	["OnRelease"] = function(self)
 		self:Clear()
 		self.frame:ClearAllPoints()
@@ -112,7 +112,7 @@ local methods = {
 		child:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, offset)
 		child:SetPoint("TOPRIGHT", frame, "TOPRIGHT", self.slider:IsShown() and -12 or 0, offset)
 		status.offset = offset
-		status.scrollvalue = value		
+		status.scrollvalue = value
 	end,
 
 	["MoveScroll"] = function(self, value)
@@ -144,7 +144,7 @@ local methods = {
 			child:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, offset)
 			self.slider:SetValue(0)
 		else
-			self.slider:Show()			
+			self.slider:Show()
 			local value = (offset / (viewheight - height) * 1000)
 			if value > 1000 then value = 1000 end
 			self.slider:SetValue(value)
@@ -160,23 +160,23 @@ local methods = {
 
 	["AddItem"] = function(self, item)
 		self.items[#self.items + 1] = item
-		
+
 		local h = #self.items * 16
 		self.itemFrame:SetHeight(h)
 		self.frame:SetHeight(min(h + 20, self.maxHeight))
-		
+
 		item.frame:SetPoint("LEFT", self.itemFrame, "LEFT")
 		item.frame:SetPoint("RIGHT", self.itemFrame, "RIGHT")
-		
+
 		item:SetPullout(self)
 		item:SetOnEnter(OnEnter)
 	end,
-	
-	["Open"] = function(self, point, relFrame, relPoint, x, y)		
+
+	["Open"] = function(self, point, relFrame, relPoint, x, y)
 		local items = self.items
 		local frame = self.frame
 		local itemFrame = self.itemFrame
-		
+
 		frame:SetPoint(point, relFrame, relPoint, x, y)
 
 		local height = 8
@@ -186,9 +186,9 @@ local methods = {
 			else
 				item:SetPoint("TOP", items[i-1].frame, "BOTTOM", 0, 1)
 			end
-			
+
 			item:Show()
-			
+
 			height = height + 16
 		end
 		itemFrame:SetHeight(height)
@@ -212,6 +212,17 @@ local methods = {
 
 	["IterateItems"] = function(self)
 		return ipairs(self.items)
+    end,
+
+	["GetMaxWidth"] = function(self)
+		local maxWidth = 0
+		for i, widget in self:IterateItems() do
+			local itemTextWidth = widget:GetWidth()
+			if (itemTextWidth > maxWidth) then
+				maxWidth = itemTextWidth
+			end
+		end
+		return maxWidth + 8
 	end,
 
 	["SetHideOnLeave"] = function(self, val)
@@ -226,7 +237,7 @@ local methods = {
 			self.frame:SetHeight(self.itemFrame:GetHeight()+20) -- see :AddItem
 		end
 	end,
-	
+
 	["GetRightBorderWidth"] = function(self)
 		return 6 + (self.slider:IsShown() and 12 or 0)
 	end,
@@ -243,7 +254,7 @@ Constructor
 
 local function Constructor()
 	local count = AceGUI:GetNextWidgetNum(Type)
-	
+
 	local frame = CreateFrame("Frame", "TSMPullout"..count, UIParent)
 	TSMAPI.Design:SetContentColor(frame)
 	frame:SetFrameStrata("FULLSCREEN_DIALOG")
@@ -253,7 +264,7 @@ local function Constructor()
 
 	local scrollFrame = CreateFrame("ScrollFrame", nil, frame)
 	local itemFrame = CreateFrame("Frame", nil, scrollFrame)
-	
+
 	local slider = CreateFrame("Slider", "TSMPulloutScrollbar"..count, scrollFrame)
 	slider:SetOrientation("VERTICAL")
 	slider:SetHitRectInsets(0, 0, -10, 0)
@@ -270,20 +281,20 @@ local function Constructor()
 	scrollFrame:SetScript("OnSizeChanged", OnSizeChanged)
 	scrollFrame:SetToplevel(true)
 	scrollFrame:SetFrameStrata("FULLSCREEN_DIALOG")
-	
+
 	itemFrame:SetPoint("TOPLEFT", scrollFrame, "TOPLEFT", 0, 0)
 	itemFrame:SetPoint("TOPRIGHT", scrollFrame, "TOPRIGHT", -12, 0)
 	itemFrame:SetHeight(400)
 	itemFrame:SetToplevel(true)
 	itemFrame:SetFrameStrata("FULLSCREEN_DIALOG")
-	
+
 	slider:SetPoint("TOPLEFT", scrollFrame, "TOPRIGHT", -16, 0)
 	slider:SetPoint("BOTTOMLEFT", scrollFrame, "BOTTOMRIGHT", -16, 0)
-	
+
 	scrollFrame:Show()
 	itemFrame:Show()
 	slider:Hide()
-	
+
 	local widget = {
 		frame = frame,
 		slider = slider,
@@ -302,13 +313,13 @@ local function Constructor()
 	scrollFrame.obj = widget
 	itemFrame.obj = widget
 	slider.obj = widget
-	
+
 	slider:SetScript("OnValueChanged", OnScrollValueChanged)
 	slider:SetMinMaxValues(0, 1000)
 	slider:SetValueStep(1)
 	slider:SetValue(0)
 	widget:FixScroll()
-	
+
 	return AceGUI:RegisterAsWidget(widget)
 end
 

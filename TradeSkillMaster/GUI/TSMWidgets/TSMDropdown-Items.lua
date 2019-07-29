@@ -104,6 +104,10 @@ do
 
 		["SetPoint"] = function(self, ...)
 			self.frame:SetPoint(...)
+        end,
+
+		["GetWidth"] = function(self)
+			return self.text:GetStringWidth() + 18 + 8
 		end,
 
 		["Show"] = function(self)

@@ -178,9 +178,6 @@ do
 			local reg = PreHookHelper(self, GetGuildBankItemInfo, 2, ...)
 			reg.item = GetGuildBankItemLink(...)
 		end,
-		SetVoidItem = function(self, ...) PreHookHelper(self, 1) end,
-		SetVoidDepositItem = function(self, ...) PreHookHelper(self, 1) end,
-		SetVoidWithdrawalItem = function(self, ...) PreHookHelper(self, 1) end,
 		SetInventoryItem = function(self, ...) PreHookHelper(self, GetInventoryItemCount, 1, ...) end,
 		SetMerchantItem = function(self, ...)
 			local reg = PreHookHelper(self, GetMerchantItemInfo, 4, ...)

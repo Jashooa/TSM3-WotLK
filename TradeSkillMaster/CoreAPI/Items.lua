@@ -110,7 +110,7 @@ function TSMAPI.Item:ToItemString(item)
     end
 
 	-- test if it's a shorter item string (without bonuses)
-	result = strjoin(":", strmatch(item, "(i)tem:([0-9%-]+):[0-9%-]*:[0-9%-]*:[0-9%-]*:[0-9%-]*:[0-9%-]*:([0-9%-]*)"))
+	result = strjoin(":", strmatch(item, "(i)tem:([0-9%-]+):[0-9%-]+:[0-9%-]+:[0-9%-]+:[0-9%-]+:[0-9%-]+:([0-9%-]+)"))
     if result and result ~= "" then
         result = gsub(gsub(result, ":0$", ""), ":0$", "") -- remove extra zeroes
 		return result
@@ -382,11 +382,12 @@ function private.StoreGetItemInfoResult(itemString, ...)
     for key, index in pairs(GET_ITEM_INFO_KEYS) do
         private.itemInfo[itemString][key] = select(index, ...)
     end
+    private.itemInfo[itemString]._getInfoResult = true
 end
 
 function private.GetItemInfoKey(itemString, key)
 	TSMAPI:Assert(GET_ITEM_INFO_KEYS[key])
-	itemString = TSMAPI.Item:ToBaseItemString(itemString)
+	itemString = TSMAPI.Item:ToItemString(itemString)
 	if not itemString then return end
 
 	local info = private.GetCachedItemInfo(itemString)
@@ -418,13 +419,45 @@ function TSMAPI.Item:HasInfo(info)
 end
 
 function TSMAPI.Item:GetName(itemString)
-    return private.GetItemInfoKey(itemString, "name")
+	local origItemString = itemString
+	itemString = TSMAPI.Item:ToItemString(itemString)
+	if not itemString then return end
+	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
+	local info = private.GetCachedItemInfo(baseItemString)
+	if info and itemString ~= baseItemString and not info._getInfoResult then
+		tinsert(private.pendingItems, baseItemString)
+	end
+	local name = nil
+	if (info and itemString == baseItemString) then
+		-- This is either a pet or base item, just return what we have.
+		name = info.name
+	elseif info and info._getInfoResult then
+		-- we have the base item info, so should be able to call GetItemInfo() for this version of the item
+		name = GetItemInfo(private.ToWoWItemString(itemString))
+	end
+	if not name then
+		-- if we got passed an item link or this is a base item and we have the item link, we can maybe extract the name from it
+		name = strmatch(origItemString, "^\124cff[0-9a-z]+\124[Hh].+\124h%[(.+)%]\124h\124r$")
+		if name == "" then
+			name = nil
+		end
+		if not name and itemString == baseItemString and info and info.link then
+			name = strmatch(info.link, "^\124cff[0-9a-z]+\124[Hh].+\124h%[(.+)%]\124h\124r$")
+			if name == "" then
+				name = nil
+			end
+		end
+		if name == "Unknown Item" then
+			name = nil
+		end
+	end
+	return name
 end
 
 function TSMAPI.Item:GeneralizeLink(itemLink)
 	local itemString = TSMAPI.Item:ToItemString(itemLink)
 	if not itemString then return end
-	if not strmatch(itemString, "i:[0-9]+:[0-9%-]*:[0-9]*") then
+	if not strmatch(itemString, "i:[0-9]+:[0-9%-]+:[0-9]+") then
 		-- swap out the itemString part of the link
 		local leader, quality, _, name, trailer, trailer2, extra = ("\124"):split(itemLink)
 		if trailer2 and not extra then
@@ -435,42 +468,87 @@ function TSMAPI.Item:GeneralizeLink(itemLink)
 end
 
 function TSMAPI.Item:GetLink(itemString)
-	return private.GetItemInfoKey(itemString, "link") or "?"
+	itemString = TSMAPI.Item:ToItemString(itemString)
+	if not itemString then return "?" end
+	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
+	local info = private.GetCachedItemInfo(baseItemString)
+	if info and itemString ~= baseItemString and not info._getInfoResult then
+		tinsert(private.pendingItems, baseItemString)
+	end
+	local name, link = nil, nil
+	if info then
+		if itemString == baseItemString then
+			link = info.link
+			name = info.name
+		elseif info._getInfoResult and strmatch(itemString, "^i:") then
+			link = select(2, GetItemInfo(private.ToWoWItemString(itemString)))
+		end
+	end
+	if link then
+        return link
+    elseif strmatch(itemString, "i:") then
+		name = name or "Unknown Item"
+		local color = "|cffff0000"
+		if info and info.quality and info.quality >= 0 and ITEM_QUALITY_COLORS[info.quality] and (itemString == baseItemString or not strmatch(itemString, "i:[0-9]+:[0-9%-]+:[0-9]+")) then
+			color = ITEM_QUALITY_COLORS[info.quality].hex
+		end
+		itemString = private.ToWoWItemString(itemString)
+		return color.."|H"..itemString.."|h["..name.."]|h|r"
+	end
+	return "?"
 end
 
 function TSMAPI.Item:GetQuality(itemString)
+	itemString = TSMAPI.Item:ToItemString(itemString)
+	if not itemString then return end
 	return private.GetItemInfoKey(itemString, "quality")
 end
 
 function TSMAPI.Item:GetItemLevel(itemString)
+	itemString = TSMAPI.Item:ToItemString(itemString)
+	if not itemString then return end
 	return private.GetItemInfoKey(itemString, "itemLevel")
 end
 
 function TSMAPI.Item:GetMinLevel(itemString)
+	itemString = TSMAPI.Item:ToItemString(itemString)
+	if not itemString then return end
 	return private.GetItemInfoKey(itemString, "minLevel")
 end
 
 function TSMAPI.Item:GetMaxStack(itemString)
+	itemString = TSMAPI.Item:ToItemString(itemString)
+	if not itemString then return end
 	return private.GetItemInfoKey(itemString, "maxStack")
 end
 
 function TSMAPI.Item:GetEquipSlot(itemString)
+	itemString = TSMAPI.Item:ToItemString(itemString)
+	if not itemString then return end
 	return private.GetItemInfoKey(itemString, "equipSlot")
 end
 
 function TSMAPI.Item:GetTexture(itemString)
+	itemString = TSMAPI.Item:ToItemString(itemString)
+	if not itemString then return end
 	return private.GetItemInfoKey(itemString, "texture")
 end
 
 function TSMAPI.Item:GetVendorPrice(itemString)
+	itemString = TSMAPI.Item:ToItemString(itemString)
+	if not itemString then return end
 	return private.GetItemInfoKey(itemString, "vendorPrice")
 end
 
 function TSMAPI.Item:GetClassId(itemString)
+	itemString = TSMAPI.Item:ToItemString(itemString)
+	if not itemString then return end
 	return TSMAPI.Item:GetClassIdFromClassString(private.GetItemInfoKey(itemString, "class"))
 end
 
 function TSMAPI.Item:GetSubClassId(itemString)
+	itemString = TSMAPI.Item:ToItemString(itemString)
+	if not itemString then return end
 	return TSMAPI.Item:GetSubClassIdFromSubClassString(private.GetItemInfoKey(itemString, "subClass"), TSMAPI.Item:GetClassId(itemString))
 end
 
@@ -478,6 +556,7 @@ function TSMAPI.Item:GetStringFromName(itemName)
     TSMAPI:Assert(type(itemName) == "string")
     local itemLink = select(2, GetItemInfo(itemName))
     local itemString = ISMAPI.Item:ToItemString(itemLink)
+    if not itemString then return end
     private.GetCachedItemInfo(itemString)
 
     return itemString

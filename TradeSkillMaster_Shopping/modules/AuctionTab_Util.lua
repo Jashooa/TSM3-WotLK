@@ -128,7 +128,7 @@ local function GetSearchFilterOptions(searchTerm)
 	if strmatch(parts[1], "^item:%d+$") then
 		parts[1] = gsub(parts[1], "item:", "i:")
 	end
-	if strmatch(parts[1], "^[ip]:%d+$") then
+	if strmatch(parts[1], "^i:%d+$") then
 		parts[1] = TSMAPI.Item:GetName(parts[1])
 		if not parts[1] then
 			return false, L["Invalid Filter"]

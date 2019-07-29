@@ -173,7 +173,7 @@ function TSM:OnInitialize()
 	for profile in TSMAPI:GetTSMProfileIterator() do
 		local needsUpdate = nil
 		for itemString in pairs(TSM.db.profile.items) do
-			if type(itemString) == "string" and not strmatch(itemString, "^[ip]:%d+") then
+			if type(itemString) == "string" and not strmatch(itemString, "^i:%d+") then
 				needsUpdate = true
 				break
 			end

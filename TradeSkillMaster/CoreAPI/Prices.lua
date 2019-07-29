@@ -11,7 +11,7 @@
 local TSM = select(2, ...)
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {context={}, itemValueKeyCache={}, moduleObjects=TSM.moduleObjects, customPriceCache={}, priceCache={}, priceCacheActive=nil, mappedWarning={}}
-local ITEM_STRING_PATTERN = "[ip]:[0-9:\-]+"
+local ITEM_STRING_PATTERN = "i:[0-9:\-]+"
 local MONEY_PATTERNS = {
 	"([0-9]+g[ ]*[0-9]+s[ ]*[0-9]+c)", 	-- g/s/c
 	"([0-9]+g[ ]*[0-9]+s)", 				-- g/s
@@ -377,7 +377,7 @@ function private:ParsePriceString(str, badPriceSource)
 			return nil, format(L["You cannot use %s as part of this custom price."], word)
 		elseif tContains(priceSourceKeys, word) then
 			-- make sure we're not trying to take the price source of a number
-			if parts[i+1] == "(" and type(parts[i+2]) == "string" and not strfind(parts[i+2], "^[ip].*:") then
+			if parts[i+1] == "(" and type(parts[i+2]) == "string" and not strfind(parts[i+2], "^i.*:") then
 				return nil, L["Invalid parameter to price source."]
 			end
 			-- valid price source

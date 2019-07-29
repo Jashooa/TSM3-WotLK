@@ -25,100 +25,97 @@ function Professions:OnInitialize()
 	Professions:RegisterEvent("TRADE_SKILL_UPDATE", private.UpdateProfessionDropdown)
 end
 
-function private.SetSlotFilter(inventorySlotIndex, categoryId)
-    UIDropDownMenu_SetSelectedID(TradeSkillInvSlotDropDown, 1);
-    SetTradeSkillInvSlotFilter(0, 1, 1);
-    UIDropDownMenu_SetSelectedID(TradeSkillSubClassDropDown, 1);
-    SetTradeSkillSubClassFilter(0, 1, 1);
+function private.SetSlotFilter(subClassId, inventorySlotIndex)
+    if subClassId then
+        SetTradeSkillSubClassFilter(subClassId, 1, 1);
+        if subClassId ~= 0 then
+            inventorySlotIndex = 0
+        end
+    end
 
     if inventorySlotIndex then
-        UIDropDownMenu_SetSelectedID(TradeSkillInvSlotDropDown, inventorySlotIndex);
         SetTradeSkillInvSlotFilter(inventorySlotIndex, 1, 1);
-	end
-
-	if categoryId then
-        UIDropDownMenu_SetSelectedID(TradeSkillSubClassDropDown, categoryId);
-        SetTradeSkillSubClassFilter(categoryId, 1, 1);
 	end
 end
 
 function private.InitializeDropdown(self, level)
-	local info = Lib_UIDropDownMenu_CreateInfo()
+	local info = UIDropDownMenu_CreateInfo()
 	if level == 1 then
 		info.text = CRAFT_IS_MAKEABLE
         info.func = function()
+            TradeSkillFrameAvailableFilterCheckButton:SetChecked(not TradeSkillFrameAvailableFilterCheckButton:GetChecked())
 			TradeSkillOnlyShowMakeable(TradeSkillFrameAvailableFilterCheckButton:GetChecked())
-			--TradeSkillUpdateFilterBar()
 		end
 		info.keepShownOnClick = true
 		info.checked = TradeSkillFrameAvailableFilterCheckButton:GetChecked()
 		info.isNotRadio = true
-		Lib_UIDropDownMenu_AddButton(info, level)
+		UIDropDownMenu_AddButton(info, level)
 
-		info.checked = 	nil
 		info.isNotRadio = nil
 		info.func =  nil
-		info.notCheckable = true
-		info.keepShownOnClick = false
+        info.keepShownOnClick = false
+        info.notCheckable = true
 		info.hasArrow = true
 
-		info.text = "Filter Slot"
+		info.text = "Subclass"
 		info.value = 1
-		Lib_UIDropDownMenu_AddButton(info, level)
+		UIDropDownMenu_AddButton(info, level)
 
-		info.text = "Filter Category"
+		info.text = "Slot"
 		info.value = 2
-		Lib_UIDropDownMenu_AddButton(info, level)
+		UIDropDownMenu_AddButton(info, level)
 	elseif level == 2 then
-		if LIB_UIDROPDOWNMENU_MENU_VALUE == 1 then
+        if UIDROPDOWNMENU_MENU_VALUE == 1 then
+            info.notCheckable = false
+            local allChecked = GetTradeSkillSubClassFilter(0)
+            info.text = ALL_SUBCLASSES
+            info.func = function() private.SetSlotFilter(0) end
+            info.checked = allChecked
+            info.hasArrow = false
+            UIDropDownMenu_AddButton(info, level)
+            local checked
+			local subClasses = {GetTradeSkillSubClasses()}
+            for i, subClass in ipairs(subClasses) do
+                if allChecked then
+                    checked = nil
+                else
+                    checked = GetTradeSkillSubClassFilter(i)
+                end
+				info.text = subClass
+                info.func = function() private.SetSlotFilter(i) end
+                info.checked = checked
+				UIDropDownMenu_AddButton(info, level)
+			end
+        elseif UIDROPDOWNMENU_MENU_VALUE == 2 then
+            local allChecked = GetTradeSkillInvSlotFilter(0)
+            info.text = ALL_INVENTORY_SLOTS
+            info.func = function() private.SetSlotFilter(nil, 0) end
+            info.checked = allChecked
+            info.hasArrow = false
+            UIDropDownMenu_AddButton(info, level)
+            local checked
 			local inventorySlots = {GetTradeSkillInvSlots()}
-			for i, inventorySlot in ipairs(inventorySlots) do
+            for i, inventorySlot in ipairs(inventorySlots) do
+                if allChecked and #inventorySlots > 1 then
+                    checked = nil
+                else
+                    checked = GetTradeSkillInvSlotFilter(i)
+                end
 				info.text = inventorySlot
-				info.func = function() private.SetSlotFilter(i) end
-				info.notCheckable = true
-				info.hasArrow = false
-				Lib_UIDropDownMenu_AddButton(info, level)
+                info.func = function() private.SetSlotFilter(nil, i) end
+                info.checked = checked
+				UIDropDownMenu_AddButton(info, level)
 			end
-		elseif LIB_UIDROPDOWNMENU_MENU_VALUE == 2 then
-			local categories = {GetTradeSkillSubClasses()}
-			for i, category in ipairs(categories) do
-				info.text = category
-				info.func = function() private.SetSlotFilter(nil, i) end
-				info.notCheckable = true
-				info.hasArrow = false
-				info.value = i
-				Lib_UIDropDownMenu_AddButton(info, level)
-			end
-		elseif LIB_UIDROPDOWNMENU_MENU_VALUE == 3 then
-			info.hasArrow = false
-			info.isNotRadio = true
-			info.notCheckable = true
-			info.keepShownOnClick = true
-			info.text = CHECK_ALL
-			info.func = function()
-				TradeSkillFrame_SetAllSourcesFiltered(false)
-				Lib_UIDropDownMenu_Refresh(TSMTradeSkillFilterDropDown, 3, 2)
-			end
-			Lib_UIDropDownMenu_AddButton(info, level)
-
-			info.text = UNCHECK_ALL
-			info.func = function()
-				TradeSkillFrame_SetAllSourcesFiltered(true)
-				Lib_UIDropDownMenu_Refresh(TSMTradeSkillFilterDropDown, 3, 2)
-			end
-			Lib_UIDropDownMenu_AddButton(info, level)
-
-			info.notCheckable = false
 		end
-	end
+    end
 end
 
 function Professions:GetFrameInfo()
 	local BFC = TSMAPI.GUI:GetBuildFrameConstants()
 	local queueBtnTooltipColor = TSMAPI.Design:GetInlineColor("link")
 	if not TSMTradeSkillFilterDropDown then
-		TSMTradeSkillFilterDropDown = CreateFrame("Frame", "TSMTradeSkillFilterDropDown", TSMCraftingTradeSkillFrame, "Lib_UIDropDownMenuTemplate")
-		Lib_UIDropDownMenu_Initialize(TSMTradeSkillFilterDropDown, private.InitializeDropdown, "MENU")
+		TSMTradeSkillFilterDropDown = CreateFrame("Frame", "TSMTradeSkillFilterDropDown", TSMCraftingTradeSkillFrame, "UIDropDownMenuTemplate")
+		UIDropDownMenu_Initialize(TSMTradeSkillFilterDropDown, private.InitializeDropdown, "MENU")
 		TSMTradeSkillFilterDropDownText:SetJustifyH("CENTER")
 		TSMTradeSkillFilterDropDownButton:Show()
 	end
@@ -432,7 +429,7 @@ function Professions:GetFrameInfo()
 			},
 			filterBtn = {
 				OnClick = function(self)
-					Lib_ToggleDropDownMenu(1, nil, TSMTradeSkillFilterDropDown, "TSMCraftingFilterButton", self:GetWidth(), 0)
+					ToggleDropDownMenu(1, nil, TSMTradeSkillFilterDropDown, "TSMCraftingFilterButton", self:GetWidth(), 0)
 				end,
 			},
 			st = {

@@ -536,7 +536,7 @@ function private.SetBlizzardProfessionFrameVisible(visible)
     if visible and not (TradeSkillFrame and TradeSkillFrame:IsVisible()) then
 		TradeSkillFrame_LoadUI()
 		TradeSkillFrame:SetScript("OnHide", private.BlizzardProfessionFrameOnHide)
-		ShowUIPanel(TradeSkillFrame)
+        TradeSkillFrame_Show()
 		private:CreateSwitchButton()
 		private.switchBtn:Show()
 		private.switchBtn:Update()
@@ -599,18 +599,18 @@ function private.ScanOpenProfessionThread(self)
 end
 
 function private.ProfessionWindowManagerHandleShowThread(self)
-	if GetTradeSkillLine() == private.currentProfession then return end
+    if GetTradeSkillLine() == private.currentProfession then return end
 
 	if not TradeSkillFrame then
 		-- need to make sure Blizzard_TradeSkillUI is loaded cause we rely on some of its tables
 		TradeSkillFrame_LoadUI()
-		TradeSkillFrame:SetScript("OnHide", nil)
-		HideUIPanel(TradeSkillFrame)
+        TradeSkillFrame:SetScript("OnHide", nil)
+        HideUIPanel(TradeSkillFrame)
 	end
 
 	-- hide any currently-visible frames
 	private.SetBlizzardProfessionFrameVisible(false)
-	private.SetTSMCraftingProfessionFrameVisible(false)
+    private.SetTSMCraftingProfessionFrameVisible(false)
 
 	-- wait for the the profession to actually load
 	while TSM:GetCurrentProfessionName() == "UNKNOWN" or InCombatLockdown() do self:Yield(true) end
@@ -629,7 +629,7 @@ function private.ProfessionWindowManagerHandleShowThread(self)
 	-- scan the profession
 	private.ScanOpenProfessionThread(self)
 
-	if private.noShow then
+    if private.noShow then
 		private.CloseProfession()
 		private.noShow = nil
 		return
@@ -637,14 +637,14 @@ function private.ProfessionWindowManagerHandleShowThread(self)
 
 	if TSM.db.global.showingDefaultFrame then
 		-- we should just show Blizzard's frame
-		TSM:LOG_INFO("Showing default profession frame")
+        TSM:LOG_INFO("Showing default profession frame")
 		private.SetBlizzardProfessionFrameVisible(true)
 	else
 		-- show our profession window
 		TSM:LOG_INFO("Showing our profession frame")
 		private.SetTSMCraftingProfessionFrameVisible(true)
     end
-	private.currentProfession = TSM:GetCurrentProfessionName()
+    private.currentProfession = TSM:GetCurrentProfessionName()
 end
 
 function private.ProfessionWindowManagerThread(self)
@@ -682,14 +682,12 @@ function private:OnProfessionUpdate()
 end
 
 function TradeSkill:ClearFilters()
-	Lib_CloseDropDownMenus()
-    UIDropDownMenu_SetSelectedID(TradeSkillSubClassDropDown, 1);
+	CloseDropDownMenus()
     SetTradeSkillSubClassFilter(0, 1, 1);
-    UIDropDownMenu_SetSelectedID(TradeSkillInvSlotDropDown, 1);
     SetTradeSkillInvSlotFilter(0, 1, 1);
-	SetTradeSkillItemNameFilter("")
+    SetTradeSkillItemNameFilter("")
+    TradeSkillFrameAvailableFilterCheckButton:SetChecked(false)
 	TradeSkillOnlyShowMakeable(false)
-    TradeSkillOnlyShowSkillUps(false)
 	if TradeSkillCollapseAllButton.collapsed then
 		TradeSkillCollapseAllButton:Click()
 	end

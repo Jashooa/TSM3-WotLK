@@ -201,5 +201,6 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 end
 
 function TSM:GetAuctionPlayer(player)
-	return player or "?"
+    if not player then return end
+	return player
 end

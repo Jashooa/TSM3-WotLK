@@ -244,7 +244,7 @@ function private:IsAuctionPageValid(resolveSellers)
 	end
 	if numAuctions == 0 then return true end
 
-	local numLinks, prevLink = 0, nil
+    local numLinks, prevLink = 0, nil
 	for i=1, numAuctions do
 		-- checks to make sure all the data has been sent to the client
 		-- if not, the data is bad and we'll wait / try again
@@ -257,7 +257,7 @@ function private:IsAuctionPageValid(resolveSellers)
 		local itemLevel = TSMAPI.Item:GetItemLevel(link)
 		if not itemString or not buyout or not stackSize or not itemLevel or not name then
 			return false
-		elseif not seller and resolveSellers and buyout ~= 0 then
+        elseif not seller and resolveSellers and buyout ~= 0 then
 			return false
 		end
 	end
@@ -270,7 +270,7 @@ function private:GetAuctionRecord(index)
 	local timeLeft = GetAuctionItemTimeLeft("list", index)
 	local rawLink = GetAuctionItemLink("list", index)
 	local link = TSMAPI.Item:GeneralizeLink(rawLink)
-	seller = TSM:GetAuctionPlayer(seller)
+	seller = TSM:GetAuctionPlayer(seller) or "?"
 	return TSMAPI.Auction:NewRecord(link, texture, stackSize, minBid, minIncrement, buyout, bid, seller, timeLeft, highBidder, rawLink)
 end
 
@@ -294,9 +294,6 @@ function private:StorePageResults(duplicateRecord)
 	end
 
 	for i=1, numAuctions do
-		if private.usableOptimize then
-			private.usableOptimize[private.pageTemp[i]] = true
-		end
 		private.database:InsertAuctionRecord(private.pageTemp[i])
 	end
 end

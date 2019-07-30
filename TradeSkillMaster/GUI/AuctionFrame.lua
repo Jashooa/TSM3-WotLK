@@ -43,7 +43,8 @@ end
 -- ============================================================================
 
 function TSM:GetAuctionPlayer(player)
-	return player or "?"
+    if not player then return end
+	return player
 end
 
 function TSM:SetAuctionTabFlashing(moduleName, flashing)

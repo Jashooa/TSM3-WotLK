@@ -11,7 +11,7 @@
 local TSM = select(2, ...)
 local Items = TSM:NewModule("Items", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
-local private = {itemInfo={}, scanTooltip=nil, pendingItems={}, soulboundCache={}}
+local private = {itemInfo={}, scanTooltip=nil, soulboundCache={}}
 local STATIC_DATA = {classLookup={}, classIdLookup={}, inventorySlotIdLookup={}}
 
 for classId, class in pairs({GetAuctionItemClasses()}) do
@@ -305,7 +305,6 @@ function Items:OnEnable()
 	for itemString, cost in pairs(TSM.STATIC_DATA.preloadedVendorCosts) do
 		TSM.db.global.vendorItems[itemString] = TSM.db.global.vendorItems[itemString] or cost
     end
-    TSMAPI.Threading:Start(private.ItemInfoThread, 0.1)
 end
 
 function Items:ScanMerchant(event)
@@ -322,33 +321,6 @@ function Items:ScanMerchant(event)
 	end
 	if event then
 		TSMAPI.Delay:AfterTime("scanMerchantDelay", 1, Items.ScanMerchant)
-	end
-end
-
-
-
--- ============================================================================
--- Item Info Thread
--- ============================================================================
-
-function private.ItemInfoThread(self)
-	self:SetThreadName("QUERY_ITEM_INFO")
-	self:Sleep(10)
-	local yieldPeriod = 10
-	local targetItemInfo = {}
-	while true do
-		for i=#private.pendingItems, 1, -1 do
-			if private.GetCachedItemInfo(private.pendingItems[i]) then
-				tremove(private.pendingItems, i)
-			end
-			if i % yieldPeriod == 0 then
-				self:Yield(true)
-				yieldPeriod = min(yieldPeriod + 10, 50)
-			else
-				self:Yield()
-			end
-		end
-		self:Sleep(1)
 	end
 end
 
@@ -395,8 +367,7 @@ function private.GetItemInfoKey(itemString, key)
 end
 
 function TSMAPI.Item:FetchInfo(itemString)
-    --private.GetCachedItemInfo(TSMAPI.Item:ToItemString(itemString))
-    tinsert(private.pendingItems, itemString)
+    private.GetCachedItemInfo(TSMAPI.Item:ToItemString(itemString))
 end
 
 function TSMAPI.Item:HasInfo(info)

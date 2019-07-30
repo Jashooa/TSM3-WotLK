@@ -32,9 +32,6 @@ Libs\LibRealmInfo\LibRealmInfo.lua
 #@end-no-lib-strip@
 
 ## Embedded libraries not on CurseForge
-Libs\DropDownMenu\UIDropDownMenuTemplates.xml
-Libs\DropDownMenu\UIDropDownMenu.lua
-Libs\DropDownMenu\EasyMenu.lua
 
 Locale\enUS.lua
 Locale\deDE.lua

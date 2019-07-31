@@ -324,7 +324,7 @@ function private:UpdateQuicksellST()
 
 		tinsert(stData, {
 			cols = {
-				{ value = format("|T%s:0|t %s", info.texture or "", info.itemLink), sortArg = info.name},
+				{ value = format("%d |T%s:0|t %s", info.quantity, info.texture or "", info.itemLink), sortArg = info.name},
 				{ value = TSMAPI:MoneyToString(info.vendorValue), sortArg = info.vendorValue },
 				{ value = TSMAPI:MoneyToString(info.potentialValue), sortArg = info.potentialValue },
 			},
@@ -414,7 +414,8 @@ function private:ShouldSell(bag,slot,quantity)
 			vendorValue = vendorValue,
 			potentialValue = max(destroyValue,marketValue),
 			bag = bag,
-			slot = slot,
+            slot = slot,
+            quantity = quantity,
 			isTrash = false,
 			isExpired = false,
 			isBOE = not isSoulbound and TSMAPI.Item:IsDisenchantable(itemString)

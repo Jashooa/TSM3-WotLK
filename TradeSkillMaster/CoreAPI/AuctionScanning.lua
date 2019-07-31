@@ -129,9 +129,9 @@ function TSMAPI.Auction:FindAuctionNoScan(targetInfo)
 	TSMAPI:Assert(type(targetInfo) == "table", "Invalid targetInfo type: "..type(targetInfo))
 	TSMAPI:Assert(AuctionFrame:IsVisible())
 
-	local keys = {"itemString", "stackSize", "displayBid", "buyout", "seller", "timeLeft"}
+	local keys = {"itemString", "stackSize", "displayedBid", "buyout", "seller", "timeLeft"}
 	for i=#keys, 1, -1 do
-		if not targetInfo[keys[i]] then
+        if not targetInfo[keys[i]] then
 			tremove(keys, i)
 		end
 	end
@@ -499,7 +499,7 @@ function private.FindAuctionThread(self, targetInfo)
 		page = 0,
 		exact = true
 	}
-	local keys = {"itemString", "stackSize", "displayBid", "buyout", "seller"}
+	local keys = {"itemString", "stackSize", "displayedBid", "buyout", "seller"}
 	local indexList = nil
 	for i=#keys, 1, -1 do
 		if not targetInfo[keys[i]] then

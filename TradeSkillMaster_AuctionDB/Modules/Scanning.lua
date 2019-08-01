@@ -146,7 +146,7 @@ function private.GroupScanThread(self, itemList)
 	local database = TSMAPI.Auction:NewDatabase()
 	for i=1, numQueries do
 		TSM.GUI:UpdateStatus(format(L["Scanning %d / %d (Page %d / %d)"], i, numQueries, 1, 1), (i-1)*100/numQueries, 0)
-		TSMAPI.Auction:ScanQuery("AuctionDB", queries[i], self:GetSendMsgToSelfCallback(), true, database)
+		TSMAPI.Auction:ScanQuery("AuctionDB", queries[i], self:GetSendMsgToSelfCallback(), nil, database)
 		while true do
 			local args = self:ReceiveMsg()
 			local event = tremove(args, 1)

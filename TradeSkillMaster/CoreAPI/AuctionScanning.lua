@@ -257,7 +257,8 @@ function private:IsAuctionPageValid(resolveSellers)
 		local itemLevel = TSMAPI.Item:GetItemLevel(link)
 		if not itemString or not buyout or not stackSize or not itemLevel or not name then
 			return false
-        elseif not seller and resolveSellers and buyout ~= 0 then
+        --elseif not seller and resolveSellers and buyout ~= 0 then
+        elseif not seller and buyout ~= 0 then
 			return false
 		end
 	end

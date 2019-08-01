@@ -248,7 +248,7 @@ function private.PostScanThread(self, scanList)
 			-- post an auction
 			TSM.GUI:SetButtonsEnabled(false)
 			private.postInfo.hasPosted[private.postInfo.currentItem.itemString] = true
-			ClearCursor()
+			--ClearCursor()
 			AuctionFrameAuctions.duration = private.postInfo.currentItem.postTime -- required to avoid Blizzard errors
 			local bag, slot = private:FindItemSlot(private.postInfo.currentItem.itemString, pendingBagChanges, private.postInfo.currentItem.stackSize)
 			if bag and slot then

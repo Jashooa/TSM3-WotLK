@@ -44,8 +44,6 @@ function Post:OnEnable()
 	end
 	if TSMAPI:HasModule("AuctionDB") then
 		tinsert(priceSources, "dbmarket")
-		tinsert(priceSources, "dbglobalminbuyoutavg")
-		tinsert(priceSources, "dbglobalmarketavg")
 	end
 	if TSMAPI:HasModule("WoWuction") then
 		tinsert(priceSources, "wowuctionmarket")

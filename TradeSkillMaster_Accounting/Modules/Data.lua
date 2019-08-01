@@ -231,7 +231,22 @@ function private:InsertAuctionRecord(newRecord)
     newRecord.time = floor(newRecord.time or time())
     newRecord.player = newRecord.player or UnitName("player")
 
-    tinsert(TSM.auctions, newRecord)
+    local duplicate = nil
+    for i = 1, #TSM.auctions do
+        if private:IsSameAuctionRecord(newRecord, TSM.auctions[i]) then
+            local diff = math.abs(TSM.auctions[i].time - newRecord.time)
+            if diff <= 30 then
+                TSM.auctions[i].numStacks = TSM.auctions[i].numStacks + 1
+                duplicate = true
+                break
+            end
+        end
+    end
+
+    if not duplicate then
+        tinsert(TSM.auctions, newRecord)
+    end
+
     sort(TSM.auctions, function(a, b) return (a.time or 0) < (b.time or 0) end)
 end
 

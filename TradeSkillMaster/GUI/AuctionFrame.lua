@@ -367,7 +367,7 @@ function private:OnEvent(event, ...)
 				private.hasShown = true
 			end
 			if TSM.db.profile.openAllBags then
-				OpenAllBags()
+				OpenAllBags(true)
 			end
 			for i = AuctionFrame.numTabs, 1, -1 do
 				local text = gsub(_G["AuctionFrameTab"..i]:GetText(), "|r", "")

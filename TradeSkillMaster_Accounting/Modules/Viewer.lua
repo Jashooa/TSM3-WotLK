@@ -126,10 +126,14 @@ function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols,
 				container.children[1]:DoLayout()
 			end,
 			OnEnter = function(_, data, self)
-				if not data then return end
-				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-				GameTooltip:SetText(L["Click for a detailed report on this item."], 1, 0.82, 0, 1)
-				GameTooltip:Show()
+                if not data then return end
+                GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+                if data.itemString then
+                    GameTooltip:SetHyperlink(TSMAPI.Item:ToWoWItemString(data.itemString))
+                end
+                GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2") .. L["Click for a detailed report on this item."] .. "|r")
+                --GameTooltip:SetText(L["Click for a detailed report on this item."], 1, 0.82, 0, 1)
+                GameTooltip:Show()
 			end,
 			OnLeave = function()
 				GameTooltip:ClearLines()
@@ -269,10 +273,14 @@ function Viewer:GetMoneyFiltersInfo(container, dataType, types, dataFunc, stCols
 	if tab then
 		stHandlers = {
 			OnEnter = function(_, data, self)
-				if not data then return end
-				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-				GameTooltip:SetText(L["Click for a detailed report on this item."], 1, 0.82, 0, 1)
-				GameTooltip:Show()
+                if not data then return end
+                GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+                if data.itemString then
+                    GameTooltip:SetHyperlink(TSMAPI.Item:ToWoWItemString(data.itemString))
+                end
+                GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2") .. L["Click for a detailed report on this item."] .. "|r")
+                --GameTooltip:SetText(L["Click for a detailed report on this item."], 1, 0.82, 0, 1)
+                GameTooltip:Show()
 			end,
 			OnLeave = function()
 				GameTooltip:ClearLines()

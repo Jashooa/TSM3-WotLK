@@ -155,8 +155,9 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 		OnEnter = function(_, data, self)
 			if not data then return end
 
-			GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-			GameTooltip:SetText(L["Shift-Right-Click to delete this record."], 1, .82, 0, 1)
+            GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+            GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2") .. L["Shift-Right-Click to delete this record."] .. "|r")
+			--GameTooltip:SetText(L["Shift-Right-Click to delete this record."], 1, .82, 0, 1)
 			GameTooltip:Show()
 		end,
 		OnLeave = function()

@@ -171,7 +171,7 @@ function TSMAPI.Item:IsSoulbound(...)
 	local result = false
 	if itemString then
 		-- it's an itemString
-		scanTooltip:SetHyperlink(private.ToWoWItemString(itemString))
+		scanTooltip:SetHyperlink(TSMAPI.Item:ToWoWItemString(itemString))
 	elseif bag and slot then
 		local itemID = GetContainerItemID(bag, slot)
 		local maxCharges
@@ -404,7 +404,7 @@ function TSMAPI.Item:GetName(itemString)
 		name = info.name
 	elseif info and info._getInfoResult then
 		-- we have the base item info, so should be able to call GetItemInfo() for this version of the item
-		name = GetItemInfo(private.ToWoWItemString(itemString))
+		name = GetItemInfo(TSMAPI.Item:ToWoWItemString(itemString))
 	end
 	if not name then
 		-- if we got passed an item link or this is a base item and we have the item link, we can maybe extract the name from it
@@ -432,7 +432,7 @@ function TSMAPI.Item:GeneralizeLink(itemLink)
 		-- swap out the itemString part of the link
 		local leader, quality, _, name, trailer, trailer2, extra = ("\124"):split(itemLink)
 		if trailer2 and not extra then
-			return strjoin("\124", leader, quality, "H"..private.ToWoWItemString(itemString), name, trailer, trailer2)
+			return strjoin("\124", leader, quality, "H"..TSMAPI.Item:ToWoWItemString(itemString), name, trailer, trailer2)
 		end
 	end
 	return TSMAPI.Item:GetLink(itemString)
@@ -452,7 +452,7 @@ function TSMAPI.Item:GetLink(itemString)
 			link = info.link
 			name = info.name
 		elseif info._getInfoResult and strmatch(itemString, "^i:") then
-			link = select(2, GetItemInfo(private.ToWoWItemString(itemString)))
+			link = select(2, GetItemInfo(TSMAPI.Item:ToWoWItemString(itemString)))
 		end
 	end
 	if link then
@@ -463,7 +463,7 @@ function TSMAPI.Item:GetLink(itemString)
 		if info and info.quality and info.quality >= 0 and ITEM_QUALITY_COLORS[info.quality] and (itemString == baseItemString or not strmatch(itemString, "i:[0-9]+:[0-9%-]+:[0-9]+")) then
 			color = ITEM_QUALITY_COLORS[info.quality].hex
 		end
-		itemString = private.ToWoWItemString(itemString)
+		itemString = TSMAPI.Item:ToWoWItemString(itemString)
 		return color.."|H"..itemString.."|h["..name.."]|h|r"
 	end
 	return "?"
@@ -533,6 +533,12 @@ function TSMAPI.Item:GetStringFromName(itemName)
     return itemString
 end
 
+function TSMAPI.Item:ToWoWItemString(itemString)
+    local _, itemId, rand = (":"):split(itemString)
+	local level = UnitLevel("player")
+	return "item:"..itemId..":0:0:0:0:0:"..(rand or "0")..":0:"..level
+end
+
 
 -- ============================================================================
 -- Helper Functions
@@ -545,9 +551,9 @@ function private.GetScanTooltip()
 	TSMScanTooltip:Show()
 	TSMScanTooltip:SetClampedToScreen(false)
     TSMScanTooltip:SetOwner(UIParent, "ANCHOR_BOTTOMRIGHT", 1000000, 100000)
-    TSMScanTooltip.SetItemByID = function(self, itemID)
+    TSMScanTooltip.SetItemByID = function(self, itemId)
         if type(itemID) ~= "number" then return end
-        self:SetHyperlink("item:"..tostring(itemID))
+        self:SetHyperlink("item:"..tostring(itemId))
     end
 	return TSMScanTooltip
 end
@@ -568,10 +574,4 @@ function private.GetTooltipText(text)
 
 	local r, g, b = text:GetTextColor()
 	return textStr, floor(r * 256), floor(g * 256), floor(b * 256)
-end
-
-function private.ToWoWItemString(itemString)
-    local _, itemId, rand = (":"):split(itemString)
-	local level = UnitLevel("player")
-	return "item:"..itemId..":0:0:0:0:0:"..(rand or "0")..":0:"..level
 end

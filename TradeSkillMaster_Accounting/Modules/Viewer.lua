@@ -97,8 +97,8 @@ end
 
 
 function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols, tab, subTab)
-	local rarityList = {[0]=L["None"]}
-	for i = 1, 4 do
+	local rarityList = {[-1]=L["None"]}
+	for i = 0, getn(ITEM_QUALITY_COLORS)-2 do
 		rarityList[i] = _G[format("ITEM_QUALITY%d_DESC", i)]
 	end
 
@@ -195,9 +195,9 @@ function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols,
 							label = L["Rarity"],
 							relativeWidth = 0.16,
 							list = rarityList,
-							value = 0,
+							value = -1,
 							callback = function(_, _, key)
-								if key > 0 then
+								if key > -1 then
 									filters.rarity = key
 								else
 									filters.rarity = nil

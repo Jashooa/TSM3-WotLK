@@ -32,7 +32,8 @@ local settingsInfo = {
 		scanData = { type = "string", default = "", lastModifiedVersion = 1},
 	},
 	global = {
-		showAHTab = { type = "boolean", default = true, lastModifiedVersion = 1},
+        showAHTab = { type = "boolean", default = true, lastModifiedVersion = 1},
+        displayGreys = { type = "boolean", default = false, lastModifiedVersion = 1},
 	},
 }
 local tooltipDefaults = {

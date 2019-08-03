@@ -251,7 +251,6 @@ function private:InsertAuctionRecord(newRecord)
 end
 
 function private:RemoveAuctionRecord(record)
-    record.time = floor(record.time or time())
     record.player = record.player or UnitName("player")
     record.numStacks = record.numStacks or 1
 
@@ -269,13 +268,13 @@ function private:RemoveAuctionRecord(record)
 end
 
 function Data:InsertActiveAuction(itemString, bid, buyout, duration, stackSize, numStacks)
-    if not (itemString and bid and buyout > 0 and duration > 0 and stackSize > 0 and numStacks > 0) then return end
+    if not (itemString and bid and buyout and duration and stackSize) then return end
 
     private:InsertAuctionRecord({itemString=itemString, bid=bid, buyout=buyout, duration=duration, stackSize=stackSize, numStacks=numStacks})
 end
 
 function Data:RemoveActiveAuction(itemString, buyout, stackSize)
-    if not (itemString and buyout > 0 and stackSize) then return end
+    if not (itemString and buyout and stackSize) then return end
 
     private:RemoveAuctionRecord({itemString=itemString, buyout=buyout, stackSize=stackSize})
 end
@@ -364,7 +363,7 @@ function private:RemoveExpiredAuctionRecord(record)
 end
 
 function Data:RemoveExpiredAuction(itemString, stackSize, time)
-    if not (itemString and stackSize > 0 and time) then return end
+    if not (itemString and stackSize and time) then return end
 
     private:RemoveExpiredAuctionRecord({itemString=itemString, stackSize=stackSize, time=time})
 end

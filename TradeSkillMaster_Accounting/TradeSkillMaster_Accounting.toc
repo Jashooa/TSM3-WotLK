@@ -24,7 +24,8 @@ Locale\ptBR.lua
 TradeSkillMaster_Accounting.lua
 Modules\ItemCache.lua
 Modules\GoldTracker.lua
-Modules\Auctions.lua
+Modules\TrackCancelAuction.lua
+Modules\TrackStartAuction.lua
 Modules\Mail.lua
 Modules\Merchant.lua
 Modules\Trade.lua

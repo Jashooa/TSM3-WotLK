@@ -248,10 +248,10 @@ function private.PostScanThread(self, scanList)
 			-- post an auction
 			TSM.GUI:SetButtonsEnabled(false)
 			private.postInfo.hasPosted[private.postInfo.currentItem.itemString] = true
-			--ClearCursor()
+			ClearCursor()
 			AuctionFrameAuctions.duration = private.postInfo.currentItem.postTime -- required to avoid Blizzard errors
 			local bag, slot = private:FindItemSlot(private.postInfo.currentItem.itemString, pendingBagChanges, private.postInfo.currentItem.stackSize)
-			if bag and slot then
+            if bag and slot then
 				PickupContainerItem(bag, slot)
 				ClickAuctionSellItemButton(AuctionsItemButton, "LeftButton")
 				StartAuction(private.postInfo.currentItem.bid, private.postInfo.currentItem.buyout, private.postInfo.currentItem.postTime, private.postInfo.currentItem.stackSize, 1)
@@ -327,7 +327,7 @@ function private.PostScanThread(self, scanList)
 			TSMAPI:DoPlaySound(TSM.db.global.confirmCompleteSound)
 			TSM.Manage:StopScan() -- will kill this thread
 			return
-		end
+        end
 	end
 end
 
@@ -570,7 +570,7 @@ function private:UpdatePendingChanges(pendingBagChanges, bag, slot, selectedQuan
 end
 
 function private:FindItemSlot(findItemString, pendingBagChanges, targetQuantity)
-	local bagInfo = select(2, private:GetBagState())
+	local bagInfo = select(2, private:GetBagState(true))
 	local resultBag, resultSlot, resultExtra = nil, nil, nil
 	for _, data in ipairs(bagInfo) do
 		local bag, slot, itemString, quantity = unpack(data)

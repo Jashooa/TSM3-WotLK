@@ -34,8 +34,10 @@ L[ [=[Below is a graph of the your character's gold on hand over time.
 
 The x-axis is time and goes from %s to %s
 The y-axis is thousands of gold.]=] ] = true
+L["Bid"] = true
 L["Bought"] = true
 L["Buyer/Seller"] = true
+L["Buyout"] = true
 L["Cancelled"] = true
 L["Cancelled Since Last Sale:"] = true
 L["|cffff0000IMPORTANT:|r When TSM_Accounting last saved data for this realm, it was too big for WoW to handle, so old data was automatically trimmed in order to avoid corruption of the saved variables. The last %s of %s data has been preserved."] = true
@@ -50,6 +52,7 @@ L["DD/MM/YY HH:MM"] = true
 L["Display Grey Items in Sales"] = true
 L["Display Money Transfers"] = true
 L["Don't Prompt to Record Trades"] = true
+L["Duration"] = true
 L["Earned Per Day:"] = true
 L["Expenses"] = true
 L["Expired"] = true

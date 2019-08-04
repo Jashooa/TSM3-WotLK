@@ -27,11 +27,11 @@ local DURATION_STRINGS = {
 local ITEM_AUCTION_ST_COLS = {
 	{name=L["Item Name"], width=0.3, headAlign="LEFT"},
     {name=L["Player"], width=0.15, headAlign="LEFT"},
-    {name="Bid", width=0.1, headAlign="LEFT"},
-    {name="Buyout", width=0.1, headAlign="LEFT"},
+    {name=L["Bid"], width=0.1, headAlign="LEFT"},
+    {name=L["Buyout"], width=0.1, headAlign="LEFT"},
 	{name=L["Stack"], width=0.05, headAlign="LEFT"},
     {name=L["Aucs"], width=0.05, headAlign="LEFT"},
-    {name="Duration", width=0.1, headAlign="LEFT"},
+    {name=L["Duration"], width=0.1, headAlign="LEFT"},
 	{name=L["Time"], width=0.15, headAlign="LEFT"},
 	defaultSort = -8,
 }

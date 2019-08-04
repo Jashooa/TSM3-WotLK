@@ -108,7 +108,7 @@ function Mail:ScanCollectedMail(oFunc, attempt, index, subIndex)
             if quantity then
                 local copper = floor((bid - ahcut) / quantity + 0.5)
                 TSM.Data:InsertItemSaleRecord(itemString, "Auction", quantity, copper, buyer, saleTime)
-                TSM.Data:RemoveActiveAuction(itemString, buyout, quantity)
+                TSM.Data:RemoveSoldAuction(itemString, buyout, quantity)
             end
 		end
 	elseif invoiceType == "buyer" and buyer and buyer ~= "" then -- AH Buys

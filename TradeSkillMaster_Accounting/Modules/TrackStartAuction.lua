@@ -65,7 +65,6 @@ function private.RemovePendingAuction()
     if #private.pendingAuctions == 0 then
         TrackStartAuction:UnregisterEvent("CHAT_MSG_SYSTEM")
         TrackStartAuction:UnregisterEvent("UI_ERROR_MESSAGE")
-        itemStringMulti, bidMulti, buyoutMulti, durationMulti, stackSizeMulti = nil
     end
 
     return post

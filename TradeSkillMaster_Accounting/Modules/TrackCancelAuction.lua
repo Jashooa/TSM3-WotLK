@@ -29,19 +29,22 @@ end
 -- ============================================================================
 
 function private.CancelAuctionWatch(index)
-    local itemName, _, stackSize, _, _, _, _, _, buyout = GetAuctionItemInfo("owner", index)
+    local itemName, _, stackSize, _, _, _, bid, _, buyout = GetAuctionItemInfo("owner", index)
     if itemName and stackSize then
         local itemString = TSM.db.global.itemStrings[itemName] or TSMAPI.Item:GetStringFromName(itemName)
-        private.AddPendingCancel(itemString, buyout, stackSize)
+        local timeLeft = GetAuctionItemTimeLeft("owner", index)
+        private.AddPendingCancel(itemString, bid, buyout, stackSize, timeLeft)
     end
     TrackCancelAuction.hooks["CancelAuction"](index)
 end
 
-function private.AddPendingCancel(itemString, buyout, stackSize)
+function private.AddPendingCancel(itemString, bid, buyout, stackSize, timeLeft)
     local pendingCancel = {}
     pendingCancel.itemString = itemString
+    pendingCancel.bid = bid
     pendingCancel.buyout = buyout
     pendingCancel.stackSize = stackSize
+    pendingCancel.timeLeft = timeLeft
     table.insert(private.pendingCancels, pendingCancel)
 
     if #private.pendingCancels == 1 then
@@ -69,7 +72,7 @@ function private.OnAuctionCancelled(self)
 
 
     if post and post.itemString then
-        TSM.Data:RemoveActiveAuction(post.itemString, post.buyout, post.stackSize)
+        TSM.Data:RemoveCancelledAuction(post.itemString, post.bid, post.buyout, post.stackSize, post.timeLeft)
     elseif post and not post.itemString then
     end
 end

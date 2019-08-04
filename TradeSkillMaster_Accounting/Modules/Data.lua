@@ -217,14 +217,13 @@ function Data:InsertMoneyExpenseRecord(key, copper, destination, timeStamp)
 	private:InsertMoneyRecord("expense", {key=key, copper=copper, otherPlayer=destination, time=timeStamp})
 end
 
-function private:IsSameAuctionRecord(recordA, recordB)
-    local keys = {"itemString", "buyout", "stackSize", "player"}
-	for _, key in ipairs(keys) do
+function private:TryMatchRecord(keys, recordA, recordB)
+    for _, key in ipairs(keys) do
 		if recordA[key] ~= recordB[key] then
 			return false
 		end
 	end
-	return true
+    return true
 end
 
 function private:InsertAuctionRecord(newRecord)
@@ -232,10 +231,11 @@ function private:InsertAuctionRecord(newRecord)
     newRecord.player = newRecord.player or UnitName("player")
 
     local duplicate = nil
+    local keys = {"itemString", "bid", "buyout", "duration", "stackSize", "player"}
     for i = 1, #TSM.auctions do
-        if private:IsSameAuctionRecord(newRecord, TSM.auctions[i]) then
+        if private:TryMatchRecord(keys, newRecord, TSM.auctions[i]) then
             local diff = math.abs(TSM.auctions[i].time - newRecord.time)
-            if diff <= 30 then
+            if diff <= 60 then
                 TSM.auctions[i].numStacks = TSM.auctions[i].numStacks + 1
                 duplicate = true
                 break
@@ -250,12 +250,19 @@ function private:InsertAuctionRecord(newRecord)
     sort(TSM.auctions, function(a, b) return (a.time or 0) < (b.time or 0) end)
 end
 
-function private:RemoveAuctionRecord(record)
+function Data:InsertActiveAuction(itemString, bid, buyout, duration, stackSize, numStacks)
+    if not (itemString and bid and buyout and duration and stackSize) then return end
+
+    private:InsertAuctionRecord({itemString=itemString, bid=bid, buyout=buyout, duration=duration, stackSize=stackSize, numStacks=numStacks})
+end
+
+function private:RemoveSoldAuctionRecord(record)
     record.player = record.player or UnitName("player")
     record.numStacks = record.numStacks or 1
 
+    local keys = {"itemString", "buyout", "stackSize", "player"}
     for i = 1, #TSM.auctions do
-        if private:IsSameAuctionRecord(record, TSM.auctions[i]) then
+        if private:TryMatchRecord(keys, record, TSM.auctions[i]) then
             TSM.auctions[i].numStacks = TSM.auctions[i].numStacks - 1
 
             if TSM.auctions[i].numStacks <= 0 then
@@ -267,37 +274,83 @@ function private:RemoveAuctionRecord(record)
     end
 end
 
-function Data:InsertActiveAuction(itemString, bid, buyout, duration, stackSize, numStacks)
-    if not (itemString and bid and buyout and duration and stackSize) then return end
-
-    private:InsertAuctionRecord({itemString=itemString, bid=bid, buyout=buyout, duration=duration, stackSize=stackSize, numStacks=numStacks})
-end
-
-function Data:RemoveActiveAuction(itemString, buyout, stackSize)
+function Data:RemoveSoldAuction(itemString, buyout, stackSize)
     if not (itemString and buyout and stackSize) then return end
 
-    private:RemoveAuctionRecord({itemString=itemString, buyout=buyout, stackSize=stackSize})
-end
-
-function private:TryMatchAuction(recordA, recordB)
-    local keys = {"itemString", "buyout", "player"}
-	for _, key in ipairs(keys) do
-		if recordA[key] ~= recordB[key] then
-			return false
-		end
-	end
-	return true
+    private:RemoveSoldAuctionRecord({itemString=itemString, buyout=buyout, stackSize=stackSize})
 end
 
 function Data:GetAuctionQuantity(itemString, buyout)
     local record = {itemString=itemString, buyout=buyout}
     record.player = UnitName("player")
 
+    keys = {"itemString", "buyout", "player"}
     for i = 1, #TSM.auctions do
-        if private:TryMatchAuction(record, TSM.auctions[i]) then
+        if private:TryMatchRecord(keys, record, TSM.auctions[i]) then
             return TSM.auctions[i].stackSize
         end
     end
+end
+
+function private:GetAuctionTimeLeft(timeLeft)
+    local minMin = 0
+    local maxMin = 0
+
+    if timeLeft == 1 then
+        maxMin = 30
+    elseif timeLeft == 2 then
+        minMin = 30
+        maxMin = 120
+    elseif timeLeft == 3 then
+        minMin = 120
+        maxMin = 720
+    elseif timeLeft == 4 then
+        minMin = 720
+        maxMin = 2880
+    end
+
+    return minMin * 60, maxMin * 60
+end
+
+function private:RemoveCancelledAuctionRecord(record)
+    record.player = record.player or UnitName("player")
+
+    local matches = {}
+    local keys = {"itemString", "bid", "buyout", "stackSize", "player"}
+    for i = 1, #TSM.auctions do
+        if private:TryMatchRecord(keys, record, TSM.auctions[i]) then
+            tinsert(matches, i)
+        end
+    end
+
+    if #matches <= 0 then
+        return
+    end
+
+    local index = nil
+    local now = time()
+    for _, match in ipairs(matches) do
+        local minLeft, maxLeft = private:GetAuctionTimeLeft(record.timeLeft)
+        local diff = private:GetAuctionExpiryTime(TSM.auctions[match]) - now
+        if diff > minLeft and diff <= maxLeft then
+            index = match
+            break
+        end
+    end
+
+    if index then
+        TSM.auctions[index].numStacks = TSM.auctions[index].numStacks - 1
+
+        if TSM.auctions[index].numStacks <= 0 then
+            tremove(TSM.auctions, index)
+        end
+    end
+end
+
+function Data:RemoveCancelledAuction(itemString, bid, buyout, stackSize, timeLeft)
+    if not (itemString and bid and buyout and stackSize and timeLeft) then return end
+
+    private:RemoveCancelledAuctionRecord({itemString=itemString, bid=bid, buyout=buyout, stackSize=stackSize, timeLeft=timeLeft})
 end
 
 function private:GetAuctionExpiryTime(record)
@@ -308,31 +361,19 @@ function private:GetAuctionExpiryTime(record)
     elseif record.duration == 2 then
         hours = 24
     elseif record.duration == 3 then
-        hour = 48
+        hours = 48
     end
 
-    return record.time + hours * SECONDS_PER_DAY
-end
-
-function private:TryMatchExpiredAuction(recordA, recordB)
-    local keys = {"itemString", "stackSize", "player"}
-
-    for _, key in ipairs(keys) do
-        if recordA[key] ~= recordB[key] then
-            return false
-        end
-    end
-
-    return true
+    return record.time + (hours * 60 * 60)
 end
 
 function private:RemoveExpiredAuctionRecord(record)
     record.player = record.player or UnitName("player")
 
     local matches = {}
-
+    local keys = {"itemString", "stackSize", "player"}
     for i = 1, #TSM.auctions do
-        if private:TryMatchExpiredAuction(record, TSM.auctions[i]) then
+        if private:TryMatchRecord(keys, record, TSM.auctions[i]) then
             tinsert(matches, i)
         end
     end

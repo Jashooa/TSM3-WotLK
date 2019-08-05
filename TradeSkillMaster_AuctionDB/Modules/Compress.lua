@@ -102,14 +102,16 @@ end
 function Compress:SaveRealmData()
 	if not TSM.updatedRealmData or not TSM.realmData then return end
 	TSM.db.realm.lastSaveTime = time()
-	TSM.db.realm.scanData = EncodeScanData(TSM.realmData, REALM_SAVE_KEYS, TSM.db.realm.lastSaveTime)
+    --TSM.db.realm.scanData = EncodeScanData(TSM.realmData, REALM_SAVE_KEYS, TSM.db.realm.lastSaveTime)
+    TSM.db.realm.scanData = TSM.realmData
 end
 
 function Compress:LoadRealmData()
 	if not TSM.db.realm.lastSaveTime or TSM.db.realm.lastSaveTime == 0 or TSM.db.realm.lastSaveTime > time() then
 		TSM.realmData = {}
 	else
-		TSM.realmData = DecodeScanData(TSM.db.realm.scanData, REALM_SAVE_KEYS, TSM.db.realm.lastSaveTime)
+        --TSM.realmData = DecodeScanData(TSM.db.realm.scanData, REALM_SAVE_KEYS, TSM.db.realm.lastSaveTime)
+        TSM.realmData = TSM.db.realm.scanData
 	end
 	-- if we weren't able to decode, just clear the scan data
 	if type(TSM.realmData) ~= "table" then

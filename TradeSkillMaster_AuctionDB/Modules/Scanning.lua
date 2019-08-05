@@ -110,7 +110,7 @@ function private.FullScanThread(self)
 		self:Yield()
 	end
 	if success then
-		private:ProcessScanDataThread(self, scanData)
+		TSM.Data:ProcessScanDataThread(self, scanData)
 	else
 		TSM:Print(L["The scan did not run successfully due to issues on Blizzard's end. Using the TSM desktop application for your scans is recommended."])
 	end
@@ -190,7 +190,7 @@ function private.GroupScanThread(self, itemList)
 		self:Yield()
 	end
 	if success then
-		private:ProcessScanDataThread(self, scanData, itemList)
+		TSM.Data:ProcessScanDataThread(self, scanData, itemList)
 	else
 		TSM:Print(L["The scan did not run successfully due to issues on Blizzard's end. Using the TSM desktop application for your scans is recommended."])
 	end
@@ -231,7 +231,7 @@ function private.GetAllScanThread(self)
 
 	-- process the scan data
 	TSM.GUI:UpdateStatus(L["Processing data..."], 100)
-	private:ProcessScanDataThread(self, scanData)
+	TSM.Data:ProcessScanDataThread(self, scanData)
 	TSM.GUI:UpdateStatus(L["Done Scanning"], 100)
 end
 

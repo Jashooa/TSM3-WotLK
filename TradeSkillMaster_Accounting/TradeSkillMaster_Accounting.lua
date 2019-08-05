@@ -63,10 +63,6 @@ local tooltipDefaults = {
 
 -- Called once the player has loaded WOW.
 function TSM:OnInitialize()
-	if TradeSkillMasterModulesDB then
-		TradeSkillMasterModulesDB.Accounting = TradeSkillMaster_AccountingDB
-	end
-
 	-- load settings
 	TSM.db = TSMAPI.Settings:Init("TradeSkillMaster_AccountingDB", settingsInfo)
 

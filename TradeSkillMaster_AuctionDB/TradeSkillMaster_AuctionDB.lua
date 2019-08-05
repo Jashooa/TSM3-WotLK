@@ -29,7 +29,7 @@ local settingsInfo = {
 		lastSaveTime = { type = "number", default = 0, lastModifiedVersion = 1},
 		lastCompleteScan = { type = "number", default = 0, lastModifiedVersion = 1},
 		lastPartialScan = { type = "number", default = 0, lastModifiedVersion = 1},
-		scanData = { type = "table", default = {}, lastModifiedVersion = 1},
+		scanData = { type = "string", default = "", lastModifiedVersion = 1},
 	},
 	global = {
         showAHTab = { type = "boolean", default = true, lastModifiedVersion = 1},
@@ -44,10 +44,6 @@ local tooltipDefaults = {
 
 -- Called once the player has loaded WOW.
 function TSM:OnInitialize()
-	if TradeSkillMasterModulesDB then
-		TradeSkillMasterModulesDB.AuctionDB = TradeSkillMaster_AuctionDBDB
-	end
-
 	-- load settings
 	TSM.db = TSMAPI.Settings:Init("TradeSkillMaster_AuctionDBDB", settingsInfo)
 

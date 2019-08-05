@@ -64,10 +64,6 @@ TSM.operationDefaults = operationDefaults
 
 -- Called once the player has loaded WOW.
 function TSM:OnInitialize()
-	if TradeSkillMasterModulesDB then
-		TradeSkillMasterModulesDB.Crafting = TradeSkillMaster_CraftingDB
-	end
-
 	-- load settings
 	TSM.db = TSMAPI.Settings:Init("TradeSkillMaster_CraftingDB", settingsInfo)
 

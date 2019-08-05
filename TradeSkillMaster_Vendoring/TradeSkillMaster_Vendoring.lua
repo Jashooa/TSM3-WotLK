@@ -46,10 +46,6 @@ local operationDefaults = {
 }
 
 function TSM:OnEnable()
-	if TradeSkillMasterModulesDB then
-		TradeSkillMasterModulesDB.Vendoring = TradeSkillMaster_VendoringDB
-	end
-
 	-- load settings
 	TSM.db = TSMAPI.Settings:Init("TradeSkillMaster_VendoringDB", settingsInfo)
 

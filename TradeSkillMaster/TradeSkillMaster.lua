@@ -160,8 +160,6 @@ function TSM:OnInitialize()
 	TSM.moduleOperationInfo = nil
 	TSM.exportedForTesting = nil
 
-	TradeSkillMasterModulesDB = TradeSkillMasterModulesDB or {}
-
 	-- load settings
 	TSM.db = TSMAPI.Settings:Init("TradeSkillMasterDB", settingsInfo)
 

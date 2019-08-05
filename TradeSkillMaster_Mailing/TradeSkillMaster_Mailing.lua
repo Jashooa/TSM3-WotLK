@@ -51,10 +51,6 @@ local operationDefaults = {
 }
 
 function TSM:OnEnable()
-	if TradeSkillMasterModulesDB then
-		TradeSkillMasterModulesDB.Mailing = TradeSkillMaster_MailingDB
-	end
-
 	-- load settings
 	TSM.db = TSMAPI.Settings:Init("TradeSkillMaster_MailingDB", settingsInfo)
 

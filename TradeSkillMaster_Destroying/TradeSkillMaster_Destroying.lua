@@ -36,10 +36,6 @@ local settingsInfo = {
 
 -- Called once the player has loaded WOW.
 function TSM:OnInitialize()
-	if TradeSkillMasterModulesDB then
-		TradeSkillMasterModulesDB.Destroying = TradeSkillMaster_DestroyingDB
-	end
-
 	-- load settings
 	TSM.db = TSMAPI.Settings:Init("TradeSkillMaster_DestroyingDB", settingsInfo)
 

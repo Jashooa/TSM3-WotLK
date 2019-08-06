@@ -11,7 +11,7 @@ local TSM = select(2, ...)
 local Compress = TSM:NewModule("Compress")
 
 
-local REALM_SAVE_KEYS = {"itemString", "numAuctions", "minBuyout", "marketValue", "lastScan", "historical"}
+local REALM_SAVE_KEYS = {"itemString", "numAuctions", "minBuyout", "marketValue", "historical", "lastScan", "scans"}
 local ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_="
 local BASE = #ALPHA
 local ENCODE_TABLE = {}
@@ -23,7 +23,8 @@ for i=1, BASE do
 end
 
 local function DecodeInt(h)
-	if h == "~" then return end
+    if h == "~" then return end
+    do return tonumber(h) end
 	local decodeTbl = DECODE_TABLE -- local reference
 	local result = 0
 	for i=1, #h do
@@ -33,7 +34,8 @@ local function DecodeInt(h)
 end
 
 local function EncodeInt(d)
-	if not d or not (d >= 0) then return "~" end -- this cannot be simplified since 0/0 is neither less than nor greater than any number
+    if not d or not (d >= 0) then return "~" end -- this cannot be simplified since 0/0 is neither less than nor greater than any number
+    do return d end
 	local result = ""
 	local diff = 1
 	while diff > 0 do
@@ -46,8 +48,53 @@ local function EncodeInt(d)
 end
 
 local function EncodeIntFromStr(d)
+    do return d end
 	d = tonumber(d)
 	return EncodeInt(tonumber(d))
+end
+
+local function EncodeScans(scans)
+    local tbl = {}
+
+    for day, data in pairs(scans) do
+        if type(data) == "table" and data.average and data.count then
+            data = EncodeInt(data.average) .. "@" .. EncodeInt(data.count)
+        else
+            data = EncodeInt(data)
+        end
+        tinsert(tbl, EncodeInt(day) .. ":" .. data)
+    end
+
+    return table.concat(tbl, "!")
+end
+
+local function DecodeScans(rope)
+    if rope == "A" then return end
+
+    local scans = {}
+    local days = {("!"):split(rope)}
+    local currentDay = TSM.Data:GetDay()
+
+    for _, data in ipairs(days) do
+        local day, marketValueData = (":"):split(data)
+        day = DecodeInt(day)
+        scans[day] = {}
+        if strfind(marketValueData, "@") then
+            local average, count = ("@"):split(marketValueData)
+            average = DecodeInt(average)
+            count = DecodeInt(count)
+            if average ~= "~" and count ~= "~" then
+                if abs(currentDay - day) <= TSM.MAX_AVG_DAY then
+                    scans[day].average = average
+                    scans[day].count = count
+                else
+                    scans[day] = average
+                end
+            end
+        end
+    end
+
+    return scans
 end
 
 local function EncodeScanData(rawData, keys, saveTime)
@@ -64,7 +111,9 @@ local function EncodeScanData(rawData, keys, saveTime)
 					tinsert(subParts, strsub(itemString, 1, 1)..gsub(strsub(itemString, 2), "([0-9]+)", EncodeIntFromStr))
 				end
 			elseif key == "lastScan" then
-				tinsert(subParts, EncodeInt(saveTime-data[key]))
+                tinsert(subParts, EncodeInt(saveTime-data[key]))
+            elseif key == "scans" then
+                tinsert(subParts, EncodeScans(data[key]))
 			else
 				tinsert(subParts, EncodeInt(data[key]))
 			end
@@ -89,7 +138,9 @@ local function DecodeScanData(rawData, keys, saveTime)
 					itemString = strsub(subPart, 1, 1)..gsub(strsub(subPart, 2), "([0-9a-zA-Z_=]+)", DecodeInt)
 				end
 			elseif key == "lastScan" then
-				temp[key] = saveTime - DecodeInt(subPart)
+                temp[key] = saveTime - DecodeInt(subPart)
+            elseif key == "scans" then
+                temp[key] = DecodeScans(subPart)
 			else
 				temp[key] = DecodeInt(subPart)
 			end

@@ -24,7 +24,7 @@ end
 
 local function DecodeInt(h)
     if h == "~" then return end
-    do return tonumber(h) end
+
 	local decodeTbl = DECODE_TABLE -- local reference
 	local result = 0
 	for i=1, #h do
@@ -35,7 +35,7 @@ end
 
 local function EncodeInt(d)
     if not d or not (d >= 0) then return "~" end -- this cannot be simplified since 0/0 is neither less than nor greater than any number
-    do return d end
+
 	local result = ""
 	local diff = 1
 	while diff > 0 do
@@ -48,12 +48,13 @@ local function EncodeInt(d)
 end
 
 local function EncodeIntFromStr(d)
-    do return d end
 	d = tonumber(d)
 	return EncodeInt(tonumber(d))
 end
 
 local function EncodeScans(scans)
+    if not scans then return "#" end
+
     local tbl = {}
 
     for day, data in pairs(scans) do
@@ -69,7 +70,7 @@ local function EncodeScans(scans)
 end
 
 local function DecodeScans(rope)
-    if rope == "A" then return end
+    if rope == "#" then return end
 
     local scans = {}
     local days = {("!"):split(rope)}
@@ -153,16 +154,14 @@ end
 function Compress:SaveRealmData()
 	if not TSM.updatedRealmData or not TSM.realmData then return end
 	TSM.db.realm.lastSaveTime = time()
-    --TSM.db.realm.scanData = EncodeScanData(TSM.realmData, REALM_SAVE_KEYS, TSM.db.realm.lastSaveTime)
-    TSM.db.realm.scanData = TSM.realmData
+    TSM.db.realm.scanData = EncodeScanData(TSM.realmData, REALM_SAVE_KEYS, TSM.db.realm.lastSaveTime)
 end
 
 function Compress:LoadRealmData()
 	if not TSM.db.realm.lastSaveTime or TSM.db.realm.lastSaveTime == 0 or TSM.db.realm.lastSaveTime > time() then
 		TSM.realmData = {}
 	else
-        --TSM.realmData = DecodeScanData(TSM.db.realm.scanData, REALM_SAVE_KEYS, TSM.db.realm.lastSaveTime)
-        TSM.realmData = TSM.db.realm.scanData
+        TSM.realmData = DecodeScanData(TSM.db.realm.scanData, REALM_SAVE_KEYS, TSM.db.realm.lastSaveTime)
 	end
 	-- if we weren't able to decode, just clear the scan data
 	if type(TSM.realmData) ~= "table" then

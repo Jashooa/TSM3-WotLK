@@ -638,15 +638,16 @@ function private.GetAllScanThread(self)
 
 		local itemBuyout = TSMAPI.Util:Round(buyout / stackSize)
 		if not scanData[itemString] then
-			scanData[itemString] = {buyouts={}, minBuyout=0, numAuctions=0}
+			scanData[itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
 		end
 		if itemBuyout > 0 then
 			if scanData[itemString].minBuyout == 0 or itemBuyout < scanData[itemString].minBuyout then
 				scanData[itemString].minBuyout = itemBuyout
 			end
-			for i=1, stackSize do
-				tinsert(scanData[itemString].buyouts, itemBuyout)
-			end
+            if itemBuyout then
+                scanData[itemString].buyoutsQuantity = scanData[itemString].buyoutsQuantity + stackSize
+                tinsert(scanData[itemString].buyouts, {value=itemBuyout, count=stackSize})
+            end
 		end
 		scanData[itemString].numAuctions = scanData[itemString].numAuctions + 1
 

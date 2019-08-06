@@ -18,28 +18,13 @@ local MAX_PERCENTILE = 0.30 -- consider at most the lowest 30% of auctions
 local MAX_JUMP = 1.2 -- between the min and max percentiles, any increase in price over 120% will trigger a discard of remaining auctions
 local SECONDS_PER_DAY = 60 * 60 * 24
 
-local function GetDay(t)
+function Data:GetDay(t)
     t = t or time()
     return floor(t / (SECONDS_PER_DAY))
 end
 
-local function ConvertScansToAverage(scans)
-    if not scans then return end
-
-    if not scans.average then
-        local total, num = 0, 0
-        for _, value in ipairs(scans) do
-            total = total + value
-            num = num + 1
-        end
-        scans.average = floor(total / num + 0.5)
-        scans.count = num
-    end
-    return scans
-end
-
 local function GetMarketValue(scans)
-    local day = GetDay()
+    local day = Data:GetDay()
     local totalAmount, totalWeight = 0, 0
 
     for i = 0, 14 do
@@ -67,19 +52,19 @@ local function GetMarketValue(scans)
 end
 
 local function UpdateMarketValue(itemData)
-    local day = GetDay()
+    local day = Data:GetDay()
 
     local scans = CopyTable(itemData.scans)
     itemData.scans = {}
 
     for i = 0, 14 do
-        local dayScans = scans[day-i]
         if i <= TSM.MAX_AVG_DAY then
-            if type(dayScans) == "number" then
-                dayScans = {average=dayScans, count=1}
+            if type(scans[day-i]) == "number" then
+                scans[day-i] = {average=scans[day-i], count=1}
             end
-            itemData.scans[day-i] = dayScans and CopyTable(dayScans)
+            itemData.scans[day-i] = scans[day-i] and CopyTable(scans[day-i])
         else
+            local dayScans = scans[day-i]
             if type(dayScans) == "table" then
                 itemData.scans[day-i] = dayScans.average
             elseif dayScans then
@@ -90,37 +75,45 @@ local function UpdateMarketValue(itemData)
     itemData.marketValue = GetMarketValue(itemData.scans)
 end
 
-local function CalculateMarketValue(buyouts)
+local function CalculateMarketValue(buyouts, numRecords)
 	local totalNum, totalBuyout = 0, 0
-	local numRecords = #buyouts
+	local numBuyouts = #buyouts
 
-	for i=1, numRecords do
-		totalNum = i - 1
-		if i ~= 1 and i > numRecords*MIN_PERCENTILE and (i > numRecords*MAX_PERCENTILE or buyouts[i] >= MAX_JUMP*buyouts[i-1]) then
-			break
-		end
+	for i=1, numBuyouts do
+		for j=1, buyouts[i].count do
+			local gi = totalNum + 1
+			if gi ~= 1 and gi > numRecords*MIN_PERCENTILE and (gi > numRecords*MAX_PERCENTILE or buyouts[i].value >= MAX_JUMP*buyouts[max(i-1, 1)].value) then
+				break
+			end
 
-		totalBuyout = totalBuyout + buyouts[i]
-		if i == numRecords then
-			totalNum = i
+			totalBuyout = totalBuyout + buyouts[i].value
+			totalNum = totalNum + 1;
 		end
 	end
 
 	local uncorrectedMean = totalBuyout / totalNum
 	local varience = 0
 
-	for i=1, totalNum do
-		varience = varience + (buyouts[i]-uncorrectedMean)^2
+	local totalLeft = totalNum
+	for i=1, numBuyouts do
+		local count = min(buyouts[i].count, totalLeft)
+		varience = varience + count*(buyouts[i].value-uncorrectedMean)^2
+		totalLeft = totalLeft - count
+		if totalLeft <= 0 then break end
 	end
 
 	local stdDev = sqrt(varience/totalNum)
 	local correctedTotalNum, correctedTotalBuyout = 1, uncorrectedMean
 
-	for i=1, totalNum do
-		if abs(uncorrectedMean - buyouts[i]) < 1.5*stdDev then
-			correctedTotalNum = correctedTotalNum + 1
-			correctedTotalBuyout = correctedTotalBuyout + buyouts[i]
+	local totalLeft = totalNum
+	for i=1, numBuyouts do
+		local count = min(buyouts[i].count, totalLeft)
+		if abs(uncorrectedMean - buyouts[i].value) < 1.5*stdDev then
+			correctedTotalNum = correctedTotalNum + count
+			correctedTotalBuyout = correctedTotalBuyout + buyouts[i].value*count
 		end
+		totalLeft = totalLeft - count
+		if totalLeft <= 0 then break end
 	end
 
 	local correctedMean = floor(correctedTotalBuyout / correctedTotalNum + 0.5)
@@ -154,19 +147,16 @@ function Data:ProcessScanDataThread(self, scanData, itemList)
 
 	-- process new data
     TSM.updatedRealmData = true
-    local day = GetDay()
+    local day = Data:GetDay()
 	for itemString, data in pairs(scanData) do
 		itemString = TSMAPI.Item:ToBaseItemString(itemString)
         TSM.realmData[itemString] = TSM.realmData[itemString] or {scans={}}
 
-        local marketValue = CalculateMarketValue(data.buyouts)
+        local marketValue = CalculateMarketValue(data.buyouts, data.buyoutsQuantity)
         local scans = TSM.realmData[itemString].scans
         scans[day] = scans[day] or {average=0, count=0}
         scans[day].average = scans[day].average or 0
         scans[day].count = scans[day].count or 0
-        if #scans[day] > 0 then
-            scans[day] = ConvertScansToAverage(scans[day])
-        end
         scans[day].average = floor((scans[day].average * scans[day].count + marketValue) / (scans[day].count + 1) + 0.5)
         scans[day].count = scans[day].count + 1
 

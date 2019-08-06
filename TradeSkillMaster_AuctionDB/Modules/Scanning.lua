@@ -96,15 +96,16 @@ function private.FullScanThread(self)
 			break
 		end
 		if not scanData[record.itemString] then
-			scanData[record.itemString] = {buyouts={}, minBuyout=0, numAuctions=0}
+			scanData[record.itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
 		end
 		if record.itemBuyout > 0 then
 			if scanData[record.itemString].minBuyout == 0 or record.itemBuyout < scanData[record.itemString].minBuyout then
 				scanData[record.itemString].minBuyout = record.itemBuyout
-			end
-			for i=1, record.stackSize do
-				tinsert(scanData[record.itemString].buyouts, record.itemBuyout)
-			end
+            end
+            if record.itemBuyout then
+                scanData[record.itemString].buyoutsQuantity = scanData[record.itemString].buyoutsQuantity + record.stackSize
+                tinsert(scanData[record.itemString].buyouts, {value=record.itemBuyout, count=record.stackSize})
+            end
 		end
 		scanData[record.itemString].numAuctions = scanData[record.itemString].numAuctions + 1
 		self:Yield()
@@ -176,15 +177,16 @@ function private.GroupScanThread(self, itemList)
 			break
 		end
 		if not scanData[record.itemString] then
-			scanData[record.itemString] = {buyouts={}, minBuyout=0, numAuctions=0}
+			scanData[record.itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
 		end
 		if record.itemBuyout > 0 then
 			if scanData[record.itemString].minBuyout == 0 or record.itemBuyout < scanData[record.itemString].minBuyout then
 				scanData[record.itemString].minBuyout = record.itemBuyout
 			end
-			for i=1, record.stackSize do
-				tinsert(scanData[record.itemString].buyouts, record.itemBuyout)
-			end
+            if record.itemBuyout then
+                scanData[record.itemString].buyoutsQuantity = scanData[record.itemString].buyoutsQuantity + record.stackSize
+                tinsert(scanData[record.itemString].buyouts, {value=record.itemBuyout, count=record.stackSize})
+            end
 		end
 		scanData[record.itemString].numAuctions = scanData[record.itemString].numAuctions + 1
 		self:Yield()
@@ -233,89 +235,4 @@ function private.GetAllScanThread(self)
 	TSM.GUI:UpdateStatus(L["Processing data..."], 100)
 	TSM.Data:ProcessScanDataThread(self, scanData)
 	TSM.GUI:UpdateStatus(L["Done Scanning"], 100)
-end
-
-
-
--- ============================================================================
--- Helper Functions
--- ============================================================================
-
-function private:ProcessScanDataThread(self, scanData, itemList)
-	local scanTime = time()
-	TSM.db.realm.lastPartialScan = scanTime
-
-	local scannedItems = nil
-	if itemList then
-		scannedItems = {}
-		for _, itemString in ipairs(itemList) do
-			scannedItems[itemString] = true
-		end
-	else
-		TSM.db.realm.lastCompleteScan = scanTime
-	end
-
-	-- clear min buyotus / num auctions and update last scan time for items we should have scanned
-	for itemString, data in pairs(TSM.realmData) do
-		if not scannedItems or scannedItems[itemString] then
-			data.minBuyout = nil
-			data.numAuctions = nil
-			data.lastScan = scanTime
-			self:Yield()
-		end
-	end
-
-	-- process new data
-	TSM.updatedRealmData = true
-	for itemString, data in pairs(scanData) do
-		itemString = TSMAPI.Item:ToBaseItemString(itemString)
-        TSM.realmData[itemString] = TSM.realmData[itemString] or {}
-        if #data.buyouts > 0 then
-            TSM.realmData[itemString].marketValue = private:CalculateMarketValue(data.buyouts)
-        else
-            TSM.realmData[itemString].marketValue = TSM.realmData[itemString].marketValue or 0
-        end
-        TSM.realmData[itemString].minBuyout = data.minBuyout
-        TSM.realmData[itemString].numAuctions = data.numAuctions
-        TSM.realmData[itemString].lastScan = scanTime
-		self:Yield()
-	end
-end
-
-function private:CalculateMarketValue(buyouts)
-	local totalNum, totalBuyout = 0, 0
-	local numRecords = #buyouts
-
-	for i=1, numRecords do
-		totalNum = i - 1
-		if i ~= 1 and i > numRecords*MIN_PERCENTILE and (i > numRecords*MAX_PERCENTILE or buyouts[i] >= MAX_JUMP*buyouts[i-1]) then
-			break
-		end
-
-		totalBuyout = totalBuyout + buyouts[i]
-		if i == numRecords then
-			totalNum = i
-		end
-	end
-
-	local uncorrectedMean = totalBuyout / totalNum
-	local varience = 0
-
-	for i=1, totalNum do
-		varience = varience + (buyouts[i]-uncorrectedMean)^2
-	end
-
-	local stdDev = sqrt(varience/totalNum)
-	local correctedTotalNum, correctedTotalBuyout = 1, uncorrectedMean
-
-	for i=1, totalNum do
-		if abs(uncorrectedMean - buyouts[i]) < 1.5*stdDev then
-			correctedTotalNum = correctedTotalNum + 1
-			correctedTotalBuyout = correctedTotalBuyout + buyouts[i]
-		end
-	end
-
-	local correctedMean = floor(correctedTotalBuyout / correctedTotalNum + 0.5)
-
-	return correctedMean
 end

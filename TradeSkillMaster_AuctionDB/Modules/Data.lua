@@ -149,7 +149,6 @@ function Data:ProcessScanDataThread(self, scanData, itemList)
     TSM.updatedRealmData = true
     local day = Data:GetDay()
 	for itemString, data in pairs(scanData) do
-		itemString = TSMAPI.Item:ToBaseItemString(itemString)
         TSM.realmData[itemString] = TSM.realmData[itemString] or {scans={}}
 
         local marketValue = CalculateMarketValue(data.buyouts, data.buyoutsQuantity)

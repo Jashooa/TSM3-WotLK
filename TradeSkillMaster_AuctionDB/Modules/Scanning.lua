@@ -94,20 +94,21 @@ function private.FullScanThread(self)
 		if not record.itemString then
 			success = false
 			break
-		end
-		if not scanData[record.itemString] then
-			scanData[record.itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
+        end
+        local itemString = TSMAPI.Item:ToBaseItemString(itemString)
+		if not scanData[itemString] then
+			scanData[itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
 		end
 		if record.itemBuyout > 0 then
-			if scanData[record.itemString].minBuyout == 0 or record.itemBuyout < scanData[record.itemString].minBuyout then
-				scanData[record.itemString].minBuyout = record.itemBuyout
+			if scanData[itemString].minBuyout == 0 or record.itemBuyout < scanData[itemString].minBuyout then
+				scanData[itemString].minBuyout = record.itemBuyout
             end
             if record.itemBuyout then
-                scanData[record.itemString].buyoutsQuantity = scanData[record.itemString].buyoutsQuantity + record.stackSize
-                tinsert(scanData[record.itemString].buyouts, {value=record.itemBuyout, count=record.stackSize})
+                scanData[itemString].buyoutsQuantity = scanData[itemString].buyoutsQuantity + record.stackSize
+                tinsert(scanData[itemString].buyouts, {value=record.itemBuyout, count=record.stackSize})
             end
 		end
-		scanData[record.itemString].numAuctions = scanData[record.itemString].numAuctions + 1
+		scanData[itemString].numAuctions = scanData[itemString].numAuctions + 1
 		self:Yield()
 	end
 	if success then
@@ -175,20 +176,21 @@ function private.GroupScanThread(self, itemList)
 		if not record.itemString then
 			success = false
 			break
-		end
-		if not scanData[record.itemString] then
-			scanData[record.itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
+        end
+        local itemString = TSMAPI.Item:ToBaseItemString(itemString)
+		if not scanData[itemString] then
+			scanData[itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
 		end
 		if record.itemBuyout > 0 then
-			if scanData[record.itemString].minBuyout == 0 or record.itemBuyout < scanData[record.itemString].minBuyout then
-				scanData[record.itemString].minBuyout = record.itemBuyout
+			if scanData[itemString].minBuyout == 0 or record.itemBuyout < scanData[itemString].minBuyout then
+				scanData[itemString].minBuyout = record.itemBuyout
 			end
             if record.itemBuyout then
-                scanData[record.itemString].buyoutsQuantity = scanData[record.itemString].buyoutsQuantity + record.stackSize
-                tinsert(scanData[record.itemString].buyouts, {value=record.itemBuyout, count=record.stackSize})
+                scanData[itemString].buyoutsQuantity = scanData[itemString].buyoutsQuantity + record.stackSize
+                tinsert(scanData[itemString].buyouts, {value=record.itemBuyout, count=record.stackSize})
             end
 		end
-		scanData[record.itemString].numAuctions = scanData[record.itemString].numAuctions + 1
+		scanData[itemString].numAuctions = scanData[itemString].numAuctions + 1
 		self:Yield()
 	end
 	if success then

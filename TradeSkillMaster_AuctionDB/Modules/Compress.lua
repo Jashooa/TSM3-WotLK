@@ -84,14 +84,15 @@ local function DecodeScans(rope)
             local average, count = ("@"):split(marketValueData)
             average = DecodeInt(average)
             count = DecodeInt(count)
-            if average ~= "~" and count ~= "~" then
-                if abs(currentDay - day) <= TSM.MAX_AVG_DAY then
-                    scans[day].average = average
-                    scans[day].count = count
-                else
-                    scans[day] = average
-                end
+            if abs(currentDay - day) <= TSM.MAX_AVG_DAY then
+                scans[day].average = average
+                scans[day].count = count
+            else
+                scans[day] = average
             end
+        else
+            local average = DecodeInt(marketValueData)
+            scans[day] = average
         end
     end
 

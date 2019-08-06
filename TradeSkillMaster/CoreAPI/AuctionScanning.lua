@@ -636,20 +636,18 @@ function private.GetAllScanThread(self)
 			return private:DoCallback("GETALL_BAD_DATA")
 		end
 
-		local itemBuyout = TSMAPI.Util:Round(buyout / stackSize)
-		if not scanData[itemString] then
-			scanData[itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
-		end
-		if itemBuyout > 0 then
-			if scanData[itemString].minBuyout == 0 or itemBuyout < scanData[itemString].minBuyout then
-				scanData[itemString].minBuyout = itemBuyout
-			end
-            if itemBuyout then
-                scanData[itemString].buyoutsQuantity = scanData[itemString].buyoutsQuantity + stackSize
-                tinsert(scanData[itemString].buyouts, {value=itemBuyout, count=stackSize})
+        local itemBuyout = TSMAPI.Util:Round(buyout / stackSize)
+        if itemBuyout > 0 then
+            if not scanData[itemString] then
+                scanData[itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
             end
-		end
-		scanData[itemString].numAuctions = scanData[itemString].numAuctions + 1
+            if scanData[itemString].minBuyout == 0 or itemBuyout < scanData[itemString].minBuyout then
+                scanData[itemString].minBuyout = itemBuyout
+            end
+            scanData[itemString].buyoutsQuantity = scanData[itemString].buyoutsQuantity + stackSize
+            tinsert(scanData[itemString].buyouts, {value=itemBuyout, count=stackSize})
+            scanData[itemString].numAuctions = scanData[itemString].numAuctions + 1
+        end
 
 		if i % 500 == 0 then
 			private:DoCallback("GETALL_PROGRESS", i, numAuctions)

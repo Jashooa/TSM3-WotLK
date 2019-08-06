@@ -151,18 +151,21 @@ function Data:ProcessScanDataThread(self, scanData, itemList)
 	for itemString, data in pairs(scanData) do
         TSM.realmData[itemString] = TSM.realmData[itemString] or {scans={}}
 
-        local marketValue = CalculateMarketValue(data.buyouts, data.buyoutsQuantity)
         local scans = TSM.realmData[itemString].scans
-        scans[day] = scans[day] or {average=0, count=0}
-        scans[day].average = scans[day].average or 0
-        scans[day].count = scans[day].count or 0
-        scans[day].average = floor((scans[day].average * scans[day].count + marketValue) / (scans[day].count + 1) + 0.5)
-        scans[day].count = scans[day].count + 1
+        scans[day] = scans[day] or {}
+
+        if #data.buyouts > 0 then
+            scans[day].average = scans[day].average or 0
+            scans[day].count = scans[day].count or 0
+            local marketValue = CalculateMarketValue(data.buyouts, data.buyoutsQuantity)
+            scans[day].average = floor((scans[day].average * scans[day].count + marketValue) / (scans[day].count + 1) + 0.5)
+            scans[day].count = scans[day].count + 1
+            UpdateMarketValue(TSM.realmData[itemString])
+        end
 
         TSM.realmData[itemString].minBuyout = data.minBuyout
         TSM.realmData[itemString].numAuctions = data.numAuctions
         TSM.realmData[itemString].lastScan = scanTime
-        UpdateMarketValue(TSM.realmData[itemString])
 		self:Yield()
 	end
 end

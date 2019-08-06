@@ -95,20 +95,18 @@ function private.FullScanThread(self)
 			success = false
 			break
         end
-        local itemString = TSMAPI.Item:ToBaseItemString(itemString)
-		if not scanData[itemString] then
-			scanData[itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
-		end
-		if record.itemBuyout > 0 then
-			if scanData[itemString].minBuyout == 0 or record.itemBuyout < scanData[itemString].minBuyout then
-				scanData[itemString].minBuyout = record.itemBuyout
+        if record.itemBuyout > 0 then
+            local itemString = TSMAPI.Item:ToBaseItemString(record.itemString)
+            if not scanData[itemString] then
+                scanData[itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
             end
-            if record.itemBuyout then
-                scanData[itemString].buyoutsQuantity = scanData[itemString].buyoutsQuantity + record.stackSize
-                tinsert(scanData[itemString].buyouts, {value=record.itemBuyout, count=record.stackSize})
+            if scanData[itemString].minBuyout == 0 or record.itemBuyout < scanData[itemString].minBuyout then
+                scanData[itemString].minBuyout = record.itemBuyout
             end
-		end
-		scanData[itemString].numAuctions = scanData[itemString].numAuctions + 1
+            scanData[itemString].buyoutsQuantity = scanData[itemString].buyoutsQuantity + record.stackSize
+            tinsert(scanData[itemString].buyouts, {value=record.itemBuyout, count=record.stackSize})
+            scanData[itemString].numAuctions = scanData[itemString].numAuctions + 1
+        end
 		self:Yield()
 	end
 	if success then
@@ -177,20 +175,18 @@ function private.GroupScanThread(self, itemList)
 			success = false
 			break
         end
-        local itemString = TSMAPI.Item:ToBaseItemString(itemString)
-		if not scanData[itemString] then
-			scanData[itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
-		end
-		if record.itemBuyout > 0 then
-			if scanData[itemString].minBuyout == 0 or record.itemBuyout < scanData[itemString].minBuyout then
-				scanData[itemString].minBuyout = record.itemBuyout
-			end
-            if record.itemBuyout then
-                scanData[itemString].buyoutsQuantity = scanData[itemString].buyoutsQuantity + record.stackSize
-                tinsert(scanData[itemString].buyouts, {value=record.itemBuyout, count=record.stackSize})
+        if record.itemBuyout > 0 then
+            local itemString = TSMAPI.Item:ToBaseItemString(record.itemString)
+            if not scanData[itemString] then
+                scanData[itemString] = {buyouts={}, minBuyout=0, numAuctions=0, buyoutsQuantity=0}
             end
-		end
-		scanData[itemString].numAuctions = scanData[itemString].numAuctions + 1
+            if scanData[itemString].minBuyout == 0 or record.itemBuyout < scanData[itemString].minBuyout then
+                scanData[itemString].minBuyout = record.itemBuyout
+            end
+            scanData[itemString].buyoutsQuantity = scanData[itemString].buyoutsQuantity + record.stackSize
+            tinsert(scanData[itemString].buyouts, {value=record.itemBuyout, count=record.stackSize})
+            scanData[itemString].numAuctions = scanData[itemString].numAuctions + 1
+        end
 		self:Yield()
 	end
 	if success then

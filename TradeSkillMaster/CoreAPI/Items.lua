@@ -270,10 +270,12 @@ function TSMAPI.Item:GetItemSubClassInfo(classId, subClassId)
 end
 
 function TSMAPI.Item:GetClassIdFromClassString(class)
+    if not class then return end
 	return STATIC_DATA.classIdLookup[strlower(class)]
 end
 
 function TSMAPI.Item:GetSubClassIdFromSubClassString(subClass, classId)
+    if not subClass then end
 	if not classId then return end
 	local class = TSMAPI.Item:GetItemClassInfo(classId)
 	if not STATIC_DATA.classLookup[class] then return end

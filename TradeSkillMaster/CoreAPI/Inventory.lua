@@ -220,7 +220,7 @@ function TSMAPI.Inventory:GetTotalQuantity(itemString)
 	return numPlayer + numAlts + numAuctions + numGuild
 end
 
-function TSMAPI.Inventory:GetCraftingTotals(ignoreCharacters, otherItems)
+function TSMAPI.Inventory:GetCraftingTotals(ignoreCharacters)
 	local bagTotal, auctionTotal, otherTotal, total = {}, {}, {}, {}
 
 	for player, data in pairs(private.playerData) do

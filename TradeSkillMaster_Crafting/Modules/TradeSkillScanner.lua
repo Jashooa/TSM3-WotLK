@@ -98,7 +98,7 @@ function private.ScanCurrentProfessionThread(self, args)
 	local scanResult = { crafts = {}, mats = {} }
 	local isEnchanting = TSM:IsCurrentProfessionEnchanting()
 	if isEnchanting then
-		self:WaitForFunction(function() return TSMAPI.Item:GetName(TSM.VELLUM_ITEM_STRING) end)
+		self:WaitForFunction(function() return TSMAPI.Item:GetName(TSM.ARMOR_VELLUM) end)
 	end
 	for index, data in pairs(professionCrafts) do
 		TSMAPI:Assert(data, "Invalid profession spell")
@@ -117,11 +117,12 @@ function private.ScanCurrentProfessionThread(self, args)
 			end
 
 			-- if this is an enchant, add a vellum to the list of mats
-			if isEnchanting and strfind(itemLink, "enchant:") then
-				scanResult.crafts[spellId].mats[TSM.VELLUM_ITEM_STRING] = 1
-				local name = TSMAPI.Item:GetName(TSM.VELLUM_ITEM_STRING)
-				scanResult.mats[TSM.VELLUM_ITEM_STRING] = scanResult.mats[TSM.VELLUM_ITEM_STRING] or {}
-				scanResult.mats[TSM.VELLUM_ITEM_STRING].name = scanResult.mats[TSM.VELLUM_ITEM_STRING].name or name
+            if isEnchanting and strfind(itemLink, "enchant:") then
+                local vellum = TSM:GetVellum(spellId)
+				scanResult.crafts[spellId].mats[vellum] = 1
+				local name = TSMAPI.Item:GetName(vellum)
+				scanResult.mats[vellum] = scanResult.mats[vellum] or {}
+				scanResult.mats[vellum].name = scanResult.mats[vellum].name or name
 				scanResult.crafts[spellId].numResult = 1
 			end
 		end
@@ -224,7 +225,7 @@ function private:GetCraftInfo(index)
 	if strfind(itemLink, "enchant:") then
         -- result of craft is enchant
         spellId = TSM:GetSpellId(spellLink)
-		itemString = TSM.enchantingItemIDs[spellId]
+		itemString = TSM.enchantingItemIDs[spellId] and TSM.enchantingItemIDs[spellId].itemString
 		craftName = GetSpellInfo(spellId)
 	elseif strfind(itemLink, "item:") then
         -- result of craft is item

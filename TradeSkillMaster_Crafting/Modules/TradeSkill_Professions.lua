@@ -821,9 +821,10 @@ function Professions:UpdateSelectedTradeSkill(forceUpdate)
 			end
 		end
 
-		if altVerb == ENSCRIBE then
+        if altVerb == ENSCRIBE then
+            local vellum = TSM:GetVellum(spellId)
 			frame.craftInfoFrame.buttonsFrame.createAllBtn:SetText(L["Enchant Vellum"])
-			frame.craftInfoFrame.buttonsFrame.createAllBtn.vellum = TSMAPI.Item:GetName(TSM.VELLUM_ITEM_STRING)
+			frame.craftInfoFrame.buttonsFrame.createAllBtn.vellum = TSMAPI.Item:GetName(vellum)
 		else
 			frame.craftInfoFrame.buttonsFrame.createAllBtn:SetText(CREATE_ALL)
 			frame.craftInfoFrame.buttonsFrame.createAllBtn.vellum = nil

@@ -361,8 +361,9 @@ function Queue:Update()
 				-- add leading space
 				leader = "    " .. leader
 				-- add row to temporary table for this profession
-				local rowText = format("%s[%d] %s|r", leader, numQueued, TSM.db.factionrealm.crafts[spellId].name or "?")
-				local velName = craft.mats[TSM.VELLUM_ITEM_STRING] and (GetItemInfo(TSM.VELLUM_ITEM_STRING) or TSM.db.factionrealm.mats[TSM.VELLUM_ITEM_STRING].name) or nil
+                local rowText = format("%s[%d] %s|r", leader, numQueued, TSM.db.factionrealm.crafts[spellId].name or "?")
+                local velString = TSM:GetVellum(spellId)
+				local velName = velString and craft.mats[velString] and (TSMAPI.Item:GetName(velString) or TSM.db.factionrealm.mats[velString].name) or nil
 				local craftProfit = select(3, TSM.Cost:GetSpellCraftPrices(spellId))
 				tinsert(stData, { cols = { { value = rowText } }, spellId = spellId, canCraft = numCanCraft, numQueued = numQueued, index = craftIndex, velName = velName, profit = craftProfit, profession = profession })
 			end

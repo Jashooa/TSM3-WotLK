@@ -10,6 +10,7 @@
 local TSM = select(2, ...)
 TSM = LibStub("AceAddon-3.0"):NewAddon(TSM, "TSM_Crafting", "AceEvent-3.0", "AceConsole-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
+local WEAPON, ARMOR = GetAuctionItemClasses()
 
 TSM.MINING_SPELLID = 2575
 TSM.SMELTING_SPELLID = 2656
@@ -366,6 +367,33 @@ end
 
 function TSM:GetInventoryTotals()
 	local ignoreCharacters = CopyTable(TSM.db.global.ignoreCharacters)
-	ignoreCharacters[UnitName("player")] = nil
-	return TSMAPI.Inventory:GetCraftingTotals(ignoreCharacters, { [TSM.VELLUM_ITEM_STRING] = true })
+    ignoreCharacters[UnitName("player")] = nil
+	return TSMAPI.Inventory:GetCraftingTotals(ignoreCharacters)
+end
+
+function TSM:GetVellum(spellId)
+    if not TSM.enchantingItemIDs[spellId] then return end
+    local minLevel = TSM.enchantingItemIDs[spellId].minItemLevel
+    local itemType = TSM.enchantingItemIDs[spellId].itemType
+
+    local vellum = nil
+    if itemType == WEAPON then
+        if minLevel == 60 then
+            vellum = TSM.WEAPON_VELLUM_III
+        elseif minLevel == 35 then
+            vellum = TSM.WEAPON_VELLUM_II
+        else
+            vellum = TSM.WEAPON_VELLUM
+        end
+    elseif itemType == ARMOR then
+        if minLevel == 60 then
+            vellum = TSM.ARMOR_VELLUM_III
+        elseif minLevel == 35 then
+            vellum = TSM.ARMOR_VELLUM_II
+        else
+            vellum = TSM.ARMOR_VELLUM
+        end
+    end
+
+    return vellum
 end

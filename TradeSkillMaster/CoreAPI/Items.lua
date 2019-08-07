@@ -526,7 +526,7 @@ end
 function TSMAPI.Item:GetStringFromName(itemName)
     TSMAPI:Assert(type(itemName) == "string")
     local itemLink = select(2, GetItemInfo(itemName))
-    local itemString = ISMAPI.Item:ToItemString(itemLink)
+    local itemString = TSMAPI.Item:ToItemString(itemLink)
     if not itemString then return end
     private.GetCachedItemInfo(itemString)
 

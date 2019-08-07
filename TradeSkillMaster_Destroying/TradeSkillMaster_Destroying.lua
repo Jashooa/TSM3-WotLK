@@ -123,23 +123,3 @@ function TSM:IsDestroyable(itemString)
 
 	return destroyCache[itemString] and unpack(destroyCache[itemString]) or nil
 end
-
-function TSM:HasDraenicEnchanting()
-	local profession1, profession2 = GetProfessions()
-
-	-- check first profession
-	if profession1 then
-		local skillName, _, level, maxLevel = GetProfessionInfo(profession1)
-		if skillName == GetSpellInfo(7411) and level >= 600 and maxLevel == 700 then
-			return true
-		end
-	end
-
-	-- check second profession
-	if profession2 then
-		local skillName, _, level, maxLevel = GetProfessionInfo(profession2)
-		if skillName == GetSpellInfo(7411) and level >= 600 and maxLevel == 700 then
-			return true
-		end
-	end
-end

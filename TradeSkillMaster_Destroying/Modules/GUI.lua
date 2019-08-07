@@ -391,9 +391,6 @@ function private.DestroyingThread(self)
 							temp.result[itemString] = quantity
 						end
 					end
-					if context.target.spell == GetSpellInfo(TSM.spells.disenchant) then
-						temp.isDraenicEnchanting = TSM:HasDraenicEnchanting()
-					end
 					TSM.db.global.history[context.target.spell] = TSM.db.global.history[context.target.spell] or {}
 					tinsert(TSM.db.global.history[context.target.spell], temp)
 				end
@@ -431,13 +428,7 @@ function private.DestroyingThread(self)
 					end
 					target = target or backupTarget
 					if target then
-						if target.spell == GetSpellInfo(TSM.spells.milling) and TSMAPI.Inventory:GetBagQuantity("i:114942") > 0 then
-							-- use the draenic mortar
-							local mortarName = TSMAPI.Item:GetName("i:114942")
-							private.frame.destroyBtn:SetAttribute("macrotext1", format("/use %s;\n/use %d %d", mortarName, target.bag, target.slot))
-						else
-							private.frame.destroyBtn:SetAttribute("macrotext1", format("/cast %s;\n/use %d %d", target.spell, target.bag, target.slot))
-						end
+						private.frame.destroyBtn:SetAttribute("macrotext1", format("/cast %s;\n/use %d %d", target.spell, target.bag, target.slot))
 						if currentState == "ST_READY" then
 							context.target = target
 							currentState = "ST_CASTING_PENDING"

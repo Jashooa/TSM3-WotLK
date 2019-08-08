@@ -17,7 +17,7 @@ local settingsInfo = {
 		sniperVendorPrice = { type = "boolean", default = true, lastModifiedVersion = 2 },
 		postBidPercent = { type = "number", default = 0.95, lastModifiedVersion = 1 },
 		minDeSearchLvl = { type = "number", default = 1, lastModifiedVersion = 1 },
-		maxDeSearchLvl = { type = "number", default = 735, lastModifiedVersion = 1 },
+		maxDeSearchLvl = { type = "number", default = 200, lastModifiedVersion = 1 },
 		maxDeSearchPercent = { type = "number", default = 1, lastModifiedVersion = 1 },
 		postUndercut = { type = "string", default = "1c", lastModifiedVersion = 3 },
 		normalPostPrice = { type = "string", default = "150% dbmarket", lastModifiedVersion = 1 },

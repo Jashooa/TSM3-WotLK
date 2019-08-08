@@ -393,23 +393,47 @@ function private:UpdateBuyST(refresh)
 					displayText = "|cffff0000"
 				end
 
-				displayText = format("%s%d |T%s:0|t %s", displayText,stackCount, texture,itemLink)
+				displayText = format("%s%d |T%s:0|t %s", displayText, stackCount, texture, itemLink)
 
 				if numAvailable > -1 then
-					displayText = format("%s |cffff0000(%d)",displayText,numAvailable)
+					displayText = format("%s |cffff0000(%d)", displayText, numAvailable)
 				end
 
 				if extendedCost then
-					local costCount = GetMerchantItemCostInfo(index)
-					for i = 1,costCount do
+                    local honorPoints, arenaPoints, costCount = GetMerchantItemCostInfo(index)
+                    if honorPoints and honorPoints ~= 0 then
+                        local factionGroup = UnitFactionGroup("player")
+                        if factionGroup then
+                            itemCostTexture = "Interface\\PVPFrame\\PVP-Currency-" .. factionGroup
+                        end
+
+                        sortPrice = sortPrice + honorPoints / 100000
+
+                        displayCost = format("%s%s%d |T%s:0|t", displayCost, displayCostSeparator, honorPoints, itemCostTexture)
+
+                        displayCostSeparator = ", "
+                    end
+                    if arenaPoints and arenaPoints ~= 0 then
+                        local factionGroup = UnitFactionGroup("player")
+                        if factionGroup then
+                            itemCostTexture = "Interface\\PVPFrame\\PVP-ArenaPoints-Icon"
+                        end
+
+                        sortPrice = sortPrice + arenaPoints / 100000
+
+                        displayCost = format("%s%s%d |T%s:0|t", displayCost, displayCostSeparator, arenaPoints, itemCostTexture)
+
+                        displayCostSeparator = ", "
+                    end
+					for i = 1, costCount do
 						itemCostTexture, itemCostValue, itemCostLink = GetMerchantItemCostItem(index,i)
 
 						sortPrice = sortPrice + itemCostValue / 100000
 
 						if itemCostTexture and itemCostValue then
-							displayCost = format("%s%s%d |T%s:0|t",displayCost,displayCostSeparator,itemCostValue,itemCostTexture)
+							displayCost = format("%s%s%d |T%s:0|t", displayCost, displayCostSeparator, itemCostValue, itemCostTexture)
 						else
-							displayCost = format("%s%s%d", displayCost,displayCostSeparator,itemCostValue)
+							displayCost = format("%s%s%d", displayCost, displayCostSeparator, itemCostValue)
 						end
 
 						displayCostSeparator = ", "
@@ -417,7 +441,7 @@ function private:UpdateBuyST(refresh)
 				end
 
 				if price > 0 then
-					displayCost = format("%s%s%s",displayCost,displayCostSeparator,TSMAPI:MoneyToString(price, "OPT_TRIM"))
+					displayCost = format("%s%s%s", displayCost, displayCostSeparator, TSMAPI:MoneyToString(price, "OPT_TRIM"))
 				end
 
 				tinsert(private.vendorItems, {

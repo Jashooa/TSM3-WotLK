@@ -88,8 +88,24 @@ function Util:GetMaxAfford(index)
 	end
 
 	if extendedCost then
-		local numCosts = GetMerchantItemCostInfo(index)
+		local honorPoints, arenaPoints, numCosts = GetMerchantItemCostInfo(index)
 
+        if honorPoints and honorPoints ~= 0 then
+            local costNumHave = GetHonorCurrency()
+            local costCanBuy = math.floor(costNumHave / honorPoints)
+
+            if maxAfford == nil or costCanBuy < maxAfford then
+                maxAfford = costCanBuy
+            end
+        end
+        if arenaPoints and arenaPoints ~= 0 then
+            local costNumHave = GetArenaCurrency()
+            local costCanBuy = math.floor(costNumHave / arenaPoints)
+
+            if maxAfford == nil or costCanBuy < maxAfford then
+                maxAfford = costCanBuy
+            end
+        end
 		for cindex = 1, numCosts do
 			local costTexture, costValue, costItemLink, costName = GetMerchantItemCostItem(index,cindex)
 

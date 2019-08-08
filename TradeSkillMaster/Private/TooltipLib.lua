@@ -191,7 +191,7 @@ do
 		end,
 		SetAuctionSellItem = function(self, ...) PreHookHelper(self, GetAuctionSellItemInfo, 3, ...) end,
 		SetInboxItem = function(self, index) PreHookHelper(self, GetInboxItem, 3, index, 1) end,
-		SetSendMailItem = function(self, ...) PreHookHelper(self, GetSendMailItem, 4, ...) end,
+		SetSendMailItem = function(self, ...) PreHookHelper(self, GetSendMailItem, 3, ...) end,
 		SetLootItem = function(self, ...) PreHookHelper(self, GetLootSlotInfo, 3, ...) end,
 		SetLootRollItem = function(self, ...) PreHookHelper(self, GetLootRollItemInfo, 3, ...) end,
 		SetTradePlayerItem = function(self, ...) PreHookHelper(self, GetTradePlayerItemInfo, 3, ...) end,

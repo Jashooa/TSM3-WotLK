@@ -89,7 +89,7 @@ function private:SendOffMailThread(self, target, codPerItem)
 	if codPerItem then
 		local numItems = 0
 		for i = 1, attachments do
-			local count = select(4, GetSendMailItem(i))
+			local count = select(3, GetSendMailItem(i))
 			numItems = numItems + count
 		end
 		SetSendMailCOD(codPerItem * numItems)
@@ -104,7 +104,7 @@ function private:SendOffMailThread(self, target, codPerItem)
 	if TSM.db.global.sendMessages then
 		local items = {}
 		for i = 1, attachments do
-			local num = select(4, GetSendMailItem(i))
+			local num = select(3, GetSendMailItem(i))
 			local link = GetSendMailItemLink(i)
 			local itemString = TSMAPI.Item:ToItemString(link)
 			if itemString then
@@ -129,7 +129,7 @@ function private:SendOffMailThread(self, target, codPerItem)
 	for i=1, ATTACHMENTS_MAX_SEND do
 		local itemString = TSMAPI.Item:ToItemString(GetSendMailItemLink(i))
 		if itemString then
-			local count = select(4, GetSendMailItem(i))
+			local count = select(3, GetSendMailItem(i))
 			inventoryQuantities[itemString] = max(TSMAPI.Inventory:GetBagQuantity(itemString) - count, 0)
 		end
 	end

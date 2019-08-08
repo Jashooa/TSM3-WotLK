@@ -576,7 +576,7 @@ function private.MailThread(self)
 		for i = 1, ATTACHMENTS_MAX_SEND do
 			local itemString = TSMAPI.Item:ToBaseItemString(GetSendMailItemLink(i))
 			if itemString then
-				items[itemString] = (items[itemString] or 0) + select(4, GetSendMailItem(i))
+				items[itemString] = (items[itemString] or 0) + select(3, GetSendMailItem(i))
 			end
 		end
 		private:InsertPendingMail(altName, "sent_mail", items, time())

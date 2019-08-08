@@ -74,7 +74,8 @@ function private.OnChatMsg(_, msg)
 				end
 			end
 			if not itemString or not count then return
-			end
+            end
+            itemString = TSMAPI.Item:ToBaseItemString(itemString)
 			private.insertInfo = { type = "buys", itemString = itemString, count = count, price = private.tradeInfo.player.money / count }
 			private.insertInfo.gotText = TSMAPI.Item:GetLink(itemString) .. "x" .. count
 			private.insertInfo.gaveText = TSMAPI:MoneyToString(private.tradeInfo.player.money)
@@ -93,7 +94,8 @@ function private.OnChatMsg(_, msg)
 				end
 			end
 			if not itemString or not count then return
-			end
+            end
+            itemString = TSMAPI.Item:ToBaseItemString(itemString)
 			private.insertInfo = { type = "sales", itemString = itemString, count = count, price = private.tradeInfo.target.money / count }
 			private.insertInfo.gaveText = TSMAPI.Item:GetLink(itemString) .. "x" .. count
 			private.insertInfo.gotText = TSMAPI:MoneyToString(private.tradeInfo.target.money)

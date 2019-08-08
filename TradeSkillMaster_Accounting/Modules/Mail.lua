@@ -102,7 +102,8 @@ function Mail:ScanCollectedMail(oFunc, attempt, index, subIndex)
 	if invoiceType == "seller" and buyer and buyer ~= "" then -- AH Sales
 		local daysLeft = select(7, GetInboxHeaderInfo(index))
 		local saleTime = (time() + (daysLeft - 30) * SECONDS_PER_DAY)
-		local itemString = TSM.db.global.itemStrings[itemName] or TSMAPI.Item:GetStringFromName(itemName)
+        local itemString = TSM.db.global.itemStrings[itemName] or TSMAPI.Item:GetStringFromName(itemName)
+        itemString = TSMAPI.Item:ToBaseItemString(itemString)
         if itemString and private:CanLootMailIndex(index, (bid - ahcut)) then
             local quantity = TSM.Data:GetAuctionQuantity(itemString, buyout)
             if quantity then
@@ -113,10 +114,10 @@ function Mail:ScanCollectedMail(oFunc, attempt, index, subIndex)
 		end
 	elseif invoiceType == "buyer" and buyer and buyer ~= "" then -- AH Buys
 		local link = (subIndex or 1) == 1 and private:GetFirstInboxItemLink(index) or GetInboxItemLink(index, subIndex or 1)
-		local itemString = TSMAPI.Item:ToItemString(link)
+        local itemString = TSMAPI.Item:ToBaseItemString(link)
 		if itemString and private:CanLootMailIndex(index, 0) then
 			--might as well grab the name for future lookups
-			local name = TSMAPI.Item:GetName(link)
+			local name = TSMAPI.Item:GetName(itemString)
 			TSM.db.global.itemStrings[name] = itemString
 
             local quantity = select(3, GetInboxItem(index, subIndex or 1))
@@ -127,10 +128,10 @@ function Mail:ScanCollectedMail(oFunc, attempt, index, subIndex)
 		end
 	elseif codAmount > 0 then -- COD Buys (only if all attachments are same item)
 		local link = (subIndex or 1) == 1 and private:GetFirstInboxItemLink(index) or GetInboxItemLink(index, subIndex or 1)
-		local itemString = TSMAPI.Item:ToItemString(link)
+		local itemString = TSMAPI.Item:ToBaseItemString(link)
 		if itemString then
 			--might as well grab the name for future lookups
-			local name = TSMAPI.Item:GetName(link)
+			local name = TSMAPI.Item:GetName(itemString)
 			TSM.db.global.itemStrings[name] = itemString
 
 			local total = 0
@@ -175,7 +176,8 @@ function Mail:ScanCollectedMail(oFunc, attempt, index, subIndex)
 				local codName = strmatch(str, "([^\(]+)"):trim()
 				local qty = strmatch(str, "\(([0-9]+)\)")
 				qty = tonumber(qty)
-				local itemString = TSM.db.global.itemStrings[codName]
+                local itemString = TSM.db.global.itemStrings[codName] or TSMAPI.Item:GetStringFromName(codName)
+                itemString = TSMAPI.Item:ToBaseItemString(itemString)
 				if itemString then
 					local copper = floor(money / qty + 0.5)
 					local maxStack = TSMAPI.Item:GetMaxStack(itemString) or 1
@@ -197,7 +199,7 @@ function Mail:ScanCollectedMail(oFunc, attempt, index, subIndex)
 		local expiredTime = (time() + (daysLeft - 30) * SECONDS_PER_DAY)
 		local link = (subIndex or 1) == 1 and private:GetFirstInboxItemLink(index) or GetInboxItemLink(index, subIndex or 1)
 		local qty = select(3, GetInboxItem(index, subIndex or 1)) or 0
-		local itemString = TSMAPI.Item:ToItemString(link)
+		local itemString = TSMAPI.Item:ToBaseItemString(link)
 		if private:CanLootMailIndex(index, 0) then
             TSM.Data:InsertItemAuctionRecord(itemString, "Expire", qty, expiredTime)
             TSM.Data:RemoveExpiredAuction(itemString, qty, expiredTime)
@@ -207,7 +209,7 @@ function Mail:ScanCollectedMail(oFunc, attempt, index, subIndex)
 		local cancelledTime = (time() + (daysLeft - 30) * SECONDS_PER_DAY)
 		local link = (subIndex or 1) == 1 and private:GetFirstInboxItemLink(index) or GetInboxItemLink(index, subIndex or 1)
 		local qty = select(3, GetInboxItem(index, subIndex or 1)) or 0
-		local itemString = TSMAPI.Item:ToItemString(link)
+		local itemString = TSMAPI.Item:ToBaseItemString(link)
 		if private:CanLootMailIndex(index, 0) then
 			TSM.Data:InsertItemAuctionRecord(itemString, "Cancel", qty, cancelledTime)
 		end

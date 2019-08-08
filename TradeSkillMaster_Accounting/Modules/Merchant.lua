@@ -85,7 +85,7 @@ end
 function private.CheckMerchantSale(bag, slot, onSelf)
 	-- check if we are trying to sell something to a vendor
 	if MerchantFrame:IsShown() and not onSelf then
-		local itemString = TSMAPI.Item:ToItemString(GetContainerItemLink(bag, slot))
+		local itemString = TSMAPI.Item:ToBaseItemString(GetContainerItemLink(bag, slot))
 		local quantity = select(2, GetContainerItemInfo(bag, slot))
 		local copper = TSMAPI.Item:GetVendorPrice(itemString)
 		tinsert(private.pendingSales, {itemString, "Vendor", quantity, copper, "Merchant", insertTime=GetTime()})
@@ -96,14 +96,14 @@ function private.OnMerchantBuy(index, quantity)
 	local price, batchQuantity = select(3, GetMerchantItemInfo(index))
 	if not price or price <= 0 then return end
 	quantity = quantity or batchQuantity
-	local itemString = TSMAPI.Item:ToItemString(GetMerchantItemLink(index))
+	local itemString = TSMAPI.Item:ToBaseItemString(GetMerchantItemLink(index))
 	local copper = TSMAPI.Util:Round(price / batchQuantity)
 	TSM.Data:InsertItemBuyRecord(itemString, "Vendor", quantity, copper, "Merchant")
 end
 
 function private.OnMerchantBuyback(index)
 	local price, quantity = select(3, GetBuybackItemInfo(index))
-	local itemString = TSMAPI.Item:ToItemString(GetBuybackItemLink(index))
+	local itemString = TSMAPI.Item:ToBaseItemString(GetBuybackItemLink(index))
 	local copper = TSMAPI.Util:Round(price / quantity)
 	TSM.Data:InsertItemBuyRecord(itemString, "Vendor", quantity, copper, "Merchant")
 end

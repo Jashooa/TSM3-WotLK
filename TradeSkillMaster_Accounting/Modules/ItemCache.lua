@@ -36,8 +36,13 @@ function private.OnBagChange()
 			local itemString = TSMAPI.Item:ToItemString(GetContainerItemLink(bag, slot))
 			local name = TSMAPI.Item:GetName(itemString)
 			if name then
+                TSM.db.global.itemStrings[name] = itemString
+            end
+            itemString = TSMAPI.Item:ToBaseItemString(itemString)
+            name = TSMAPI.Item:GetName(itemString)
+			if name then
 				TSM.db.global.itemStrings[name] = itemString
-			end
+            end
 		end
 	end
 end
@@ -45,10 +50,18 @@ end
 -- scans the player's current auctions to build up the name -> itemString lookup table
 function private:ScanAuctionItems()
 	for i=1, GetNumAuctionItems("owner") do
-		local link = GetAuctionItemLink("owner", i)
-		if link then
-			local name = TSMAPI.Item:GetName(link)
-			TSM.db.global.itemStrings[name] = TSMAPI.Item:ToItemString(GetAuctionItemLink("owner", i))
-		end
+        local link = GetAuctionItemLink("owner", i)
+        if link then
+            local itemString = TSMAPI.Item:ToItemString(link)
+            local name = TSMAPI.Item:GetName(itemString)
+            if name then
+                TSM.db.global.itemStrings[name] = itemString
+            end
+            itemString = TSMAPI.Item:ToBaseItemString(itemString)
+            name = TSMAPI.Item:GetName(itemString)
+            if name then
+                TSM.db.global.itemStrings[name] = itemString
+            end
+        end
 	end
 end

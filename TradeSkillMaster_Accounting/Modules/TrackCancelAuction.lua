@@ -32,6 +32,7 @@ function private.CancelAuctionWatch(index)
     local itemName, _, stackSize, _, _, _, bid, _, buyout = GetAuctionItemInfo("owner", index)
     if itemName and stackSize then
         local itemString = TSM.db.global.itemStrings[itemName] or TSMAPI.Item:GetStringFromName(itemName)
+        itemString = TSMAPI.Item:ToBaseItemString(itemString)
         local timeLeft = GetAuctionItemTimeLeft("owner", index)
         private.AddPendingCancel(itemString, bid, buyout, stackSize, timeLeft)
     end

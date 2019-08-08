@@ -33,7 +33,7 @@ function private.StartAuctionWatch(bid, buyout, duration, stackSize, numStacks)
     local itemName = GetAuctionSellItemInfo()
     if itemName and stackSize then
         local itemString = TSM.db.global.itemStrings[itemName] or TSMAPI.Item:GetStringFromName(itemName)
-
+        itemString = TSMAPI.Item:ToBaseItemString(itemString)
         itemStringMulti, bidMulti, buyoutMulti, durationMulti, stackSizeMulti = itemString, bid, buyout, duration, stackSize
         private.AddPendingAuction(itemString, bid, buyout, duration, stackSize, 1)
     end

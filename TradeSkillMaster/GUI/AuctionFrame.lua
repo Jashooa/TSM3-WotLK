@@ -363,7 +363,7 @@ function private:OnEvent(event, ...)
 				AuctionFrame.Hide = function() end
 				HideUIPanel(AuctionFrame)
 				AuctionFrame.Hide = nil
-				SetUIPanelAttribute(AuctionFrame, "area", nil)
+				AuctionFrame:SetAttribute("area", nil)
 				private.hasShown = true
 			end
 			if TSM.db.profile.openAllBags then

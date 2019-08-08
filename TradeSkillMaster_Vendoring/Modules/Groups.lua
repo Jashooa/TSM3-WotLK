@@ -225,7 +225,7 @@ function private.BuyThread(self)
 	end
 
 	for index = 1, numMerchantItems do
-		local name, texture, price, stackCount, numAvailable, _, isUsable, extendedCost = GetMerchantItemInfo(index)
+		local name, texture, price, stackCount, numAvailable, isUsable, extendedCost = GetMerchantItemInfo(index)
 		local vendorItemLink = GetMerchantItemLink(index)
 		local vendorItemString = TSMAPI.Item:ToItemString(vendorItemLink)
 

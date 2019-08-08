@@ -14,6 +14,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_AuctionDB") -- lo
 local private = {}
 
 TSM.MAX_AVG_DAY = 1
+TSM.HISTORICAL_DAYS = 60
 local SECONDS_PER_DAY = 60 * 60 * 24
 
 StaticPopupDialogs["TSM_AUCTIONDB_NO_DATA_POPUP"] = {
@@ -39,7 +40,8 @@ local settingsInfo = {
 local tooltipDefaults = {
 	_version = 2,
 	minBuyout = true,
-	marketValue = true,
+    marketValue = true,
+    historical = true,
 }
 
 -- Called once the player has loaded WOW.
@@ -60,7 +62,8 @@ end
 function TSM:RegisterModule()
 	TSM.priceSources = {
 		{ key = "DBMarket", label = L["AuctionDB - Market Value"], callback = "GetRealmItemData", arg = "marketValue", takeItemString = true },
-		{ key = "DBMinBuyout", label = L["AuctionDB - Minimum Buyout"], callback = "GetRealmItemData", arg = "minBuyout", takeItemString = true },
+        { key = "DBMinBuyout", label = L["AuctionDB - Minimum Buyout"], callback = "GetRealmItemData", arg = "minBuyout", takeItemString = true },
+        { key = "DBHistorical", label = L["AuctionDB - Historical Price"], callback = "GetRealmItemData", arg = "historical", takeItemString = true },
 	}
 	TSM.moduleOptions = {callback="Config:Load"}
 	if TSM.db.global.showAHTab then
@@ -91,7 +94,8 @@ end
 
 local TOOLTIP_STRINGS = {
 	minBuyout = {L["Min Buyout:"], L["Min Buyout x%s:"]},
-	marketValue = {L["Market Value:"], L["Market Value x%s:"]},
+    marketValue = {L["Market Value:"], L["Market Value x%s:"]},
+    historical = {L["Historical Price:"], L["Historical Price x%s:"]},
 }
 local function TooltipMoneyFormat(value, quantity, moneyCoins)
 	return TSMAPI:MoneyToString(value*quantity, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil)
@@ -123,7 +127,9 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 	-- add min buyout
 	InsertTooltipValueLine(itemString, quantity, "minBuyout", "realm", lines, options, TooltipMoneyFormat, moneyCoins)
 	-- add market value
-	InsertTooltipValueLine(itemString, quantity, "marketValue", "realm", lines, options, TooltipMoneyFormat, moneyCoins)
+    InsertTooltipValueLine(itemString, quantity, "marketValue", "realm", lines, options, TooltipMoneyFormat, moneyCoins)
+    -- add historical price
+    InsertTooltipValueLine(itemString, quantity, "historical", "realm", lines, options, TooltipMoneyFormat, moneyCoins)
 
 	-- add the header if we've added at least one line
 	if #lines > numStartingLines then

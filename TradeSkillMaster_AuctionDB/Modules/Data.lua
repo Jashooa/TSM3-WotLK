@@ -121,6 +121,17 @@ local function CalculateMarketValue(buyouts, numRecords)
 	return correctedMean
 end
 
+local function UpdateHistoricalValue(itemData, marketValue)
+    local historical = itemData.historical
+    if historical then
+        if Data:GetDay(itemData.lastScan) < Data:GetDay() then
+            itemData.historical = floor((historical * (TSM.HISTORICAL_DAYS - 1) + marketValue) / (TSM.HISTORICAL_DAYS) + 0.5)
+        end
+    else
+        itemData.historical = marketValue
+    end
+end
+
 function Data:ProcessScanDataThread(self, scanData, itemList)
 	local scanTime = time()
 	TSM.db.realm.lastPartialScan = scanTime
@@ -155,9 +166,10 @@ function Data:ProcessScanDataThread(self, scanData, itemList)
         scans[day] = scans[day] or {}
 
         if #data.buyouts > 0 then
+            local marketValue = CalculateMarketValue(data.buyouts, data.buyoutsQuantity)
+            UpdateHistoricalValue(TSM.realmData[itemString], marketValue)
             scans[day].average = scans[day].average or 0
             scans[day].count = scans[day].count or 0
-            local marketValue = CalculateMarketValue(data.buyouts, data.buyoutsQuantity)
             scans[day].average = floor((scans[day].average * scans[day].count + marketValue) / (scans[day].count + 1) + 0.5)
             scans[day].count = scans[day].count + 1
             UpdateMarketValue(TSM.realmData[itemString])

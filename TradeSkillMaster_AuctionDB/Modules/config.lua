@@ -137,6 +137,10 @@ function Config:GetSearchSTData(filters)
                         sortArg = data.marketValue or 0,
                     },
                     {
+                        value = TSMAPI:MoneyToString(data.historical) or "---",
+                        sortArg = data.historical or 0,
+                    },
+                    {
                         value = (timeDiff and TSMAPI.Design:GetInlineColor("link2") .. format(L["%s ago"], timeDiff) .. "|r" or TSMAPI.Design:GetInlineColor("link2") .. "---|r"),
                         sortArg = data.lastScan and (time() - data.lastScan) or 0,
                     },
@@ -170,17 +174,22 @@ function Config:LoadSearch(container)
     local stCols = {
         {
             name = L["Name"],
-            width = 0.40,
+            width = 0.30,
             headAlign="LEFT",
         },
         {
             name = L["Min Buyout"],
-            width = 0.19,
+            width = 0.16,
             headAlign="LEFT",
         },
         {
             name = L["Market Value"],
-            width = 0.19,
+            width = 0.16,
+            headAlign="LEFT",
+        },
+        {
+            name = L["Historical Price"],
+            width = 0.16,
             headAlign="LEFT",
         },
         {
@@ -342,6 +351,13 @@ function Config:LoadTooltipOptions(container, options)
 					settingInfo = { options, "marketValue" },
 					relativeWidth = 1,
 					tooltip = L["If checked, the market value of the item will be displayed"],
+                },
+				{
+					type = "CheckBox",
+					label = L["Display historical price in the tooltip."],
+					settingInfo = { options, "historical" },
+					relativeWidth = 1,
+					tooltip = L["If checked, the historical price of the item will be displayed."],
 				},
 			},
 		},

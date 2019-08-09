@@ -9,7 +9,6 @@
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
 local Cost = TSM:NewModule("Cost", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
 local private = {loopCheck={item=nil, visitCount=nil}, matsVisited={}}
 
 

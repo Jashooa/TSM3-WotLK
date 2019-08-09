@@ -7,7 +7,6 @@
 -- ------------------------------------------------------------------------------ --
 
 local TSM = select(2, ...)
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {auctionTabs={}, queuedTabs={}, previousTab=nil, showCallbacks={}}
 LibStub("AceEvent-3.0"):Embed(private)
 LibStub("AceHook-3.0"):Embed(private)
@@ -160,10 +159,10 @@ function private:CreateTSMAHTab(moduleName, callbackShow, callbackHide)
 						end
 					end
 					GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-					GameTooltip:AddLine(L["Gold Info:"])
-					GameTooltip:AddDoubleLine(L["Player Gold"], TSMAPI:MoneyToString(GetMoney(), "OPT_ICON"), 1, 1, 1, 1, 1, 1)
-					GameTooltip:AddDoubleLine(L["Incoming Auction Sales"], TSMAPI:MoneyToString(incomingTotal, "OPT_ICON"), 1, 1, 1, 1, 1, 1)
-					GameTooltip:AddDoubleLine(L["Current Auctions Value"], TSMAPI:MoneyToString(currentTotal, "OPT_ICON"), 1, 1, 1, 1, 1, 1)
+					GameTooltip:AddLine("Gold Info:")
+					GameTooltip:AddDoubleLine("Player Gold", TSMAPI:MoneyToString(GetMoney(), "OPT_ICON"), 1, 1, 1, 1, 1, 1)
+					GameTooltip:AddDoubleLine("Incoming Auction Sales", TSMAPI:MoneyToString(incomingTotal, "OPT_ICON"), 1, 1, 1, 1, 1, 1)
+					GameTooltip:AddDoubleLine("Current Auctions Value", TSMAPI:MoneyToString(currentTotal, "OPT_ICON"), 1, 1, 1, 1, 1, 1)
 					GameTooltip:Show()
 				end,
 				OnLeave = function()

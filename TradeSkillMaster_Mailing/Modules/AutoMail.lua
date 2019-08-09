@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local AutoMail = TSM:NewModule("AutoMail", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Mailing") -- loads the localization table
 local private = {}
 
 
@@ -118,9 +117,9 @@ function private:SendOffMailThread(self, target, codPerItem)
 		end
 		local cod = GetSendMailCOD()
 		if cod and cod > 0 then
-			sendMsg = format(L["Sent %s to %s with a COD of %s."], table.concat(temp, ", "), target, TSMAPI:MoneyToString(cod))
+			sendMsg = format("Sent %s to %s with a COD of %s.", table.concat(temp, ", "), target, TSMAPI:MoneyToString(cod))
 		else
-			sendMsg = format(L["Sent %s to %s."], table.concat(temp, ", "), target)
+			sendMsg = format("Sent %s to %s.", table.concat(temp, ", "), target)
 		end
 	end
 
@@ -148,7 +147,7 @@ function private:SendOffMailThread(self, target, codPerItem)
 				ClearSendMail()
 				self:Yield(true)
 			end
-			TSM:Print(L["Failed to send mail:"].." "..errorEvent)
+			TSM:Print("Failed to send mail:".." "..errorEvent)
 			self:Exit(true)
 		end
 	end
@@ -203,7 +202,7 @@ function private.SendMailThread(self, args)
 	local numToSend, target, codPerItem, isDryRun = unpack(args)
 
 	if isDryRun then
-		TSM:Printf(L["Mailing would send the following items to %s:"], target)
+		TSM:Printf("Mailing would send the following items to %s:", target)
 		local numSent = {}
 		for bag, slot, itemString, quantity in TSMAPI.Inventory:BagIterator(true, false, true) do
 			if (numToSend[itemString] or 0) > 0 then
@@ -304,7 +303,7 @@ function private.SendMailThread(self, args)
 					else
 						-- the player's bags are full
 						if not printedBagsFullMsg then
-							TSM:Print(L["Could not send mail due to not having free bag space available to split a stack of items."])
+							TSM:Print("Could not send mail due to not having free bag space available to split a stack of items.")
 							printedBagsFullMsg = true
 						end
 					end

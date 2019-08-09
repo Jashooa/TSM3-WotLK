@@ -10,7 +10,6 @@
 local TSM = select(2, ...)
 local Options = TSM:NewModule("Options")
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Destroying")
 local private = {ignoreSTCreated=nil}
 
 
@@ -18,7 +17,7 @@ local private = {ignoreSTCreated=nil}
 function Options:Load(container)
 	local tabGroup = AceGUI:Create("TSMTabGroup")
 	tabGroup:SetLayout("Fill")
-	tabGroup:SetTabs({{text=L["Destroying Log"], value=1}, {text=L["Averages"], value=2}, {text=L["Ignored Items"], value=3}})
+	tabGroup:SetTabs({{text="Destroying Log", value=1}, {text="Averages", value=2}, {text="Ignored Items", value=3}})
 	tabGroup:SetCallback("OnGroupSelected", function(self, _, value)
 		tabGroup:ReleaseChildren()
 		if value == 1 then
@@ -40,7 +39,7 @@ end
 function Options:GetFormattedTime(rTime)
 	if TSM.db.global.timeFormat == "ago" then
 		if time() == rTime then
-			return format(L["now"])
+			return format("now")
 		end
 		return format("%s ago", SecondsToTime(time()-rTime) or "?")
 	elseif TSM.db.global.timeFormat == "usdate" then
@@ -101,19 +100,19 @@ end
 function Options:LoadLog(container)
 	local stCols = {
 		{
-			name = L["Spell"],
+			name = "Spell",
 			width = 0.08,
 		},
 		{
-			name = L["Destroyed Item"],
+			name = "Destroyed Item",
 			width = 0.2,
 		},
 		{
-			name = L["Result"],
+			name = "Result",
 			width = 0.56,
 		},
 		{
-			name = L["Time"],
+			name = "Time",
 			width = 0.14,
 		}
 	}
@@ -193,19 +192,19 @@ end
 function Options:LoadAverages(container)
 	local stCols = {
 		{
-			name = L["Spell"],
+			name = "Spell",
 			width = 0.1,
 		},
 		{
-			name = L["Times Destroyed"],
+			name = "Times Destroyed",
 			width = 0.15,
 		},
 		{
-			name = L["Destroyed Item"],
+			name = "Destroyed Item",
 			width = 0.3,
 		},
 		{
-			name = L["Average Result (per Destroy)"],
+			name = "Average Result (per Destroy)",
 			width = 0.45,
 		}
 	}
@@ -255,7 +254,7 @@ end
 function Options:LoadIgnored(container)
 	local stCols = {
 		{
-			name = L["Ignored Item"],
+			name = "Ignored Item",
 			width = 1,
 		}
 	}
@@ -264,7 +263,7 @@ function Options:LoadIgnored(container)
 			if not data.itemString then return end
 			GameTooltip:SetOwner(self, "ANCHOR_NONE")
 			GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT")
-			GameTooltip:AddLine(L["Right click on this row to remove this item from the permanent ignore list."], 1, 1, 1, true)
+			GameTooltip:AddLine("Right click on this row to remove this item from the permanent ignore list.", 1, 1, 1, true)
 			GameTooltip:Show()
 		end,
 		OnLeave = function()
@@ -275,7 +274,7 @@ function Options:LoadIgnored(container)
 			if not data.itemString then return end
 			if button == "RightButton" then
 				TSM.db.global.ignore[data.itemString] = nil
-				TSM:Printf(L["Removed %s from the permanent ignore list."], data.link)
+				TSM:Printf("Removed %s from the permanent ignore list.", data.link)
 				Options:UpdateIgnoreST()
 				TSM.GUI:UpdateST()
 			end
@@ -312,86 +311,86 @@ function Options:LoadOptions(container)
 			children = {
 				{
 					type = "InlineGroup",
-					title = L["General Options"],
+					title = "General Options",
 					layout = "Flow",
 					children = {
 						{
 							type = "CheckBox",
-							label = L["Enable Automatic Stack Combination"],
+							label = "Enable Automatic Stack Combination",
 							relativeWidth = 0.5,
 							settingInfo = {TSM.db.global, "autoStack"},
-							tooltip = L["If checked, partial stacks of herbs/ore will automatically be combined."],
+							tooltip = "If checked, partial stacks of herbs/ore will automatically be combined.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Show Destroying Frame Automatically"],
+							label = "Show Destroying Frame Automatically",
 							relativeWidth = 0.49,
 							settingInfo = {TSM.db.global, "autoShow"},
-							tooltip = L["If checked, the Destroying window will automatically be shown when there's items to destroy in your bags. Otherwise, you can open it up by typing '/tsm destroy'."],
+							tooltip = "If checked, the Destroying window will automatically be shown when there's items to destroy in your bags. Otherwise, you can open it up by typing '/tsm destroy'.",
 						},
 						{
 							type = "Dropdown",
-							label = L["Time Format"],
+							label = "Time Format",
 							relativeWidth = 0.5,
-							list = {["ago"]=L["_ Hr _ Min ago"], ["usdate"]="MM/DD/YY HH:MM", ["aidate"]="YY/MM/DD HH:MM", ["eudate"]="DD/MM/YY HH:MM"},
+							list = {["ago"]="_ Hr _ Min ago", ["usdate"]="MM/DD/YY HH:MM", ["aidate"]="YY/MM/DD HH:MM", ["eudate"]="DD/MM/YY HH:MM"},
 							settingInfo = {TSM.db.global, "timeFormat"},
-							tooltip = L["Select what format Destroying should use to display times in the Destroying log."],
+							tooltip = "Select what format Destroying should use to display times in the Destroying log.",
 						},
 						{
 							type = "Slider",
-							label = L["Days of Log Data"],
+							label = "Days of Log Data",
 							relativeWidth = 0.49,
 							min = 0,
 							max = 30,
 							step = 1,
 							settingInfo = {TSM.db.global, "logDays"},
-							tooltip = L["The destroying log will throw out any data that is older than this many days."],
+							tooltip = "The destroying log will throw out any data that is older than this many days.",
 						}
 					},
 				},
 				{
 					type = "InlineGroup",
-					title = L["Disenchanting Options"],
+					title = "Disenchanting Options",
 					layout = "Flow",
 					children = {
 						{
 							type = "Dropdown",
-							label = L["Maximum Disenchant Quality"],
+							label = "Maximum Disenchant Quality",
 							list = {[2]=ITEM_QUALITY2_DESC, [3]=ITEM_QUALITY3_DESC, [4]=ITEM_QUALITY4_DESC},
 							relativeWidth = 0.5,
 							settingInfo = {TSM.db.global, "deMaxQuality"},
-							tooltip = L["Destroying will not list any items above this quality for disenchanting."],
+							tooltip = "Destroying will not list any items above this quality for disenchanting.",
 							callback = function(self)
 								TSM.GUI:UpdateST()
 							end,
 						},
 						{
 							type = "CheckBox",
-							label = L["Include Soulbound Items"],
+							label = "Include Soulbound Items",
 							relativeWidth = 0.49,
 							settingInfo = {TSM.db.global, "includeSoulbound"},
-							tooltip = L["If checked, soulbound items can be destroyed by TSM_Destroying. USE THIS WITH EXTREME CAUTION!"],
+							tooltip = "If checked, soulbound items can be destroyed by TSM_Destroying. USE THIS WITH EXTREME CAUTION!",
 							callback = function(self)
 								TSM.GUI:UpdateST()
 							end,
 						},
 						{
 							type = "EditBox",
-							label = L["Above Custom Price ('0c' to disable)"],
+							label = "Above Custom Price ('0c' to disable)",
 							settingInfo = { TSM.db.global, "deAbovePrice" },
 							relativeWidth = 0.5,
 							acceptCustom = true,
-							tooltip = L["Only disenchantable items which have a disenchant value ABOVE this custom price will be displayed in the destroying window."],
+							tooltip = "Only disenchantable items which have a disenchant value ABOVE this custom price will be displayed in the destroying window.",
 							callback = function(self)
 								TSM.GUI:UpdateST()
 							end,
 						},
 						{
 							type = "CheckBox",
-							label = L["Above Vendor Sell Price"],
+							label = "Above Vendor Sell Price",
 							relativeWidth = 0.49,
 							settingInfo = {TSM.db.global, "deAboveVendor"},
-							tooltip = L["If checked, Only disenchantable items which have a disenchant value above the vendor sell price will be displayed in the destroying window."],
+							tooltip = "If checked, Only disenchantable items which have a disenchant value above the vendor sell price will be displayed in the destroying window.",
 							callback = function(self)
 								TSM.GUI:UpdateST()
 							end,

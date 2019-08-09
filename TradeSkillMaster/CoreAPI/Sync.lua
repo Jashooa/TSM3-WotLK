@@ -13,7 +13,6 @@ local TSM = select(2, ...)
 local Sync = TSM:NewModule("Sync", "AceComm-3.0", "AceEvent-3.0")
 TSMAPI.Sync = {}
 local private = {addedFriends={}, invalidPlayers={}, connections={}, threadId=nil, syncTables={}, tagUpdateTimes={}, rpcFunctions={}, rpcSeqNum=0, pendingRPC={}, lastNewPlayerSend=0}
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local RECEIVE_TIMEOUT = 5
 local HEARTBEAT_TIMEOUT = 10
 local UPDATE_PERIOD = 15
@@ -74,7 +73,7 @@ end
 
 function TSMAPI.Sync:Mirror(tbl, tag)
 	TSMAPI:Assert(type(tbl) == "table" and type(tag) == "string")
-	
+
 	-- setup metadata if necessary
 	TSM.db.factionrealm.syncMetadata[tag] = TSM.db.factionrealm.syncMetadata[tag] or {}
 	for key in pairs(tbl) do
@@ -83,7 +82,7 @@ function TSMAPI.Sync:Mirror(tbl, tag)
 			TSM.db.factionrealm.syncMetadata[tag][key] = {lastUpdate=time(), owner=TSMAPI.Sync:GetAccountKey()}
 		end
 	end
-	
+
 	private.syncTables[tag] = tbl
 	private.tagUpdateTimes[tag] = time()
 end
@@ -145,13 +144,13 @@ end
 function TSMAPI.Sync:CallRPC(name, targetPlayer, handler, ...)
 	TSMAPI:Assert(targetPlayer)
 	TSMAPI:Assert(private.rpcFunctions[name], "Cannot call an RPC which is not also registered locally.")
-	
+
 	-- lookup the target account to validate that the targetPlayer is a character that
 	-- we have syncing setup with and that they are online
 	local account = TSM.db.factionrealm.syncMetadata[private:GetTagByTable(TSM.db.factionrealm.characters)][targetPlayer].owner
 	TSMAPI:Assert(account)
 	if targetPlayer ~= private:GetTargetPlayer(account) then return end
-	
+
 	private.rpcSeqNum = private.rpcSeqNum + 1
 	private:SendData(DATA_TYPES.RPC_CALL, targetPlayer, {name=name, args={...}, seq=private.rpcSeqNum})
 	private.pendingRPC[private.rpcSeqNum] = {name=name, handler=handler, sendTime=time()}
@@ -201,15 +200,15 @@ end
 
 function Sync:DoSetup(targetPlayer, newSyncCallback)
 	if strlower(targetPlayer) == strlower(UnitName("player")) then
-		TSM:Print(L["Sync Setup Error: You entered the name of the current character and not the character on the other account."])
+		TSM:Print("Sync Setup Error: You entered the name of the current character and not the character on the other account.")
 		return
 	elseif not private:IsPlayerOnline(targetPlayer) then
-		TSM:Print(L["Sync Setup Error: The specified player on the other account is not currently online."])
+		TSM:Print("Sync Setup Error: The specified player on the other account is not currently online.")
 		return
 	end
 	for player in pairs(TSM.db.factionrealm.characters) do
 		if strlower(player) == targetPlayer then
-			TSM:Print(L["Sync Setup Error: This character is already part of a known account."])
+			TSM:Print("Sync Setup Error: This character is already part of a known account.")
 			return
 		end
 	end
@@ -243,7 +242,7 @@ function Sync:RemoveSync(account)
 end
 
 function Sync:GetConnectionStatus(account)
-	return private.connections[account] and private.connections[account].status or ("|cffff0000"..L["Offline"].."|r")
+	return private.connections[account] and private.connections[account].status or ("|cffff0000".."Offline".."|r")
 end
 
 
@@ -255,8 +254,8 @@ end
 function private.ConnectionThread(self, account)
 	self:SetThreadName("SYNC_CONNECTION_"..account)
 	local connectionInfo = private.connections[account]
-	connectionInfo.status = "|cffff0000"..L["Offline"].."|r"
-	
+	connectionInfo.status = "|cffff0000".."Offline".."|r"
+
 	-- wait for a target player to be online for the account
 	local targetPlayer = nil
 	while true do
@@ -267,8 +266,8 @@ function private.ConnectionThread(self, account)
 			self:Sleep(1)
 		end
 	end
-	connectionInfo.status = format(L["Connecting to %s..."], targetPlayer)
-	
+	connectionInfo.status = format("Connecting to %s...", targetPlayer)
+
 	local isServer = account < TSMAPI.Sync:GetAccountKey() -- the lower account key is the server, other is the client
 	if isServer then
 		-- wait for connection request from the client
@@ -281,9 +280,9 @@ function private.ConnectionThread(self, account)
 		-- wait for the connection request ACK
 		if not private:WaitForMsgThread(self, DATA_TYPES.CONNECTION_REQUEST_ACK) then return end
 	end
-	
+
 	-- now that we are connected, data can flow in both directions freely
-	connectionInfo.status = format("|cff00ff00"..L["Connected to %s"].."|r", targetPlayer)
+	connectionInfo.status = format("|cff00ff00".."Connected to %s".."|r", targetPlayer)
 	connectionInfo.player = targetPlayer
 	TSM:LOG_INFO("CONNECTED TO: %s %s", account, targetPlayer)
 	self:RegisterEvent("PLAYER_LOGOUT", function() return private:SendData(DATA_TYPES.DISCONNECT, targetPlayer) end)
@@ -293,7 +292,7 @@ function private.ConnectionThread(self, account)
 		if not private:IsPlayerOnline(targetPlayer, true) or time() - times.lastHeartbeatReceive > HEARTBEAT_TIMEOUT then
 			return
 		end
-		
+
 		-- check if we should send out the last update time
 		if next(private.syncTables) and time() - times.lastUpdateSend > 3 then
 			local maxLastUpdateTime = 0
@@ -310,13 +309,13 @@ function private.ConnectionThread(self, account)
 				times.lastUpdateSend = time()
 			end
 		end
-		
+
 		-- check if we should send a heartbeat
 		if time() - times.lastHeartbeatSend > floor(HEARTBEAT_TIMEOUT / 2) then
 			private:SendData(DATA_TYPES.HEARTBEAT, targetPlayer)
 			times.lastHeartbeatSend = time()
 		end
-		
+
 		-- process any pending messages
 		while self:GetNumMsgs() > 0 do
 			local event, data = unpack(self:ReceiveMsg())
@@ -401,7 +400,7 @@ function private.ConnectionThread(self, account)
 				times.lastUpdateDone = times.maxUpdateTimeSent
 			elseif event == DATA_TYPES.DISCONNECT then
 				TSM:LOG_INFO("Disconnected from %s", targetPlayer)
-				connectionInfo.status = "|cffff0000"..L["Offline"].."|r"
+				connectionInfo.status = "|cffff0000".."Offline".."|r"
 				self:Sleep(2) -- wait 2 seconds while they completely log out
 				return
 			else
@@ -454,13 +453,13 @@ function private:NewAccountThread(self)
 	end
 	if private.newAccount and private.newSyncAcked then
 		TSM.db.factionrealm.syncAccounts[private.newAccount] = true
-		
+
 		-- add the character to the list of characters on behalf of the other account
 		local tag = TSMAPI:Assert(private:GetTagByTable(TSM.db.factionrealm.characters))
 		TSMAPI:Assert(not TSM.db.factionrealm.syncMetadata[tag][private.newPlayer])
 		TSM.db.factionrealm.syncMetadata[tag][private.newPlayer] = {owner=private.newAccount, lastUpdate=1}
 		TSM.db.factionrealm.characters[private.newPlayer] = true
-		
+
 		if private.newSyncCallback then
 			private.newSyncCallback()
 		end
@@ -493,7 +492,7 @@ function private.SyncThread(self)
 			self:Sleep(0.1)
 		end
 	end
-	
+
 	-- continuously spawn connection threads with online players
 	local localAccountKey = TSMAPI.Sync:GetAccountKey()
 	while true do
@@ -544,11 +543,11 @@ function private:ReceiveData(packet, source)
 	-- remove realm name from source
 	source = ("-"):split(source)
 	source = source:trim()
-	
+
 	-- decompress the packet
 	packet = private:Decompress(packet)
 	if not packet then return end
-	
+
 	-- validate the packet
 	if type(packet) == "string" then
 		-- if it's a string that means there was no data
@@ -561,7 +560,7 @@ function private:ReceiveData(packet, source)
 		return
 	end
 	if packet.v ~= SYNC_VERSION then return end
-	
+
 	if packet.dt == DATA_TYPES.WHOAMI_ACCOUNT or packet.dt == DATA_TYPES.WHOAMI_ACK then
 		-- we don't yet have a connection, so treat seperately
 		if private.newPlayer and strlower(private.newPlayer) == strlower(source) then
@@ -580,7 +579,7 @@ function private:ReceiveData(packet, source)
 		private.pendingRPC[packet.d.seq] = nil
 	else
 		if not private.connections[packet.sa] or not private.connections[packet.sa].threadId then return end
-		
+
 		-- send the data to the connection thread
 		TSMAPI.Threading:SendMsg(private.connections[packet.sa].threadId, {packet.dt, packet.d})
 	end
@@ -595,7 +594,7 @@ end
 function private:ShowSVCopyError()
 	if private.didShowSVError then return end
 	private.didShowSVError = true
-	TSM:ShowConfigError(L["It appears that you've manually copied your saved variables between accounts which will cause TSM's automatic sync'ing to not work. You'll need to undo this, and/or delete the TradeSkillMaster and TSM_Crafting saved variables files on both accounts (with WoW closed) in order to fix this."])
+	TSM:ShowConfigError("It appears that you've manually copied your saved variables between accounts which will cause TSM's automatic sync'ing to not work. You'll need to undo this, and/or delete the TradeSkillMaster and TSM_Crafting saved variables files on both accounts (with WoW closed) in order to fix this.")
 end
 
 function private:GetTagByTable(tbl)
@@ -625,7 +624,7 @@ function private:IsPlayerOnline(target, noAdd)
 			return connected
 		end
 	end
-	
+
 	if not noAdd and not private.invalidPlayers[strlower(target)] and GetNumFriends() ~= 50 then
 		-- add them as a friend
 		AddFriend(target)
@@ -641,7 +640,7 @@ end
 
 function private:GetTargetPlayer(account)
 	local targetPlayer = nil
-	
+
 	-- find the player to connect to without adding to the friends list
 	for player in TSMAPI.Sync:GetTableIter(TSM.db.factionrealm.characters, account) do
 		if private:IsPlayerOnline(player, true) then
@@ -665,7 +664,7 @@ end
 function private:Compress(data, isChat)
 	TSMAPI:Assert(type(data) == "table" or type(data) == "string", "Invalid parameter")
 	local encodeTbl = isChat and LibCompressChatEncodeTable or LibCompressAddonEncodeTable
-	
+
 	-- We will compress using Huffman, LZW, and no compression separately, validate each one, and pick the shortest valid one.
 	-- This is to deal with a bug in the compression code.
 	local serialized = nil
@@ -678,7 +677,7 @@ function private:Compress(data, isChat)
 	encodedData[1] = encodeTbl:Encode(LibCompress:CompressHuffman(serialized))
 	encodedData[2] = encodeTbl:Encode(LibCompress:CompressLZW(serialized))
 	encodedData[3] = encodeTbl:Encode("\001"..serialized)
-	
+
 	-- verify each compresion and pick the shortest valid one
 	local minIndex = -1
 	local minLen = math.huge
@@ -689,7 +688,7 @@ function private:Compress(data, isChat)
 			minIndex = i
 		end
 	end
-	
+
 	TSMAPI:Assert(encodedData[minIndex], "Could not compress data")
 	return encodedData[minIndex]
 end

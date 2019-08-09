@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local QuickSend = TSM:NewModule("QuickSend", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Mailing") -- loads the localization table
 local private = {frame=nil, itemLink=nil, quantity=0, target="", cod=0}
 
 
@@ -23,7 +22,7 @@ function QuickSend:CreateTab()
 		children = {
 			{
 				type = "Text",
-				text = L["This tab allows you to quickly send any quantity of an item to another character. You can also specify a COD to set on the mail (per item)."],
+				text = "This tab allows you to quickly send any quantity of an item to another character. You can also specify a COD to set on the mail (per item).",
 				textSize = "normal",
 				justify = {"LEFT", "TOP"},
 				size = {0, 50},
@@ -35,7 +34,7 @@ function QuickSend:CreateTab()
 			},
 			{
 				type = "Text",
-				text = L["Item (Drag Into Box):"],
+				text = "Item (Drag Into Box):",
 				textSize = "small",
 				justify = {"LEFT", "CENTER"},
 				size = {0, 20},
@@ -44,7 +43,7 @@ function QuickSend:CreateTab()
 			{
 				type = "InputBox",
 				key = "itemBox",
-				tooltip = L["Drag (or place) the item that you want to send into this editbox."],
+				tooltip = "Drag (or place) the item that you want to send into this editbox.",
 				size = {0, 20},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}, {"TOPRIGHT", -95, -65}},
 				scripts = {"OnEditFocusGained", "OnReceiveDrag", "OnMouseDown"},
@@ -52,16 +51,16 @@ function QuickSend:CreateTab()
 			{
 				type = "Button",
 				key = "itemClearBtn",
-				text = L["Clear"],
+				text = "Clear",
 				textHeight = 15,
-				tooltip = L["Clicking this button clears the item box."],
+				tooltip = "Clicking this button clears the item box.",
 				size = {0, 20},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}, {"TOPRIGHT", -5, -65}},
 				scripts = {"OnClick"},
 			},
 			{
 				type = "Text",
-				text = L["Target:"],
+				text = "Target:",
 				textSize = "small",
 				justify = {"LEFT", "CENTER"},
 				size = {0, 20},
@@ -70,7 +69,7 @@ function QuickSend:CreateTab()
 			{
 				type = "InputBox",
 				key = "targetBox",
-				tooltip = L["Enter the name of the player you want to send this item to."].."\n\n"..TSM.SPELLING_WARNING,
+				tooltip = "Enter the name of the player you want to send this item to.".."\n\n"..TSM.SPELLING_WARNING,
 				autoComplete = AUTOCOMPLETE_LIST.MAIL,
 				size = {100, 20},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}},
@@ -78,7 +77,7 @@ function QuickSend:CreateTab()
 			},
 			{
 				type = "Text",
-				text = L["Max Quantity:"],
+				text = "Max Quantity:",
 				textSize = "small",
 				justify = {"LEFT", "CENTER"},
 				size = {0, 20},
@@ -89,14 +88,14 @@ function QuickSend:CreateTab()
 				key = "qtyBox",
 				numeric = true,
 				text = private.quantity,
-				tooltip = L["This is the maximum number of the specified item to send when you click the button below. Setting this to 0 will send ALL items."],
+				tooltip = "This is the maximum number of the specified item to send when you click the button below. Setting this to 0 will send ALL items.",
 				size = {0, 20},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}, {"TOPRIGHT", -5, -95}},
 				scripts = {"OnEnterPressed", "OnEditFocusLost", "OnTabPressed"},
 			},
 			{
 				type = "Text",
-				text = L["COD Amount (per Item):"],
+				text = "COD Amount (per Item):",
 				textSize = "small",
 				justify = {"LEFT", "CENTER"},
 				size = {0, 20},
@@ -106,7 +105,7 @@ function QuickSend:CreateTab()
 				type = "InputBox",
 				key = "codBox",
 				text = TSMAPI:MoneyToString(private.cod),
-				tooltip = L["Enter the desired COD amount (per item) to send this item with. Setting this to '0c' will result in no COD being set."],
+				tooltip = "Enter the desired COD amount (per item) to send this item with. Setting this to '0c' will result in no COD being set.",
 				size = {0, 20},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}, {"TOPRIGHT", -5, -125}},
 				scripts = {"OnEnterPressed"},
@@ -116,7 +115,7 @@ function QuickSend:CreateTab()
 				key = "btn",
 				text = "",
 				textHeight = 15,
-				tooltip = L["Click this button to mail the item to the specified character."].."\n\n"..TSMAPI.Design:GetInlineColor("link")..L["Shift-Click|r to leave the fields populated after sending."],
+				tooltip = "Click this button to mail the item to the specified character.".."\n\n"..TSMAPI.Design:GetInlineColor("link").."Shift-Click|r to leave the fields populated after sending.",
 				size = {0, 40},
 				points = {{"TOPLEFT", 5, -155}, {"TOPRIGHT", -5, -155}},
 				scripts = {"OnClick"},
@@ -214,7 +213,7 @@ function QuickSend:CreateTab()
 
 					local clearOnSend = not IsShiftKeyDown()
 					TSM.AutoMail:SendItems({[itemString]=quantity}, private.target, function() private:UpdateSendButton(clearOnSend) end, private.cod > 0 and private.cod)
-					self:SetText(L["Sending..."])
+					self:SetText("Sending...")
 					self:Disable()
 				end,
 			},
@@ -237,23 +236,23 @@ function private:UpdateSendButton(didSend)
 	end
 	if not private.itemLink then
 		btn:Disable()
-		btn:SetText(L["No Item Specified"])
+		btn:SetText("No Item Specified")
 	elseif private.target == "" then
 		btn:Disable()
-		btn:SetText(L["No Target Specified"])
+		btn:SetText("No Target Specified")
 	else
 		btn:Enable()
 		if private.cod > 0 then
 			if private.quantity == 0 then
-				btn:SetText(format(L["Send all %s to %s - %s per Item COD"], private.itemLink, private.target, TSMAPI:MoneyToString(private.cod)))
+				btn:SetText(format("Send all %s to %s - %s per Item COD", private.itemLink, private.target, TSMAPI:MoneyToString(private.cod)))
 			else
-				btn:SetText(format(L["Send %sx%d to %s - %s per Item COD"], private.itemLink, private.quantity, private.target, TSMAPI:MoneyToString(private.cod)))
+				btn:SetText(format("Send %sx%d to %s - %s per Item COD", private.itemLink, private.quantity, private.target, TSMAPI:MoneyToString(private.cod)))
 			end
 		else
 			if private.quantity == 0 then
-				btn:SetText(format(L["Send all %s to %s - No COD"], private.itemLink, private.target))
+				btn:SetText(format("Send all %s to %s - No COD", private.itemLink, private.target))
 			else
-				btn:SetText(format(L["Send %sx%d to %s - No COD"], private.itemLink, private.quantity, private.target))
+				btn:SetText(format("Send %sx%d to %s - No COD", private.itemLink, private.quantity, private.target))
 			end
 		end
 	end

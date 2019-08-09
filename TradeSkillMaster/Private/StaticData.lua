@@ -10,7 +10,6 @@
 
 local TSM = select(2, ...)
 TSM.STATIC_DATA = {}
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster")
 local WEAPON, ARMOR = GetAuctionItemClasses()
 
 
@@ -119,7 +118,7 @@ TSM.STATIC_DATA.notDisenchantable = {
 
 TSM.STATIC_DATA.disenchantInfo = {
 	{
-		desc = L["Dust"],
+		desc = "Dust",
 		["i:10940"] = { -- Strange Dust
 			minLevel = 0,
 			maxLevel = 24,
@@ -195,7 +194,7 @@ TSM.STATIC_DATA.disenchantInfo = {
 		},
 	},
 	{
-		desc = L["Essences"],
+		desc = "Essences",
 		["i:10939"] = { -- Greater Magic Essence
 			minLevel = 1,
 			maxLevel = 15,
@@ -271,7 +270,7 @@ TSM.STATIC_DATA.disenchantInfo = {
 		},
 	},
 	{
-		desc = L["Shards"],
+		desc = "Shards",
 		["i:10978"] = { -- Small Glimmering Shard
 			minLevel = 1,
 			maxLevel = 20,
@@ -389,7 +388,7 @@ TSM.STATIC_DATA.disenchantInfo = {
 		},
 	},
 	{
-		desc = L["Crystals"],
+		desc = "Crystals",
 		["i:20725"] = { -- Nexus Crystal
 			minLevel = 56,
 			maxLevel = 60,

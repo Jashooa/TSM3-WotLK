@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local AuctionTab = TSM:NewModule("AuctionTab", "AceEvent-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Shopping") -- loads the localization table
 local private = { frame = nil, threadId = nil, searchInProgress = false, searchMode = "normal", targetItem = nil }
 
 -- ============================================================================
@@ -195,7 +194,7 @@ function private.SniperScanThread(self)
 	local tempDatabase = TSMAPI.Auction:NewDatabase()
 	tempDatabase.disableFastFind = true -- we can't do a fast find based on this DB
 	TSMAPI.Auction:ScanLastPage("Shopping", ScanCallback, tempDatabase)
-	private.frame.content.result.statusBar:SetStatusText(L["Scanning Last Page..."])
+	private.frame.content.result.statusBar:SetStatusText("Scanning Last Page...")
 	private.frame.content.result.statusBar:UpdateStatus(100, 100)
 	while true do
 		local args = self:ReceiveMsg()
@@ -272,7 +271,7 @@ function private.BuyAuctionsThread(self, auctionInfo)
 	private.frame.content.result.buyoutBtn:Disable()
 	private.frame.content.result.confirmation.buyout.buyoutBtn:Disable()
 	private.frame.content.result.confirmation.buyout.closeBtn:Enable()
-	private.frame.UpdateConfirmation("progress", nil, L["Searching for auction..."])
+	private.frame.UpdateConfirmation("progress", nil, "Searching for auction...")
 	local lastMsgIsBid = nil
 	local pendingBuyMsg = format(ERR_AUCTION_WON_S, auctionRecord.name)
 	self:RegisterEvent("CHAT_MSG_SYSTEM", function(_, msg)
@@ -305,7 +304,7 @@ function private.BuyAuctionsThread(self, auctionInfo)
 				TSM:LOG_INFO("Could not find auction!")
 				private.frame.content.result.rt:RemoveSelectedRecord(buyoutInfo.totalNum)
 				self:SendMsgToParent("CONFIRM_DONE")
-				TSM:Print(L["Could not find this item on the AH. Removing it."])
+				TSM:Print("Could not find this item on the AH. Removing it.")
 				return
 			end
 		end
@@ -329,7 +328,7 @@ function private.BuyAuctionsThread(self, auctionInfo)
 					buyoutInfo.progress = temp
 					if not auctionRecord:DoBuyout(index) then
 						-- we failed to buy this auction
-						TSM:Print(L["Failed to buy this auction. Skipping it."])
+						TSM:Print("Failed to buy this auction. Skipping it.")
 						self:SendMsgToSelf("BUYOUT_FAILED")
 					end
 					private:SetMaxQuantity(auctionRecord, private:GetMaxQuantity(auctionRecord) - buyoutInfo.perBuyQuantity)
@@ -486,7 +485,7 @@ function private.PostAuctionsThread(self, auctionInfo)
 			ClickAuctionSellItemButton(AuctionsItemButton, "LeftButton")
 			local bid = floor(max(postInfo.buyout * TSM.db.global.postBidPercent, 1))
 			StartAuction(bid, postInfo.buyout, postInfo.duration, postInfo.stackSize, postInfo.numStacks)
-			private.frame.UpdateConfirmation("progress", nil, L["Posting auctions..."])
+			private.frame.UpdateConfirmation("progress", nil, "Posting auctions...")
 		elseif event == "AUCTION_POSTED" then
 			-- auction was posted so add the records and close the confirmation frame
 			local numStacksPosted = unpack(args)
@@ -559,7 +558,7 @@ function private.CancelAuctionsThread(self, auctionInfo)
 			local index = tremove(indexList)
 			if not auctionRecord:DoCancel(index) then
 				-- canceling should only fail if there is a bidder
-				TSM:Print(L["Failed to cancel auction because somebody has bid on it."])
+				TSM:Print("Failed to cancel auction because somebody has bid on it.")
 				break
 			end
 			cancelFrame.cancelBtn:Disable()
@@ -602,7 +601,7 @@ function private.BidAuctionsThread(self, auctionInfo)
 	private.frame.content.result.buyoutBtn:Disable()
 	bidFrame.bidBtn:Disable()
 	bidFrame.closeBtn:Enable()
-	private.frame.UpdateConfirmation("progress", nil, L["Searching for auction..."])
+	private.frame.UpdateConfirmation("progress", nil, "Searching for auction...")
 	self:RegisterEvent("CHAT_MSG_SYSTEM", function(_, msg) if msg == ERR_AUCTION_BID_PLACED then self:SendMsgToSelf("BID_PLACED") end end)
 	self:RegisterEvent("UI_ERROR_MESSAGE", function(_, msg) if msg == ERR_AUCTION_HIGHER_BID or msg == ERR_ITEM_NOT_FOUND or msg == ERR_NOT_ENOUGH_MONEY then self:SendMsgToSelf("BID_FAILED") end end)
 
@@ -638,7 +637,7 @@ function private.BidAuctionsThread(self, auctionInfo)
 			TSM:LOG_INFO("Could not find auction!")
 			private.frame.content.result.rt:RemoveSelectedRecord(bidInfo.totalNum)
 			self:SendMsgToParent("CONFIRM_DONE")
-			TSM:Print(L["Could not find this item on the AH. Removing it."])
+			TSM:Print("Could not find this item on the AH. Removing it.")
 			return
 		end
 	end
@@ -672,7 +671,7 @@ function private.BidAuctionsThread(self, auctionInfo)
 			if index then
 				if not auctionRecord:DoBid(index, bidInfo.bid) then
 					-- we failed to bid on this auction
-					TSM:Print(L["Failed to bid on this auction. Skipping it."])
+					TSM:Print("Failed to bid on this auction. Skipping it.")
 					break
 				else
 					bidInfo.index = index
@@ -928,7 +927,7 @@ function private.AuctionTabThread(self)
 						if name then
 							tinsert(names, name .. "/exact")
 						else
-							TSM:Printf(L["Could not lookup item info for '%s' so skipping it."], item)
+							TSM:Printf("Could not lookup item info for '%s' so skipping it.", item)
 						end
 					end
 					searchFilter = table.concat(names, ";")
@@ -962,13 +961,13 @@ function private.AuctionTabThread(self)
 								private.extraInfo.maxQuantity = tonumber(strsub(parts[i], 2))
 							else
 								targetItem = nil
-								TSM:Printf(L["Unexpected filters (only '/even' or '/ignorede' or '/x<MAX_QUANTITY>' is supported in crafting mode): %s"], table.concat(parts, "/", 2))
+								TSM:Printf("Unexpected filters (only '/even' or '/ignorede' or '/x<MAX_QUANTITY>' is supported in crafting mode): %s", table.concat(parts, "/", 2))
 							end
 						end
 					end
 				end
 				if not targetItem or not self:WaitForItemInfo(targetItem) then
-					TSM:Print(L["This is not a valid target item."])
+					TSM:Print("This is not a valid target item.")
 				else
 					searchFilter = TSM.AuctionTabUtil:GetCraftingFilterString(targetItem, private.extraInfo.ignoreDisenchant)
 					if searchFilter then
@@ -976,7 +975,7 @@ function private.AuctionTabThread(self)
 						private.frame.header.searchBox:SetText(TSMAPI.Item:GetName(targetItem) .. (private.extraInfo.evenOnly and "/even" or "") .. (private.extraInfo.maxQuantity and ("/x" .. private.extraInfo.maxQuantity) or "") .. (private.extraInfo.ignoreDisenchant and "/ignorede" or ""))
 						scanThreadId = TSMAPI.Threading:Start(private.FilterScanThread, 0.7, nil, searchFilter, self:GetThreadId())
 					else
-						TSM:Print(L["Could not find crafting info for the specified item."])
+						TSM:Print("Could not find crafting info for the specified item.")
 					end
 				end
 			end
@@ -1035,7 +1034,7 @@ function private.AuctionTabThread(self)
 						end
 					end
 				end
-				TSM:Print(format(L["%d auctions found below vendor price for a potential profit of %s!"], numAuctions, TSMAPI:MoneyToString(totalProfit)))
+				TSM:Print(format("%d auctions found below vendor price for a potential profit of %s!", numAuctions, TSMAPI:MoneyToString(totalProfit)))
 			end
 			private.frame.content.result.rt:SetDisabled(false)
 		elseif event == "STOP_SCAN" then
@@ -1115,7 +1114,7 @@ function private.AuctionTabThread(self)
 			TSMAPI:Assert(not TSMAPI.Threading:IsValid(confirmThreadId))
 			confirmThreadId = nil
 			if private:GetMaxQuantity(auctionInfo.record) <= 0 then
-				TSM:Print(L["Purchased the maximum quantity of this item!"])
+				TSM:Print("Purchased the maximum quantity of this item!")
 			end
 			private.frame.UpdateConfirmation()
 			private.frame.content.result.rt:SetDatabase(auctionInfo.database, dbFilterFunc)

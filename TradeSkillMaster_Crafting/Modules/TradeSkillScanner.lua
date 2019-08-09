@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local TradeSkillScanner = TSM:NewModule("TradeSkillScanner", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
 local private = { priceTextCache = { lastClear = 0 }, scanThreadId = nil, scanThreadCallback = nil, updateThreadId = nil }
 local MAX_SCAN_YIELDS = 20
 local STATIC_DATA = {}
@@ -201,7 +200,7 @@ function private.ScanCurrentProfessionThread(self, args)
 		end
 		if not fixedMatCosts[itemString] then
 			-- the user will need to manually fix it
-			TSM:Printf(L["A loop was detected in the mat cost of %s. Please correct this in your settings. This is typically caused by having 'crafting' in the custom price of two mats which can be crafted into each other."], TSMAPI.Item:GetLink(itemString))
+			TSM:Printf("A loop was detected in the mat cost of %s. Please correct this in your settings. This is typically caused by having 'crafting' in the custom price of two mats which can be crafted into each other.", TSMAPI.Item:GetLink(itemString))
 		end
 	end
 	for itemString, fixedCustomPrice in pairs(fixedMatCosts) do
@@ -370,6 +369,6 @@ function TradeSkillScanner:CreatePresetGroups()
 			end
 		end
 	end
-	TSM:Printf(L["Created profession group for %s."], professionName)
+	TSM:Printf("Created profession group for %s.", professionName)
 	TSMAPI.Groups:CreatePreset(groupInfo)
 end

@@ -9,7 +9,6 @@
 local TSM = select(2, ...)
 local TradeSkill = TSM:GetModule("TradeSkill")
 local Queue = TradeSkill:NewModule("Queue")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
 local private = { craftNextInfo = nil }
 
 -- ============================================================================
@@ -30,7 +29,7 @@ function Queue:GetFrameInfo()
 				type = "ScrollingTableFrame",
 				key = "craftST",
 				headFontSize = 14,
-				stCols = { { name = L["Craft Queue"], width = 1 } },
+				stCols = { { name = "Craft Queue", width = 1 } },
 				stDisableSelection = true,
 				points = { { "TOPLEFT", 5, -5 }, { "BOTTOMRIGHT", BFC.PARENT, "RIGHT", -5, 5 } },
 				scripts = { "OnEnter", "OnLeave", "OnClick" },
@@ -45,7 +44,7 @@ function Queue:GetFrameInfo()
 				type = "ScrollingTableFrame",
 				key = "matST",
 				headFontSize = 12,
-				stCols = { { name = L["Material Name"], width = 0.49 }, { name = L["Need"], width = 0.115 }, { name = L["Total"], width = 0.115 }, { name = L["Cost"], width = 0.28 } },
+				stCols = { { name = "Material Name", width = 0.49 }, { name = "Need", width = 0.115 }, { name = "Total", width = 0.115 }, { name = "Cost", width = 0.28 } },
 				stDisableSelection = true,
 				points = { { "TOPLEFT", BFC.PARENT, "LEFT", 5, -5 }, { "BOTTOMRIGHT", -5, 68 } },
 				scripts = { "OnEnter", "OnLeave", "OnClick" },
@@ -72,7 +71,7 @@ function Queue:GetFrameInfo()
 			{
 				type = "Button",
 				key = "clearBtn",
-				text = L["Clear Queue"],
+				text = "Clear Queue",
 				textHeight = 14,
 				size = { 120, 20 },
 				points = { { "BOTTOMLEFT", 5, 5 } },
@@ -83,7 +82,7 @@ function Queue:GetFrameInfo()
 				key = "craftNextBtn",
 				name = "TSMCraftNextButton",
 				isSecure = true,
-				text = L["Craft Next"],
+				text = "Craft Next",
 				textHeight = 18,
 				size = { 0, 20 },
 				points = { { "BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0 }, { "BOTTOMRIGHT", -5, 5 } },
@@ -119,7 +118,7 @@ function Queue:GetFrameInfo()
 					GameTooltip:SetOwner(self, "ANCHOR_NONE")
 					GameTooltip:SetPoint("LEFT", self, "RIGHT")
 					GameTooltip:AddLine((TSM.db.factionrealm.crafts[data.spellId].name or "?") .. " (x" .. data.numQueued .. ")")
-					GameTooltip:AddLine(L["Profit (Total Profit):"] .. " " .. (TSMAPI:MoneyToString(profit, color) or "---") .. "(" .. (TSMAPI:MoneyToString(totalProfit, color) or "---") .. ")")
+					GameTooltip:AddLine("Profit (Total Profit):" .. " " .. (TSMAPI:MoneyToString(profit, color) or "---") .. "(" .. (TSMAPI:MoneyToString(totalProfit, color) or "---") .. ")")
 					for itemString, matQuantity in pairs(TSM.db.factionrealm.crafts[data.spellId].mats) do
 						local name = TSMAPI.Item:GetName(itemString) or (TSM.db.factionrealm.mats[itemString] and TSM.db.factionrealm.mats[itemString].name) or "?"
 						local inventory = TSMAPI.Inventory:GetBagQuantity(itemString)
@@ -217,12 +216,12 @@ function Queue:UpdateFrameStatus(frame)
 	if not TradeSkill:GetVisibilityInfo().frame then return end
 	if TSM.db.global.frameQueueOpen then
 		private.frame.queue:Show()
-		private.frame.queueBtn:SetText(L["Hide Queue"])
+		private.frame.queueBtn:SetText("Hide Queue")
 		private.frame.queueBtn:LockHighlight()
 		Queue.Update()
 	else
 		private.frame.queue:Hide()
-		private.frame.queueBtn:SetText(L["Show Queue"])
+		private.frame.queueBtn:SetText("Show Queue")
 		private.frame.queueBtn:UnlockHighlight()
 	end
 end
@@ -296,7 +295,7 @@ function Queue:Update()
 	-- update estimated total cost / profit labels
 	totalCost = totalCost and TSMAPI:MoneyToString(totalCost, TSMAPI.Design:GetInlineColor("link")) or (TSMAPI.Design:GetInlineColor("link") .. "---|r")
 	totalProfit = totalProfit and (totalProfit < 0 and "|cffff0000-|r" .. TSMAPI:MoneyToString(-totalProfit, "|cffff0000") or TSMAPI:MoneyToString(totalProfit, "|cff00ff00")) or TSMAPI.Design:GetInlineColor("link") .. "---|r"
-	private.frame.queue.profitLabel:SetText(format(L["Estimated Cost: %s\nEstimated Profit: %s"], totalCost, totalProfit))
+	private.frame.queue.profitLabel:SetText(format("Estimated Cost: %s\nEstimated Profit: %s", totalCost, totalProfit))
 
 	for profession, crafts in pairs(queueCrafts) do
 		-- get all the players with this profession
@@ -355,7 +354,7 @@ function Queue:Update()
 				end
 
 				if not craftIndex and craft.players[playerName] and craft.profession == currentProfession then
-					leader = L["|cffff0000[Filtered]|r "] .. leader
+					leader = "|cffff0000[Filtered]|r " .. leader
 				end
 
 				-- add leading space

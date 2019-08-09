@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local Util = TSM:NewModule("Util", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
 local private = { currentBank = nil, frame = nil, minPriceCache = {} }
 
 
@@ -99,7 +98,7 @@ function Util:createTab(parent)
 					{
 						type = "Button",
 						key = "btnToBags",
-						text = L["Post Cap To Bags"],
+						text = "Post Cap To Bags",
 						textHeight = 14,
 						size = { 0, 28 },
 						points = { { "TOPLEFT", 5, -5 }, { "TOPRIGHT", BFC.PARENT, "CENTER", -3, -15 } },
@@ -108,7 +107,7 @@ function Util:createTab(parent)
 					{
 						type = "Button",
 						key = "btnAHToBags",
-						text = L["AH Shortfall To Bags"],
+						text = "AH Shortfall To Bags",
 						textHeight = 14,
 						size = { 0, 28 },
 						points = { { "TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0 }, { "TOPRIGHT", -5, -5 } },
@@ -117,7 +116,7 @@ function Util:createTab(parent)
 					{
 						type = "Button",
 						key = "btnToBank",
-						text = L["Group To Bank"],
+						text = "Group To Bank",
 						textHeight = 14,
 						size = { 0, 28 },
 						points = { { "TOPLEFT", "btnToBags", "BOTTOMLEFT", 0, -5 }, { "TOPRIGHT", "btnToBags", "BOTTOMRIGHT", 0, -5 } },
@@ -126,7 +125,7 @@ function Util:createTab(parent)
 					{
 						type = "Button",
 						key = "btnAllToBags",
-						text = L["Group To Bags"],
+						text = "Group To Bags",
 						textHeight = 14,
 						size = { 0, 28 },
 						points = { { "TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0 }, { "TOPRIGHT", "btnAHToBags", "BOTTOMRIGHT", 0, -5 } },
@@ -135,7 +134,7 @@ function Util:createTab(parent)
 					{
 						type = "Button",
 						key = "btnMaxExpToBank",
-						text = L["Max Expired to Bank"],
+						text = "Max Expired to Bank",
 						textHeight = 14,
 						size = { 0, 28 },
 						points = { { "TOPLEFT", "btnToBank", "BOTTOMLEFT", 0, -5 }, { "TOPRIGHT", "btnToBank", "BOTTOMRIGHT", 0, -5 } },
@@ -144,7 +143,7 @@ function Util:createTab(parent)
 					{
 						type = "Button",
 						key = "btnMaxExpToBags",
-						text = L["Max Expired to Bags"],
+						text = "Max Expired to Bags",
 						textHeight = 14,
 						size = { 0, 28 },
 						points = { { "TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0 }, { "TOPRIGHT", "btnAllToBags", "BOTTOMRIGHT", 0, -5 } },
@@ -153,7 +152,7 @@ function Util:createTab(parent)
 					{
 						type = "Button",
 						key = "btnNonGroupBank",
-						text = L["Non Group to Bank"],
+						text = "Non Group to Bank",
 						textHeight = 14,
 						size = { 0, 28 },
 						points = { { "TOPLEFT", "btnMaxExpToBank", "BOTTOMLEFT", 0, -5 }, { "TOPRIGHT", "btnMaxExpToBank", "BOTTOMRIGHT", 0, -5 } },
@@ -162,7 +161,7 @@ function Util:createTab(parent)
 					{
 						type = "Button",
 						key = "btnNonGroupBags",
-						text = L["Non Group to Bags"],
+						text = "Non Group to Bags",
 						textHeight = 14,
 						size = { 0, 28 },
 						points = { { "TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0 }, { "TOPRIGHT", "btnMaxExpToBags", "BOTTOMRIGHT", 0, -5 } },
@@ -219,7 +218,7 @@ function Util:groupTree(grpInfo, src, all, ah, maxExpired)
 
 			if not opSettings then
 				-- operation doesn't exist anymore in Auctioning
-				TSM:Printf(L["'%s' has an Auctioning operation of '%s' which no longer exists."], groupName, opName)
+				TSM:Printf("'%s' has an Auctioning operation of '%s' which no longer exists.", groupName, opName)
 			else
 				--it's a valid operation
 				for itemString in pairs(data.items) do
@@ -291,9 +290,9 @@ function Util:groupTree(grpInfo, src, all, ah, maxExpired)
 	end
 
 	if next(newgrp) == nil then
-		TSM:Print(L["Nothing to Move"])
+		TSM:Print("Nothing to Move")
 	else
-		TSM:Print(L["Preparing to Move"])
+		TSM:Print("Preparing to Move")
 		TSMAPI:MoveItems(newgrp, Util.PrintMsg, false)
 	end
 end
@@ -311,7 +310,7 @@ function Util:nonGroupTree(grpInfo, src)
 
 			if not opSettings then
 				-- operation doesn't exist anymore in Auctioning
-				TSM:Printf(L["'%s' has an Auctioning operation of '%s' which no longer exists."], groupName, opName)
+				TSM:Printf("'%s' has an Auctioning operation of '%s' which no longer exists.", groupName, opName)
 			else
 				-- it's a valid operation so remove all the items from bagItems so we are left with non group items to move
 				for itemString in pairs(data.items) do
@@ -335,9 +334,9 @@ function Util:nonGroupTree(grpInfo, src)
 	end
 
 	if next(newgrp) == nil then
-		TSM:Print(L["Nothing to Move"])
+		TSM:Print("Nothing to Move")
 	else
-		TSM:Print(L["Preparing to Move"])
+		TSM:Print("Preparing to Move")
 		TSMAPI:MoveItems(newgrp, Util.PrintMsg, true)
 	end
 end

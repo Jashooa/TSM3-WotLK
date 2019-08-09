@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local AuctionTabFrame = TSM:NewModule("AuctionTabFrame")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Shopping") -- loads the localization table
 local private = nil
 local frameFunctions = {}
 
@@ -63,7 +62,7 @@ function AuctionTabFrame:Create(parent)
 								type = "Button",
 								key = "postBtn",
 								name = "TSMShoppingPostButton",
-								text = L["Post"],
+								text = "Post",
 								textHeight = 20,
 								size = {80, 24},
 								points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 3, 0}},
@@ -126,7 +125,7 @@ function AuctionTabFrame:Create(parent)
 											},
 											{
 												type = "Text",
-												text = L["Price Per Item:"],
+												text = "Price Per Item:",
 												textHeight = 14,
 												justify = {"LEFT", "MIDDLE"},
 												size = {0, 14},
@@ -141,7 +140,7 @@ function AuctionTabFrame:Create(parent)
 											},
 											{
 												type = "Text",
-												text = L["Auction Buyout:"],
+												text = "Auction Buyout:",
 												textHeight = 14,
 												justify = {"LEFT", "MIDDLE"},
 												size = {0, 14},
@@ -156,7 +155,7 @@ function AuctionTabFrame:Create(parent)
 											},
 											{
 												type = "Text",
-												text = L["Purchasing Auction:"],
+												text = "Purchasing Auction:",
 												textHeight = 14,
 												justify = {"LEFT", "MIDDLE"},
 												size = {0, 14},
@@ -209,7 +208,7 @@ function AuctionTabFrame:Create(parent)
 												type = "Dropdown",
 												key = "modeDropdown",
 												value = 2,
-												list = {L["Auction Buyout"], L["Item Buyout"]},
+												list = {"Auction Buyout", "Item Buyout"},
 												size = {140, 25},
 												points = {{"TOPLEFT", 5, -40}},
 												scripts = {"OnValueChanged"},
@@ -232,7 +231,7 @@ function AuctionTabFrame:Create(parent)
 											{
 												type = "Text",
 												key = "stackText",
-												text = L["stack(s) of"],
+												text = "stack(s) of",
 												textHeight = 14,
 												justify = {"LEFT", "MIDDLE"},
 												size = {0, 25},
@@ -274,7 +273,7 @@ function AuctionTabFrame:Create(parent)
 											},
 											{
 												type = "Text",
-												text = L["Duration:"],
+												text = "Duration:",
 												textHeight = 14,
 												size = {0, 25},
 												points = {{"TOPLEFT", 5, -145}},
@@ -293,7 +292,7 @@ function AuctionTabFrame:Create(parent)
 											},
 											{
 												type = "Text",
-												text = L["Total Deposit:"],
+												text = "Total Deposit:",
 												textHeight = 13,
 												size = {0, 25},
 												points = {{"TOPLEFT", 5, -180}},
@@ -346,7 +345,7 @@ function AuctionTabFrame:Create(parent)
 											},
 											{
 												type = "Text",
-												text = L["Canceling Auction:"],
+												text = "Canceling Auction:",
 												textHeight = 14,
 												justify = {"LEFT", "MIDDLE"},
 												size = {0, 14},
@@ -399,7 +398,7 @@ function AuctionTabFrame:Create(parent)
 											},
 											{
 												type = "Text",
-												text = L["Minimum Bid:"],
+												text = "Minimum Bid:",
 												textHeight = 13,
 												size = {0, 15},
 												points = {{"TOPLEFT", 5, -35}},
@@ -414,7 +413,7 @@ function AuctionTabFrame:Create(parent)
 											},
 											{
 												type = "Text",
-												text = L["Auction Buyout:"],
+												text = "Auction Buyout:",
 												textHeight = 13,
 												size = {0, 25},
 												points = {{"TOPLEFT", 5, -55}},
@@ -433,7 +432,7 @@ function AuctionTabFrame:Create(parent)
 											},
 											{
 												type = "Text",
-												text = L["Auction Bid:"],
+												text = "Auction Bid:",
 												textHeight = 14,
 												justify = {"LEFT", "MIDDLE"},
 												size = {0, 25},
@@ -498,7 +497,7 @@ function AuctionTabFrame:Create(parent)
 						children = {
 							{
 								type = "Text",
-								text = L["Search Mode:"],
+								text = "Search Mode:",
 								textHeight = 16,
 								justify = {"RIGHT", "MIDDLE"},
 								size = {95, 0},
@@ -507,9 +506,9 @@ function AuctionTabFrame:Create(parent)
 							{
 								type = "Button",
 								key = "normal",
-								text = L["Normal"],
+								text = "Normal",
 								textHeight = 18,
-								tooltip = L["When in normal mode, you may run simple and filtered searches of the auction house."],
+								tooltip = "When in normal mode, you may run simple and filtered searches of the auction house.",
 								size = {70, 22},
 								points = {{"LEFT", BFC.PREV, "RIGHT", 4, 0}},
 								scripts = {"OnClick"},
@@ -519,7 +518,7 @@ function AuctionTabFrame:Create(parent)
 								key = "crafting",
 								text = "Crafting",
 								textHeight = 18,
-								tooltip = L["When in crafting mode, the search results will include materials which can be used to craft the item which you search for. This includes milling, prospecting, and disenchanting."],
+								tooltip = "When in crafting mode, the search results will include materials which can be used to craft the item which you search for. This includes milling, prospecting, and disenchanting.",
 								size = {0, 22},
 								points = {{"LEFT", BFC.PREV, "RIGHT", 4, 0}, {"RIGHT"}},
 								scripts = {"OnClick"},
@@ -560,7 +559,7 @@ function AuctionTabFrame:Create(parent)
 							{
 								type = "Button",
 								key = "result",
-								text = L["Search Results"],
+								text = "Search Results",
 								textHeight = 18,
 								size = {155, 0},
 								points = {{"TOPLEFT"}, {"BOTTOMLEFT"}},
@@ -569,7 +568,7 @@ function AuctionTabFrame:Create(parent)
 							{
 								type = "Button",
 								key = "saved",
-								text = L["Saved Searches / TSM Groups"],
+								text = "Saved Searches / TSM Groups",
 								textHeight = 18,
 								size = {280, 0},
 								points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}, {"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
@@ -578,7 +577,7 @@ function AuctionTabFrame:Create(parent)
 							{
 								type = "Button",
 								key = "other",
-								text = L["Custom Filter / Other Searches"],
+								text = "Custom Filter / Other Searches",
 								textHeight = 18,
 								size = {285, 0},
 								points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}, {"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
@@ -724,9 +723,9 @@ function AuctionTabFrame:Create(parent)
 					OnEnter = function(self)
 						GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
 						GameTooltip:SetMinimumWidth(400)
-						GameTooltip:AddLine(L["Enter what you want to search for in this box. You can also use the following options for more complicated searches."].."\n", 1, 1, 1, 1)
-						GameTooltip:AddLine(format("|cffffff00"..L["Multiple Search Terms:|r You can search for multiple things at once by simply separated them with a ';'. For example '%selementium ore; obsidium ore|r' will search for both elementium and obsidium ore."].."\n", TSMAPI.Design:GetInlineColor("link2")), 1, 1, 1, 1)
-						GameTooltip:AddLine(format("|cffffff00"..L["Inline Filters:|r You can easily add common search filters to your search such as rarity, level, and item type. For example '%sarmor/leather/epic/85/i350/i377|r' will search for all leather armor of epic quality that requires level 85 and has an ilvl between 350 and 377 inclusive. Also, '%sinferno ruby/exact|r' will display only raw inferno rubys (none of the cuts)."].."\n", TSMAPI.Design:GetInlineColor("link2"), TSMAPI.Design:GetInlineColor("link2")), 1, 1, 1, 1)
+						GameTooltip:AddLine("Enter what you want to search for in this box. You can also use the following options for more complicated searches.".."\n", 1, 1, 1, 1)
+						GameTooltip:AddLine(format("|cffffff00".."Multiple Search Terms:|r You can search for multiple things at once by simply separated them with a ';'. For example '%selementium ore; obsidium ore|r' will search for both elementium and obsidium ore.".."\n", TSMAPI.Design:GetInlineColor("link2")), 1, 1, 1, 1)
+						GameTooltip:AddLine(format("|cffffff00".."Inline Filters:|r You can easily add common search filters to your search such as rarity, level, and item type. For example '%sarmor/leather/epic/85/i350/i377|r' will search for all leather armor of epic quality that requires level 85 and has an ilvl between 350 and 377 inclusive. Also, '%sinferno ruby/exact|r' will display only raw inferno rubys (none of the cuts).".."\n", TSMAPI.Design:GetInlineColor("link2"), TSMAPI.Design:GetInlineColor("link2")), 1, 1, 1, 1)
 						GameTooltip:Show()
 					end,
 					OnLeave = function() GameTooltip:Hide() end,
@@ -749,7 +748,7 @@ function AuctionTabFrame:Create(parent)
 						else
 							local text = self:GetParent().searchBox:GetText()
 							if text == "" then
-								return TSM:Print(L["You must enter a search filter before starting the search."])
+								return TSM:Print("You must enter a search filter before starting the search.")
 							end
 							TSM.AuctionTab:StartSearch({searchMode=private.searchMode, extraInfo={searchType="filter"}, filter=text})
 						end
@@ -793,12 +792,12 @@ end
 
 local rtPriceInfoDefaults = {
 	normal = {
-		headers = {{L["Auction Bid\n(per item)"], L["Auction Bid\n(per stack)"]}, {L["Auction Buyout\n(per item)"], L["Auction Buyout\n(per stack)"]}},
-		defaultPctHeader = L["% Market Value"],
-		apiGatheringPctHeader = L["% Mat Price"],
-		groupPctHeader = L["% Max Price"],
-		vendorPctHeader = L["% Vendor Value"],
-		disenchantPctHeader = L["% DE Value"],
+		headers = {{"Auction Bid\n(per item)", "Auction Bid\n(per stack)"}, {"Auction Buyout\n(per item)", "Auction Buyout\n(per stack)"}},
+		defaultPctHeader = "% Market Value",
+		apiGatheringPctHeader = "% Mat Price",
+		groupPctHeader = "% Max Price",
+		vendorPctHeader = "% Vendor Value",
+		disenchantPctHeader = "% DE Value",
 		GetRowPrices = function(record, isPerItem)
 			if isPerItem then
 				return record.itemDisplayedBid, record.itemBuyout, record.isHighBidder and "|cffffff00" or nil
@@ -824,9 +823,9 @@ local rtPriceInfoDefaults = {
 		end,
 	},
 	crafting = {
-		headers = {{L["Auction Buyout\n(per item)"], L["Auction Buyout\n(per stack)"]}, {L["Target Price\n(per item)"], L["Target Price\n(per stack)"]}},
-		defaultPctHeader = L["% Target Value"],
-		apiGatheringPctHeader = L["% Mat Price"],
+		headers = {{"Auction Buyout\n(per item)", "Auction Buyout\n(per stack)"}, {"Target Price\n(per item)", "Target Price\n(per stack)"}},
+		defaultPctHeader = "% Target Value",
+		apiGatheringPctHeader = "% Mat Price",
 		GetRowPrices = function(record, isPerItem)
 			local rate = TSM.AuctionTabUtil:GetConvertRate(private.targetItem, record.itemString, record)
 			if isPerItem then
@@ -974,12 +973,12 @@ function frameFunctions.UpdateSearchInProgress(inProgress, updateStatus)
 			headerFrame.searchBtn:SetText(SEARCH)
 			headerFrame.searchBtn:Disable()
 		else
-			headerFrame.searchBtn:SetText(L["Stop"])
+			headerFrame.searchBtn:SetText("Stop")
 			headerFrame.searchBtn:Enable()
 		end
 		-- check if we are just starting a search
 		if updateStatus then
-			private.frame.content.result.statusBar:SetStatusText(L["Preparing Filters..."])
+			private.frame.content.result.statusBar:SetStatusText("Preparing Filters...")
 			private.frame.content.result.statusBar:UpdateStatus(0, 0)
 			private.frame.content.result.rt:Clear()
 		end
@@ -1003,7 +1002,7 @@ function frameFunctions.UpdateSearchInProgress(inProgress, updateStatus)
 		-- check if we are just finishing a search
 		if updateStatus then
 			private.frame.content.result.statusBar:UpdateStatus(100, 100)
-			private.frame.content.result.statusBar:SetStatusText(L["Done Scanning"])
+			private.frame.content.result.statusBar:SetStatusText("Done Scanning")
 		end
 
 		if private.extraInfo and private.extraInfo.continue then
@@ -1086,6 +1085,6 @@ function frameFunctions:UpdateScanStatus(statusType, ...)
 		pageStatus = {...}
 	end
 	pageStatus[2] = max(pageStatus[2], 1)
-	private.frame.content.result.statusBar:SetStatusText(format(L["Scanning %d / %d (Page %d / %d)"], scanStatus[1], scanStatus[2], min(pageStatus[1]+1, pageStatus[2]), pageStatus[2]))
+	private.frame.content.result.statusBar:SetStatusText(format("Scanning %d / %d (Page %d / %d)", scanStatus[1], scanStatus[2], min(pageStatus[1]+1, pageStatus[2]), pageStatus[2]))
 	private.frame.content.result.statusBar:UpdateStatus(100*(scanStatus[1]-1)/scanStatus[2], 100*pageStatus[1]/pageStatus[2])
 end

@@ -7,7 +7,6 @@
 -- ------------------------------------------------------------------------------ --
 
 -- loads the localization table --
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Warehousing")
 
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
@@ -17,9 +16,9 @@ local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
 function move:restockGroup(grpInfo, src)
 	local restockItems, next = TSM.data:unIndexRestockGroupTree(grpInfo, src), next
 	if next(restockItems) == nil then
-		TSM:Print(L["Nothing to Restock"])
+		TSM:Print("Nothing to Restock")
 	else
-		TSM:Print(L["Restocking"])
+		TSM:Print("Restocking")
 		TSMAPI:MoveItems(restockItems, TSM.PrintMsg, true)
 	end
 end
@@ -27,9 +26,9 @@ end
 function move:groupTree(grpInfo, src, dest)
 	local moveItems, next = TSM.data:unIndexMoveGroupTree(grpInfo, src, dest), next
 	if next(moveItems) == nil then
-		TSM:Print(L["Nothing to Move"])
+		TSM:Print("Nothing to Move")
 	else
-		TSM:Print(L["Preparing to Move"])
+		TSM:Print("Preparing to Move")
 		TSMAPI:MoveItems(moveItems, TSM.PrintMsg, true)
 	end
 end
@@ -53,9 +52,9 @@ function move:EmptyRestore(dest, restore)
 	end
 
 	if next(moveItems) == nil then
-		TSM:Print(L["Nothing to Move"])
+		TSM:Print("Nothing to Move")
 	else
-		TSM:Print(L["Preparing to Move"])
+		TSM:Print("Preparing to Move")
 		TSMAPI:MoveItems(moveItems, TSM.PrintMsg, true)
 		if restore then
 			TSM.db.factionrealm.BagState = {}
@@ -67,9 +66,9 @@ function move:manualMove(searchString, src, quantity)
 	local moveItems = TSM.data:unIndexItem(searchString, src, quantity)
 	local next = next
 	if next(moveItems) == nil then
-		TSM:Print(L["Nothing to Move"])
+		TSM:Print("Nothing to Move")
 	else
-		TSM:Print(L["Preparing to Move"])
+		TSM:Print("Preparing to Move")
 		TSMAPI:MoveItems(moveItems, TSM.PrintMsg)
 	end
 end
@@ -165,7 +164,7 @@ function move:areBanksVisible()
 	elseif LiteBagInventory and LiteBagInventory:IsVisible() then
 		return true
 	end
-	TSM:Print(L["Canceled"])
+	TSM:Print("Canceled")
 	return nil
 end
 

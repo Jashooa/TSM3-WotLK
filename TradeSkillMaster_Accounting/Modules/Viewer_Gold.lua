@@ -10,7 +10,6 @@
 local TSM = select(2, ...)
 local Gold = TSM.modules.Viewer:NewModule("Gold")
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local private = {lineGraph=nil}
 local SECONDS_PER_DAY = 24 * 60 * 60
 
@@ -29,17 +28,17 @@ function Gold:Draw(container)
 	else
 		data, minX, maxX, minY, maxY = private:GetGoldGraphPoints(TSM.goldLog[player])
 	end
-	
-	local dropdownList = {["<ALL>"]=L["Sum of All Characters/Guilds"]}
+
+	local dropdownList = {["<ALL>"]="Sum of All Characters/Guilds"}
 	for player in pairs(TSM.goldLog) do
 		dropdownList[player] = player
 	end
-	
-	local timeList = {[0]=L["All"]}
+
+	local timeList = {[0]="All"}
 	for _, days in ipairs({1, 3, 7, 14, 30, 90, 180, 365}) do
-		timeList[days] = format(L["Last %d Days"], days)
+		timeList[days] = format("Last %d Days", days)
 	end
-	
+
 	if not data then
 		local page = {
 			{
@@ -48,7 +47,7 @@ function Gold:Draw(container)
 				children = {
 					{
 						type = "Label",
-						text = L["Accounting has not yet collected enough information for this tab. This is likely due to not having recorded enough data points or not seeing any significant fluctuations (over 1k gold) in your gold on hand."],
+						text = "Accounting has not yet collected enough information for this tab. This is likely due to not having recorded enough data points or not seeing any significant fluctuations (over 1k gold) in your gold on hand.",
 						relativeWidth = 1,
 					},
 					{
@@ -56,7 +55,7 @@ function Gold:Draw(container)
 					},
 					{
 						type = "Dropdown",
-						label = L["Character/Guild to Graph"],
+						label = "Character/Guild to Graph",
 						settingInfo = {TSM.db.realm, "goldGraphCharacter"},
 						relativeWidth = 0.5,
 						list = dropdownList,
@@ -65,7 +64,7 @@ function Gold:Draw(container)
 					},
 					{
 						type = "Dropdown",
-						label = L["Timeframe Filter"],
+						label = "Timeframe Filter",
 						relativeWidth = 0.49,
 						list = timeList,
 						settingInfo = {TSM.db.realm, "goldGraphTimeframe"},
@@ -97,7 +96,7 @@ function Gold:Draw(container)
 			children = {
 				{
 					type = "Label",
-					text = format(L["Below is a graph of the your character's gold on hand over time.\n\nThe x-axis is time and goes from %s to %s\nThe y-axis is thousands of gold."], startDate, endDate),
+					text = format("Below is a graph of the your character's gold on hand over time.\n\nThe x-axis is time and goes from %s to %s\nThe y-axis is thousands of gold.", startDate, endDate),
 					relativeWidth = 1,
 				},
 				{
@@ -105,7 +104,7 @@ function Gold:Draw(container)
 				},
 				{
 					type = "Dropdown",
-					label = L["Character to Graph"],
+					label = "Character to Graph",
 					settingInfo = {TSM.db.realm, "goldGraphCharacter"},
 					relativeWidth = 0.5,
 					list = dropdownList,
@@ -113,7 +112,7 @@ function Gold:Draw(container)
 				},
 				{
 					type = "Dropdown",
-					label = L["Timeframe Filter"],
+					label = "Timeframe Filter",
 					relativeWidth = 0.49,
 					list = timeList,
 					settingInfo = {TSM.db.realm, "goldGraphTimeframe"},
@@ -235,13 +234,13 @@ function private:GetGoldGraphSumData()
 		end
 	end
 	if #players == 0 then return end
-	
+
 	local indicies = {}
 	local absStartMinute = min(unpack(starts))
 	for i=1, #players do
 		indicies[i] = 1
 	end
-	
+
 	local temp = {}
 	local staticCopper = 0
 	for t=absStartMinute, currentMinute do

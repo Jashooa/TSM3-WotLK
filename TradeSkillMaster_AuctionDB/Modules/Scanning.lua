@@ -9,7 +9,6 @@
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
 local Scan = TSM:NewModule("Scan", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_AuctionDB") -- loads the localization table
 local private = {threadId=nil}
 
 local MIN_PERCENTILE = 0.15 -- consider at least the lowest 15% of auctions
@@ -57,7 +56,7 @@ end
 
 function private.FullScanThread(self)
 	self:SetThreadName("AUCTIONDB_FULL_SCAN")
-	TSM.GUI:UpdateStatus(L["Running query..."], 0, 0)
+	TSM.GUI:UpdateStatus("Running query...", 0, 0)
 
 	local database = TSMAPI.Auction:NewDatabase()
 	TSMAPI.Auction:ScanQuery("AuctionDB", {name=""}, self:GetSendMsgToSelfCallback(), nil, database)
@@ -69,10 +68,10 @@ function private.FullScanThread(self)
 			-- the page we're scanning has changed
 			local page, total = unpack(args)
 			local remainingPages = total - page
-			local statusText = format(L["Scanning page %s/%s"], page, total)
+			local statusText = format("Scanning page %s/%s", page, total)
 			if page > 50 and remainingPages > 0 then
 				-- add approximate time remaining to the status text
-				statusText = format(L["Scanning page %s/%s - Approximately %s remaining"], page, total, SecondsToTime(floor((page / (time() - startTime)) * remainingPages)))
+				statusText = format("Scanning page %s/%s - Approximately %s remaining", page, total, SecondsToTime(floor((page / (time() - startTime)) * remainingPages)))
 			end
 			TSM.GUI:UpdateStatus(statusText, page*100/total)
 		elseif event == "SCAN_COMPLETE" then
@@ -80,14 +79,14 @@ function private.FullScanThread(self)
 			break
 		elseif event == "INTERRUPTED" then
 			-- scan was interrupted
-			TSM.GUI:UpdateStatus(L["Done Scanning"], 100)
+			TSM.GUI:UpdateStatus("Done Scanning", 100)
 			return
 		else
 			error("Unexpected message: "..tostring(event))
 		end
 	end
 
-	TSM.GUI:UpdateStatus(L["Processing data..."], 100)
+	TSM.GUI:UpdateStatus("Processing data...", 100)
 	local success = true
 	local scanData = {}
 	for _, record in ipairs(database.records) do
@@ -112,16 +111,16 @@ function private.FullScanThread(self)
 	if success then
 		TSM.Data:ProcessScanDataThread(self, scanData)
 	else
-		TSM:Print(L["The scan did not run successfully due to issues on Blizzard's end. Using the TSM desktop application for your scans is recommended."])
+		TSM:Print("The scan did not run successfully due to issues on Blizzard's end. Using the TSM desktop application for your scans is recommended.")
 	end
-	TSM.GUI:UpdateStatus(L["Done Scanning"], 100)
+	TSM.GUI:UpdateStatus("Done Scanning", 100)
 end
 
 function private.GroupScanThread(self, itemList)
 	self:SetThreadName("AUCTIONDB_GROUP_SCAN")
 
 	-- generate queries
-	TSM.GUI:UpdateStatus(L["Preparing Filters..."], 0, 0)
+	TSM.GUI:UpdateStatus("Preparing Filters...", 0, 0)
 	TSMAPI.Auction:GenerateQueries(itemList, self:GetSendMsgToSelfCallback())
 	local queries = nil
 	while true do
@@ -133,7 +132,7 @@ function private.GroupScanThread(self, itemList)
 			break
 		elseif event == "INTERRUPTED" then
 			-- we were interrupted
-			TSM.GUI:UpdateStatus(L["Done Scanning"], 100)
+			TSM.GUI:UpdateStatus("Done Scanning", 100)
 			return
 		else
 			error("Unexpected message: "..tostring(event))
@@ -141,11 +140,11 @@ function private.GroupScanThread(self, itemList)
 	end
 
 	-- scan queries
-	TSM.GUI:UpdateStatus(L["Running query..."])
+	TSM.GUI:UpdateStatus("Running query...")
 	local numQueries = #queries
 	local database = TSMAPI.Auction:NewDatabase()
 	for i=1, numQueries do
-		TSM.GUI:UpdateStatus(format(L["Scanning %d / %d (Page %d / %d)"], i, numQueries, 1, 1), (i-1)*100/numQueries, 0)
+		TSM.GUI:UpdateStatus(format("Scanning %d / %d (Page %d / %d)", i, numQueries, 1, 1), (i-1)*100/numQueries, 0)
 		TSMAPI.Auction:ScanQuery("AuctionDB", queries[i], self:GetSendMsgToSelfCallback(), nil, database)
 		while true do
 			local args = self:ReceiveMsg()
@@ -153,13 +152,13 @@ function private.GroupScanThread(self, itemList)
 			if event == "SCAN_PAGE_UPDATE" then
 				-- the page we're scanning has changed
 				local page, numPages = unpack(args)
-				TSM.GUI:UpdateStatus(format(L["Scanning %d / %d (Page %d / %d)"], i, numQueries, page+1, numPages), (i-1)*100/numQueries, page*100/numPages)
+				TSM.GUI:UpdateStatus(format("Scanning %d / %d (Page %d / %d)", i, numQueries, page+1, numPages), (i-1)*100/numQueries, page*100/numPages)
 			elseif event == "SCAN_COMPLETE" then
 				-- we're done scanning this query
 				break
 			elseif event == "INTERRUPTED" then
 				-- scan was interrupted
-				TSM.GUI:UpdateStatus(L["Done Scanning"], 100)
+				TSM.GUI:UpdateStatus("Done Scanning", 100)
 				return
 			else
 				error("Unexpected message: "..tostring(event))
@@ -167,7 +166,7 @@ function private.GroupScanThread(self, itemList)
 		end
 	end
 
-	TSM.GUI:UpdateStatus(L["Processing data..."], 100)
+	TSM.GUI:UpdateStatus("Processing data...", 100)
 	local success = true
 	local scanData = {}
 	for _, record in ipairs(database.records) do
@@ -192,9 +191,9 @@ function private.GroupScanThread(self, itemList)
 	if success then
 		TSM.Data:ProcessScanDataThread(self, scanData, itemList)
 	else
-		TSM:Print(L["The scan did not run successfully due to issues on Blizzard's end. Using the TSM desktop application for your scans is recommended."])
+		TSM:Print("The scan did not run successfully due to issues on Blizzard's end. Using the TSM desktop application for your scans is recommended.")
 	end
-	TSM.GUI:UpdateStatus(L["Done Scanning"], 100)
+	TSM.GUI:UpdateStatus("Done Scanning", 100)
 end
 
 function private.GetAllScanThread(self)
@@ -206,23 +205,23 @@ function private.GetAllScanThread(self)
 		local event = tremove(args, 1)
 		if event == "GETALL_QUERY_START" then
 			-- getall query was sent to the server
-			TSM.GUI:UpdateStatus(L["Running query..."], 0, 0)
+			TSM.GUI:UpdateStatus("Running query...", 0, 0)
 		elseif event == "GETALL_PROGRESS" then
 			-- progress update
 			local currentIndex, numAuctions = unpack(args)
-			TSM.GUI:UpdateStatus(L["Scanning results..."], currentIndex*100/numAuctions)
+			TSM.GUI:UpdateStatus("Scanning results...", currentIndex*100/numAuctions)
 		elseif event == "SCAN_COMPLETE" then
 			-- we are done scanning
 			scanData = unpack(args)
 			break
 		elseif event == "GETALL_BUSY" then
 			-- can't run GetAll right now
-			TSM:Print(L["Can't run a GetAll scan right now."])
+			TSM:Print("Can't run a GetAll scan right now.")
 			return
 		elseif event == "GETALL_BAD_DATA" then
 			-- got bad data from the server
-			TSM:Print(L["The scan did not run successfully due to issues on Blizzard's end. Using the TSM desktop application for your scans is recommended."])
-			TSM.GUI:UpdateStatus(L["Done Scanning"], 100)
+			TSM:Print("The scan did not run successfully due to issues on Blizzard's end. Using the TSM desktop application for your scans is recommended.")
+			TSM.GUI:UpdateStatus("Done Scanning", 100)
 			return
 		else
 			error("Unexpected message: "..tostring(event))
@@ -230,7 +229,7 @@ function private.GetAllScanThread(self)
 	end
 
 	-- process the scan data
-	TSM.GUI:UpdateStatus(L["Processing data..."], 100)
+	TSM.GUI:UpdateStatus("Processing data...", 100)
 	TSM.Data:ProcessScanDataThread(self, scanData)
-	TSM.GUI:UpdateStatus(L["Done Scanning"], 100)
+	TSM.GUI:UpdateStatus("Done Scanning", 100)
 end

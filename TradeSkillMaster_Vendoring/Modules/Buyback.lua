@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local Buyback = TSM:NewModule("Buyback", "AceEvent-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Vendoring") -- loads the localization table
 
 local private = { frame = nil, inspecting = false, hovering = false }
 
@@ -27,11 +26,11 @@ function Buyback:CreateTab()
 				key = "buybackST",
 				stCols = {
 					{
-						name = L["Item"],
+						name = "Item",
 						width = 0.7,
 					},
 					{
-						name = L["Cost"],
+						name = "Cost",
 						width = 0.3,
 						align="RIGHT"
 					},

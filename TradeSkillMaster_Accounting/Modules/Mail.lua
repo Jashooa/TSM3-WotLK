@@ -9,7 +9,6 @@
 -- create a local reference to the TradeSkillMaster_Accounting table and register a new module
 local TSM = select(2, ...)
 local Mail = TSM:NewModule("Mail", "AceEvent-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local private = {}
 
 local SECONDS_PER_DAY = 24 * 60 * 60

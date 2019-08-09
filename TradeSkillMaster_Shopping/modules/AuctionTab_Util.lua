@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local AuctionTabUtil = TSM:NewModule("AuctionTabUtil", "AceHook-3.0", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Shopping") -- loads the localization table
 local private = {rateCache={}}
 
 
@@ -121,7 +120,7 @@ local function GetSearchFilterOptions(searchTerm)
 	local queryString, class, subClass, invType, minLevel, maxLevel, minILevel, maxILevel, rarity, usableOnly, exactOnly, evenOnly, maxQuantity, maxPrice
 
 	if #parts == 0 then
-		return false, L["Invalid Filter"]
+		return false, "Invalid Filter"
 	end
 
 	-- deal with item strings
@@ -131,7 +130,7 @@ local function GetSearchFilterOptions(searchTerm)
 	if strmatch(parts[1], "^i:%d+$") then
 		parts[1] = TSMAPI.Item:GetName(parts[1])
 		if not parts[1] then
-			return false, L["Invalid Filter"]
+			return false, "Invalid Filter"
 		end
 	end
 
@@ -146,13 +145,13 @@ local function GetSearchFilterOptions(searchTerm)
 			elseif not maxLevel then
 				maxLevel = tonumber(str)
 			else
-				return false, L["Invalid Min Level"]
+				return false, "Invalid Min Level"
 			end
 		elseif GetMaxQuantity(str) then
 			if not maxQuantity then
 				maxQuantity = GetMaxQuantity(str)
 			else
-				return false, L["Invalid Max Quantity"]
+				return false, "Invalid Max Quantity"
 			end
 		elseif GetItemLevel(str) then
 			if not minILevel then
@@ -160,54 +159,54 @@ local function GetSearchFilterOptions(searchTerm)
 			elseif not maxILevel then
 				maxILevel = GetItemLevel(str)
 			else
-				return false, L["Invalid Item Level"]
+				return false, "Invalid Item Level"
 			end
 		elseif not class and TSMAPI.Item:GetClassIdFromClassString(str) then
 			if not class then
 				class = TSMAPI.Item:GetClassIdFromClassString(str)
 			else
-				return false, L["Invalid Item Type"]
+				return false, "Invalid Item Type"
 			end
 		elseif class and TSMAPI.Item:GetSubClassIdFromSubClassString(str, class) then
 			if not subClass then
 				subClass = TSMAPI.Item:GetSubClassIdFromSubClassString(str, class)
 			else
-				return false, L["Invalid Item SubType"]
+				return false, "Invalid Item SubType"
 			end
 		elseif GetItemInventoryType(str) then
 			if not invType then
 				invType = GetItemInventoryType(str)
 			else
-				return false, L["Invalid Item Inventory Type"]
+				return false, "Invalid Item Inventory Type"
 			end
 		elseif GetItemRarity(str) then
 			if not rarity then
 				rarity = GetItemRarity(str)
 			else
-				return false, L["Invalid Item Rarity"]
+				return false, "Invalid Item Rarity"
 			end
 		elseif strlower(str) == "usable" then
 			if not usableOnly then
 				usableOnly = true
 			else
-				return false, L["Invalid Usable Only Filter"]
+				return false, "Invalid Usable Only Filter"
 			end
 		elseif strlower(str) == "exact" then
 			if not exactOnly then
 				exactOnly = true
 			else
-				return false, L["Invalid Exact Only Filter"]
+				return false, "Invalid Exact Only Filter"
 			end
 		elseif strlower(str) == "even" then
 			if not evenOnly then
 				evenOnly = true
 			else
-				return false, L["Invalid Even Only Filter"]
+				return false, "Invalid Even Only Filter"
 			end
 		elseif TSMAPI:MoneyFromString(str) then
 			maxPrice = TSMAPI:MoneyFromString(str)
 		else
-			return false, L["Unknown Filter"]
+			return false, "Unknown Filter"
 		end
 	end
 
@@ -242,10 +241,10 @@ function AuctionTabUtil:ParseFilterString(searchQuery)
 			local isValid, queryString, class, subClass, invType, minLevel, maxLevel, minILevel, maxILevel, rarity, usableOnly, exactOnly, evenOnly, maxQuantity, maxPrice = GetSearchFilterOptions(searchTerm)
 
 			if not isValid then
-				TSM:Print(L["Skipped the following search term because it's invalid."])
+				TSM:Print("Skipped the following search term because it's invalid.")
 				TSM:Print("\""..searchTerm.."\": "..queryString)
 			elseif strlenutf8(queryString) > 63 then
-				TSM:Print(L["Skipped the following search term because it's too long. Blizzard does not allow search terms over 63 characters."])
+				TSM:Print("Skipped the following search term because it's too long. Blizzard does not allow search terms over 63 characters.")
 				TSM:Print("\""..searchTerm.."\"")
 				isValid = nil
 			end

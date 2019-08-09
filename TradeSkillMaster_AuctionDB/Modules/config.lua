@@ -10,7 +10,6 @@
 local TSM = select(2, ...)
 local Config = TSM:NewModule("Config")
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_AuctionDB") -- loads the localization table
 
 local DEFAULT_FILTERS = { name = nil, rarity = nil, class = nil, subClass = nil }
 
@@ -23,7 +22,7 @@ function Config:Load(container)
 	tg:SetLayout("Fill")
 	tg:SetFullHeight(true)
 	tg:SetFullWidth(true)
-	tg:SetTabs({{value=1, text=L["Options"]}, {value=2, text=L["Search"]}})
+	tg:SetTabs({{value=1, text="Options"}, {value=2, text="Search"}})
 	tg:SetCallback("OnGroupSelected", function(self, _, value)
 		self:ReleaseChildren()
 		if value == 1 then
@@ -39,9 +38,9 @@ end
 function Config:LoadOptions(container)
 	local lastScanInfo
 	if TSM.db.realm.lastCompleteScan > 0 then
-		lastScanInfo = format(L["Last updated from in-game scan %s ago."], SecondsToTime(time() - TSM.db.realm.lastCompleteScan))
+		lastScanInfo = format("Last updated from in-game scan %s ago.", SecondsToTime(time() - TSM.db.realm.lastCompleteScan))
 	else
-		lastScanInfo = L["No scans found."]
+		lastScanInfo = "No scans found."
 	end
 	local page = {
 		{
@@ -50,7 +49,7 @@ function Config:LoadOptions(container)
 			children = {
 				{
 					type = "InlineGroup",
-					title = L["Last Update Time"],
+					title = "Last Update Time",
 					layout = "Flow",
 					children = {
 						{
@@ -62,22 +61,22 @@ function Config:LoadOptions(container)
 				},
 				{
 					type = "InlineGroup",
-					title = L["General Options"],
+					title = "General Options",
 					layout = "Flow",
 					children = {
 						{
 							type = "CheckBox",
-							label = L["Show AuctionDB AH Tab (Requires Reload)"],
+							label = "Show AuctionDB AH Tab (Requires Reload)",
 							settingInfo = { TSM.db.global, "showAHTab" },
 							relativeWidth = 1,
-							tooltip = L["If checked, AuctionDB will add a tab to the AH to allow for in-game scans. If you are using the TSM app exclusively for your scans, you may want to hide it by unchecking this option. This option requires a reload to take effect."],
+							tooltip = "If checked, AuctionDB will add a tab to the AH to allow for in-game scans. If you are using the TSM app exclusively for your scans, you may want to hide it by unchecking this option. This option requires a reload to take effect.",
                         },
 						{
 							type = "CheckBox",
-							label = L["Display Grey Items in Search"],
+							label = "Display Grey Items in Search",
                             settingInfo = { TSM.db.global, "displayGreys" },
                             relativeWidth = 1,
-							tooltip = L["If checked, poor quality items will be shown in AuctionDB search data."],
+							tooltip = "If checked, poor quality items will be shown in AuctionDB search data.",
 						},
 					},
                 },
@@ -141,7 +140,7 @@ function Config:GetSearchSTData(filters)
                         sortArg = data.historical or 0,
                     },
                     {
-                        value = (timeDiff and TSMAPI.Design:GetInlineColor("link2") .. format(L["%s ago"], timeDiff) .. "|r" or TSMAPI.Design:GetInlineColor("link2") .. "---|r"),
+                        value = (timeDiff and TSMAPI.Design:GetInlineColor("link2") .. format("%s ago", timeDiff) .. "|r" or TSMAPI.Design:GetInlineColor("link2") .. "---|r"),
                         sortArg = data.lastScan and (time() - data.lastScan) or 0,
                     },
                 },
@@ -154,46 +153,46 @@ function Config:GetSearchSTData(filters)
 end
 
 function Config:LoadSearch(container)
-	local rarityList = {[-1]=L["None"]}
+	local rarityList = {[-1]="None"}
 	for i = 0, getn(ITEM_QUALITY_COLORS)-2 do
 		rarityList[i] = _G[format("ITEM_QUALITY%d_DESC", i)]
     end
 
-	local classList, subClassList = {[0]=L["None"]}, {[0]={}}
+	local classList, subClassList = {[0]="None"}, {[0]={}}
 	for i, className in ipairs({ GetAuctionItemClasses() }) do
 		classList[i] = className
 		subClassList[i] = {}
 		for j, subClassName in ipairs({ GetAuctionItemSubClasses(i) }) do
 			subClassList[i][j] = subClassName
         end
-        subClassList[i][0]=L["None"]
+        subClassList[i][0]="None"
 	end
 
     local filters = CopyTable(DEFAULT_FILTERS)
 
     local stCols = {
         {
-            name = L["Name"],
+            name = "Name",
             width = 0.30,
             headAlign="LEFT",
         },
         {
-            name = L["Min Buyout"],
+            name = "Min Buyout",
             width = 0.16,
             headAlign="LEFT",
         },
         {
-            name = L["Market Value"],
+            name = "Market Value",
             width = 0.16,
             headAlign="LEFT",
         },
         {
-            name = L["Historical Price"],
+            name = "Historical Price",
             width = 0.16,
             headAlign="LEFT",
         },
         {
-            name = L["Last Scanned"],
+            name = "Last Scanned",
             width = 0.22,
             headAlign="LEFT",
         },
@@ -204,14 +203,14 @@ function Config:LoadSearch(container)
         OnClick = function(_, data, _, button)
             if data and IsShiftKeyDown() and button == "RightButton" then
                 TSM.realmData[data.itemString] = nil
-                TSM:Printf(L["Removed %s from AuctionDB."], TSMAPI.Item:GetLink(data.itemString) or data.itemString)
+                TSM:Printf("Removed %s from AuctionDB.", TSMAPI.Item:GetLink(data.itemString) or data.itemString)
             end
         end,
         OnEnter = function(_, data, self)
             if not data then return end
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:SetHyperlink(TSMAPI.Item:ToWoWItemString(data.itemString))
-            GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2") .. L["Shift-Right-Click to clear all data for this item from AuctionDB."] .. "|r")
+            GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2") .. "Shift-Right-Click to clear all data for this item from AuctionDB." .. "|r")
             GameTooltip:Show()
         end,
         OnLeave = function()
@@ -231,7 +230,7 @@ function Config:LoadSearch(container)
 					children = {
                         {
                             type = "Label",
-                            text = L["You can use this page to lookup an item or group of items in the AuctionDB database. Note that this does not perform a live search of the AH."],
+                            text = "You can use this page to lookup an item or group of items in the AuctionDB database. Note that this does not perform a live search of the AH.",
                             relativeWidth = 1,
                         },
                         {
@@ -239,7 +238,7 @@ function Config:LoadSearch(container)
                         },
 						{
 							type = "EditBox",
-							label = L["Search"],
+							label = "Search",
 							relativeWidth = 0.40,
 							onTextChanged = true,
 							callback = function(_, _, value)
@@ -254,7 +253,7 @@ function Config:LoadSearch(container)
 						},
 						{
 							type = "Dropdown",
-							label = L["Rarity"],
+							label = "Rarity",
 							relativeWidth = 0.16,
 							list = rarityList,
 							value = -1,
@@ -269,7 +268,7 @@ function Config:LoadSearch(container)
                         },
                         {
                             type = "Dropdown",
-                            label = L["Class"],
+                            label = "Class",
                             list = classList,
                             value = 0,
                             relativeWidth = 0.22,
@@ -294,7 +293,7 @@ function Config:LoadSearch(container)
                         },
                         {
                             type = "Dropdown",
-                            label = L["SubClass"],
+                            label = "SubClass",
                             disabled = true,
                             value = 0,
                             relativeWidth = 0.22,
@@ -340,24 +339,24 @@ function Config:LoadTooltipOptions(container, options)
 			children = {
 				{
 					type = "CheckBox",
-					label = L["Display min buyout in tooltip."],
+					label = "Display min buyout in tooltip.",
 					settingInfo = { options, "minBuyout" },
 					relativeWidth = 1,
-					tooltip = L["If checked, the lowest buyout value seen in the last scan of the item will be displayed."],
+					tooltip = "If checked, the lowest buyout value seen in the last scan of the item will be displayed.",
 				},
 				{
 					type = "CheckBox",
-					label = L["Display market value in tooltip."],
+					label = "Display market value in tooltip.",
 					settingInfo = { options, "marketValue" },
 					relativeWidth = 1,
-					tooltip = L["If checked, the market value of the item will be displayed"],
+					tooltip = "If checked, the market value of the item will be displayed",
                 },
 				{
 					type = "CheckBox",
-					label = L["Display historical price in the tooltip."],
+					label = "Display historical price in the tooltip.",
 					settingInfo = { options, "historical" },
 					relativeWidth = 1,
-					tooltip = L["If checked, the historical price of the item will be displayed."],
+					tooltip = "If checked, the historical price of the item will be displayed.",
 				},
 			},
 		},

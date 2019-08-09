@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local Scan = TSM:NewModule("Scan", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
 local private = {scanThreadId=nil, callbackThreadId=nil, database=nil, filterArgs=nil, lowestAuctionCache={}}
 
 
@@ -32,7 +31,7 @@ function private.ScanThread(self, itemList)
 		TSM.Manage:UpdateStatus("scan", 0, 0)
 		return
 	end
-	
+
 	-- scan all the queries
 	local scannedItems = {}
 	for i=1, #queries do
@@ -63,7 +62,7 @@ function private.ScanThread(self, itemList)
 			end
 		end
 	end
-	
+
 	-- we're done scanning
 	TSM.Manage:UpdateStatus("scan", #queries, #queries)
 	private:DoCallback("DONE_SCANNING")
@@ -125,12 +124,12 @@ function private.AuctionRecordFilter(record)
 	if record.timeLeft <= private.filterOperation.ignoreLowDuration then
 		-- ignoring low duration
 		return
-	elseif private.filterOperation.matchStackSize and record.stackSize ~= private.filterOperation.stackSize then	
+	elseif private.filterOperation.matchStackSize and record.stackSize ~= private.filterOperation.stackSize then
 		-- matching stack size
 		return
 	elseif private.filterOperation.priceReset == "ignore" and record.itemBuyout then
 		local minPrice = TSM.Util:GetMinPrice(private.filterOperation, record.itemString)
-		if minPrice and record.itemBuyout <= minPrice then	
+		if minPrice and record.itemBuyout <= minPrice then
 			-- ignoring auctions below threshold
 			return
 		end
@@ -199,9 +198,9 @@ function Scan:GetLowestAuction(itemString, operation)
 			break
 		end
 	end
-	
+
 	if not lowestBuyoutInfo then return end
-	
+
 	-- prioritize blacklist, then whitelist, then player
 	sort(lowestBuyoutInfo, private.LowestAuctionSort)
 	-- preserve the hasInvalidSeller flag
@@ -233,7 +232,7 @@ function Scan:GetPlayerAuctionCount(itemString, findBuyout, findBid, findStackSi
 			quantity = quantity + 1
 		end
 	end
-	
+
 	return quantity
 end
 

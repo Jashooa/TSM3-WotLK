@@ -12,7 +12,6 @@ Provides two scroll lists with buttons to move selected items from one list to t
 -------------------------------------------------------------------------------]]
 local TSM = select(2, ...)
 local Type, Version = "TSMGroupItemList", 1
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -353,7 +352,7 @@ local function Constructor()
 		if not self.list or #self.list <= 1 then return end
 		GameTooltip:SetOwner(self, "ANCHOR_NONE")
 		GameTooltip:SetPoint("LEFT", self, "RIGHT")
-		GameTooltip:AddLine(L["Click to change what is shown in this column."])
+		GameTooltip:AddLine("Click to change what is shown in this column.")
 		GameTooltip:Show()
 	end)
 	leftTitle:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -411,7 +410,7 @@ local function Constructor()
 		if not self.list or #self.list <= 1 then return end
 		GameTooltip:SetOwner(self, "ANCHOR_NONE")
 		GameTooltip:SetPoint("LEFT", self, "RIGHT")
-		GameTooltip:AddLine(L["Click to change what is shown in this column."])
+		GameTooltip:AddLine("Click to change what is shown in this column.")
 		GameTooltip:Show()
 	end)
 	rightTitle:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -441,7 +440,7 @@ local function Constructor()
 
 
 	local label = TSM.GUI:CreateLabel(frame, "normal")
-	label:SetText(L["Filter:"])
+	label:SetText("Filter:")
 	label:SetPoint("TOPLEFT", 0, -5)
 	label:SetHeight(20)
 	label:SetJustifyV("CENTER")
@@ -452,7 +451,7 @@ local function Constructor()
 	filter:SetWidth(150)
 	filter:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
 	filter:SetScript("OnEditFocusLost", OnFilterSet)
-	filter.tooltip = L["Here you can filter the item lists below. You can enter a simple string to filter by, or a more complex filter which includes item level, rarity, price, etc. Ex: '/weapon/i600/epic/100g/500g'"]
+	filter.tooltip = "Here you can filter the item lists below. You can enter a simple string to filter by, or a more complex filter which includes item level, rarity, price, etc. Ex: '/weapon/i600/epic/100g/500g'"
 
 	local line = TSM.GUI:CreateHorizontalLine(frame, 0)
 	line:SetPoint("TOPLEFT", 0, -58)
@@ -462,8 +461,8 @@ local function Constructor()
 	line:SetPoint("TOP", 0, -60)
 	line:SetPoint("BOTTOM")
 
-	local ignoreCheckBox = TSM.GUI:CreateCheckBox(frame, L["When checked, random enchants will be ignored for ungrouped items.\n\nNB: This will not affect parent group items that were already added with random enchants\n\nIf you have this checked when adding an ungrouped randomly enchanted item, it will act as all possible random enchants of that item."])
-	ignoreCheckBox:SetLabel(L["Ignore Random Enchants on Ungrouped Items"])
+	local ignoreCheckBox = TSM.GUI:CreateCheckBox(frame, "When checked, random enchants will be ignored for ungrouped items.\n\nNB: This will not affect parent group items that were already added with random enchants\n\nIf you have this checked when adding an ungrouped randomly enchanted item, it will act as all possible random enchants of that item.")
+	ignoreCheckBox:SetLabel("Ignore Random Enchants on Ungrouped Items")
 	ignoreCheckBox:SetPoint("BOTTOMLEFT", filter, "BOTTOMRIGHT", 20, 5)
 	ignoreCheckBox:SetPoint("TOPRIGHT", 0, -2)
 	ignoreCheckBox:SetCallback("OnValueChanged", OnIgnoreChanged)
@@ -472,7 +471,7 @@ local function Constructor()
 	addBtn:SetPoint("TOPLEFT", 0, -33)
 	addBtn:SetWidth(170)
 	addBtn:SetHeight(20)
-	addBtn:SetText(L["Add >>>"])
+	addBtn:SetText("Add >>>")
 	addBtn.type = "Add"
 	addBtn:SetScript("OnClick", OnButtonClick)
 
@@ -480,18 +479,18 @@ local function Constructor()
 	removeBtn:SetPoint("TOPRIGHT", 0, -33)
 	removeBtn:SetWidth(170)
 	removeBtn:SetHeight(20)
-	removeBtn:SetText(L["<<< Remove"])
+	removeBtn:SetText("<<< Remove")
 	removeBtn.type = "Remove"
 	removeBtn:SetScript("OnClick", OnButtonClick)
-	removeBtn.tooltip = L["You can hold shift while clicking this button to leave the items in the parent group (if one exists) rather than removing from all groups."]
+	removeBtn.tooltip = "You can hold shift while clicking this button to leave the items in the parent group (if one exists) rather than removing from all groups."
 
 	local clearBtn = TSM.GUI:CreateButton(frame, 16)
 	clearBtn:SetPoint("BOTTOMLEFT", addBtn, "BOTTOMRIGHT", 15, 0)
 	clearBtn:SetPoint("BOTTOMRIGHT", removeBtn, "BOTTOMLEFT", -15, 0)
 	clearBtn:SetHeight(20)
-	clearBtn:SetText(L["Clear Selection"])
+	clearBtn:SetText("Clear Selection")
 	clearBtn:SetScript("OnClick", OnClearButtonClicked)
-	clearBtn.tooltip = L["Deselects all items in both columns."]
+	clearBtn.tooltip = "Deselects all items in both columns."
 
 
 	local widget = {

@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local Cancel = TSM:NewModule("Cancel", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
 local private = {queue={}, threadId=nil, specialScanOptions=nil}
 local CANCEL_ALL_OPERATION = {isFake=true}
 
@@ -17,7 +16,7 @@ function Cancel:StartScan(isGroup, scanInfo)
 	wipe(private.queue)
 	wipe(TSM.operationLookup)
 	private.specialScanOptions = nil
-	TSM.operationNameLookup[CANCEL_ALL_OPERATION] = "|cffff0000"..L["Cancel All"].."|r"
+	TSM.operationNameLookup[CANCEL_ALL_OPERATION] = "|cffff0000".."Cancel All".."|r"
 	local processedItems, scanList = {}, {}
 
 	for i=1, GetNumAuctionItems("owner") do
@@ -111,19 +110,19 @@ function private:ValidateOperation(itemString, operation)
 
 	-- don't cancel this item if their settings are invalid
 	if not prices.minPrice then
-		errMsg = format(L["Did not cancel %s because your minimum price (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.minPrice)
+		errMsg = format("Did not cancel %s because your minimum price (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.minPrice)
 	elseif not prices.maxPrice then
-		errMsg = format(L["Did not cancel %s because your maximum price (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.maxPrice)
+		errMsg = format("Did not cancel %s because your maximum price (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.maxPrice)
 	elseif not prices.normalPrice then
-		errMsg = format(L["Did not cancel %s because your normal price (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.normalPrice)
+		errMsg = format("Did not cancel %s because your normal price (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.normalPrice)
 	elseif operation.cancelRepost and not prices.cancelRepostThreshold then
-		errMsg = format(L["Did not cancel %s because your cancel to repost threshold (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.cancelRepostThreshold)
+		errMsg = format("Did not cancel %s because your cancel to repost threshold (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.cancelRepostThreshold)
 	elseif not prices.undercut then
-		errMsg = format(L["Did not cancel %s because your undercut (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.undercut)
+		errMsg = format("Did not cancel %s because your undercut (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.undercut)
 	elseif prices.maxPrice < prices.minPrice then
-		errMsg = format(L["Did not cancel %s because your maximum price (%s) is lower than your minimum price (%s). Check your settings."], TSMAPI.Item:GetLink(itemString), operation.maxPrice, operation.minPrice)
+		errMsg = format("Did not cancel %s because your maximum price (%s) is lower than your minimum price (%s). Check your settings.", TSMAPI.Item:GetLink(itemString), operation.maxPrice, operation.minPrice)
 	elseif prices.normalPrice < prices.minPrice then
-		errMsg = format(L["Did not cancel %s because your normal price (%s) is lower than your minimum price (%s). Check your settings."], TSMAPI.Item:GetLink(itemString), operation.normalPrice, operation.minPrice)
+		errMsg = format("Did not cancel %s because your normal price (%s) is lower than your minimum price (%s). Check your settings.", TSMAPI.Item:GetLink(itemString), operation.normalPrice, operation.minPrice)
 	end
 
 	if errMsg then
@@ -348,7 +347,7 @@ function private:ShouldCancel(index, itemString, operation)
 			return false, "notUndercut"
 		end
 	elseif lowestAuction.isInvalidSeller then
-		TSM:Printf(L["The seller name of the lowest auction for %s was not given by the server. Skipping this item."], GetAuctionItemLink("owner", index))
+		TSM:Printf("The seller name of the lowest auction for %s was not given by the server. Skipping this item.", GetAuctionItemLink("owner", index))
 		return false, "invalidSeller"
 	end
 

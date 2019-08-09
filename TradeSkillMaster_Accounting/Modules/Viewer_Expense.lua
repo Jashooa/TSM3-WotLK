@@ -10,7 +10,6 @@
 local TSM = select(2, ...)
 local Expense = TSM.modules.Viewer:NewModule("Expense")
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local private = {filters={}}
 
 
@@ -20,22 +19,22 @@ local private = {filters={}}
 -- ============================================================================
 
 local ITEM_SELL_BUY_ST_COLS = {
-	{name=L["Item Name"], width=0.34, headAlign="LEFT"},
-	{name=L["Player"], width=0.1, headAlign="LEFT"},
-	{name=L["Type"], width=0.06, headAlign="LEFT"},
-	{name=L["Stack"], width=0.05, headAlign="LEFT"},
-	{name=L["Aucs"], width=0.05, headAlign="LEFT"},
-	{name=L["Per Item"], width=0.12, headAlign="LEFT"},
-	{name=L["Total Price"], width=0.13, headAlign="LEFT"},
-	{name=L["Time"], width=0.14, headAlign="LEFT"},
+	{name="Item Name", width=0.34, headAlign="LEFT"},
+	{name="Player", width=0.1, headAlign="LEFT"},
+	{name="Type", width=0.06, headAlign="LEFT"},
+	{name="Stack", width=0.05, headAlign="LEFT"},
+	{name="Aucs", width=0.05, headAlign="LEFT"},
+	{name="Per Item", width=0.12, headAlign="LEFT"},
+	{name="Total Price", width=0.13, headAlign="LEFT"},
+	{name="Time", width=0.14, headAlign="LEFT"},
 	defaultSort = -8,
 }
 local ITEM_MONEY_ST_COLS = {
-	{name=L["Type"], width=0.2, headAlign="LEFT"},
-	{name=L["Player"], width=0.2, headAlign="LEFT"},
-	{name=L["Other Player"], width=0.2, headAlign="LEFT"},
-	{name=L["Amount"], width=0.15, headAlign="LEFT"},
-	{name=L["Time"], width=0.15, headAlign="LEFT"},
+	{name="Type", width=0.2, headAlign="LEFT"},
+	{name="Player", width=0.2, headAlign="LEFT"},
+	{name="Other Player", width=0.2, headAlign="LEFT"},
+	{name="Amount", width=0.15, headAlign="LEFT"},
+	{name="Time", width=0.15, headAlign="LEFT"},
 	defaultSort = -5,
 }
 
@@ -52,7 +51,7 @@ function Expense:Draw(container)
 
 	local tabGroup = AceGUI:Create("TSMTabGroup")
 	tabGroup:SetLayout("Fill")
-	tabGroup:SetTabs({ { text = L["Purchases"], value = 1 }, { text = OTHER, value = 2 } })
+	tabGroup:SetTabs({ { text = "Purchases", value = 1 }, { text = OTHER, value = 2 } })
 	tabGroup:SetCallback("OnGroupSelected", function(self, _, value)
 		tabGroup:ReleaseChildren()
 		TSM.Viewer:HideScrollingTables()

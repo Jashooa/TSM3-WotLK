@@ -9,7 +9,6 @@
 -- This file contains all the code for TSM's standalone features
 
 local TSM = select(2, ...)
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local Features = TSM:NewModule("Features", "AceHook-3.0", "AceEvent-3.0")
 local private = {isLoaded={vendorBuy=nil, auctionSale=nil, auctionBuy=nil}, lastPurchase=nil, prevLineId=nil, prevLineResult=nil, origChatFrame_OnEvent=nil}
 
@@ -131,7 +130,7 @@ function private.FilterSystemMsg(_, _, msg, ...)
 		local link = TSM.db.char.auctionMessages and TSM.db.char.auctionMessages[msg]
 		if private.lastPurchase and msg == format(ERR_AUCTION_WON_S, private.lastPurchase.name) then
 			-- we just bought an auction
-			private.prevLineResult = format(L["You won an auction for %sx%d for %s"], private.lastPurchase.link, private.lastPurchase.stackSize, TSMAPI:MoneyToString(private.lastPurchase.buyout, "|cffffffff"))
+			private.prevLineResult = format("You won an auction for %sx%d for %s", private.lastPurchase.link, private.lastPurchase.stackSize, TSMAPI:MoneyToString(private.lastPurchase.buyout, "|cffffffff"))
 			local itemId = TSMAPI.Item:ToItemID(private.lastPurchase.link)
 			return nil, private.prevLineResult, ...
 		elseif link then
@@ -146,7 +145,7 @@ function private.FilterSystemMsg(_, _, msg, ...)
 			if numAuctions == 1 then -- this was the last auction
 				TSM.db.char.auctionMessages[msg] = nil
 			end
-			private.prevLineResult = format(L["Your auction of %s has sold for %s!"], link, TSMAPI:MoneyToString(price, "|cffffffff"))
+			private.prevLineResult = format("Your auction of %s has sold for %s!", link, TSMAPI:MoneyToString(price, "|cffffffff"))
 			TSMAPI:DoPlaySound(TSM.db.global.auctionSaleSound)
 			local itemId = TSMAPI.Item:ToItemID(link)
 			return nil, private.prevLineResult, ...

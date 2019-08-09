@@ -10,7 +10,6 @@
 local TSM = select(2, ...)
 local Viewer = TSM:NewModule("Viewer", "AceEvent-3.0", "AceHook-3.0")
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local private = {}
 
 local DEFAULT_FILTERS = {
@@ -38,16 +37,16 @@ function Viewer:GetMultiLabelLine(description, data, key, isPerDay, isNumber, ti
 	if isNumber then
 		lines = {
 			{ text = color2 .. description, relativeWidth = 0.19 },
-			{ text = color .. L["Total:"] .. " |r" .. (total or 0), relativeWidth = 0.22 },
-			{ text = color .. format(L["Last %d Days"], timeframe1 or 30) .. " |r" .. (month or 0), relativeWidth = 0.29 },
-			{ text = color .. format(L["Last %d Days"], timeframe2 or 7) .. " |r" .. (week or 0), relativeWidth = 0.29 }
+			{ text = color .. "Total:" .. " |r" .. (total or 0), relativeWidth = 0.22 },
+			{ text = color .. format("Last %d Days", timeframe1 or 30) .. " |r" .. (month or 0), relativeWidth = 0.29 },
+			{ text = color .. format("Last %d Days", timeframe2 or 7) .. " |r" .. (week or 0), relativeWidth = 0.29 }
 		}
 	else
 		lines = {
 			{ text = color2 .. description, relativeWidth = 0.19 },
-			{ text = color .. L["Total:"] .. " |r" .. (TSMAPI:MoneyToString(total) or "---"), relativeWidth = 0.22 },
-			{ text = color .. format(L["Last %d Days"], timeframe1 or 30) .. ": |r" .. (TSMAPI:MoneyToString(month) or "---"), relativeWidth = 0.29 },
-			{ text = color .. format(L["Last %d Days"], timeframe2 or 7) .. ": |r" .. (TSMAPI:MoneyToString(week) or "---"), relativeWidth = 0.29 }
+			{ text = color .. "Total:" .. " |r" .. (TSMAPI:MoneyToString(total) or "---"), relativeWidth = 0.22 },
+			{ text = color .. format("Last %d Days", timeframe1 or 30) .. ": |r" .. (TSMAPI:MoneyToString(month) or "---"), relativeWidth = 0.29 },
+			{ text = color .. format("Last %d Days", timeframe2 or 7) .. ": |r" .. (TSMAPI:MoneyToString(week) or "---"), relativeWidth = 0.29 }
 		}
 	end
 	return lines
@@ -64,7 +63,7 @@ function Viewer:Load(parent)
 
 	local tabGroup = AceGUI:Create("TSMTabGroup")
 	tabGroup:SetLayout("Fill")
-	tabGroup:SetTabs({ { text = L["Revenue"], value = 1 }, { text = L["Expenses"], value = 2 }, { text = L["Failed Auctions"], value = 3 }, { text = L["Items"], value = 4 }, { text = L["Summary"], value = 5 }, { text = L["Player Gold"], value = 6 }, { text = "Active Auctions", value = 7 } })
+	tabGroup:SetTabs({ { text = "Revenue", value = 1 }, { text = "Expenses", value = 2 }, { text = "Failed Auctions", value = 3 }, { text = "Items", value = 4 }, { text = "Summary", value = 5 }, { text = "Player Gold", value = 6 }, { text = "Active Auctions", value = 7 } })
 	tabGroup:SetCallback("OnGroupSelected", function(self, _, value)
 		tabGroup:ReleaseChildren()
 		Viewer:HideScrollingTables()
@@ -97,20 +96,20 @@ end
 
 
 function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols, tab, subTab)
-	local rarityList = {[-1]=L["None"]}
+	local rarityList = {[-1]="None"}
 	for i = 0, getn(ITEM_QUALITY_COLORS)-2 do
 		rarityList[i] = _G[format("ITEM_QUALITY%d_DESC", i)]
 	end
 
-	local timeList = {[99]=L["All"], [0]=L["Today"], [1]=L["Yesterday"]}
+	local timeList = {[99]="All", [0]="Today", [1]="Yesterday"}
 	for _, days in ipairs({7, 14, 30, 60}) do
-		timeList[days] = format(L["Last %d Days"], days)
+		timeList[days] = format("Last %d Days", days)
 	end
 
 	local playerList = CopyTable(TSM.ViewerUtil.playerListCache)
-	playerList["all"] = L["All"]
+	playerList["all"] = "All"
 
-	local typeList = {["all"] = L["All"]}
+	local typeList = {["all"] = "All"}
 	for _, dataType in ipairs(types) do
 		typeList[dataType] = dataType
 	end
@@ -131,8 +130,8 @@ function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols,
                 if data.itemString then
                     GameTooltip:SetHyperlink(TSMAPI.Item:ToWoWItemString(data.itemString))
                 end
-                GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2") .. L["Click for a detailed report on this item."] .. "|r")
-                --GameTooltip:SetText(L["Click for a detailed report on this item."], 1, 0.82, 0, 1)
+                GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2") .. "Click for a detailed report on this item." .. "|r")
+                --GameTooltip:SetText("Click for a detailed report on this item.", 1, 0.82, 0, 1)
                 GameTooltip:Show()
 			end,
 			OnLeave = function()
@@ -153,7 +152,7 @@ function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols,
 					children = {
 						{
 							type = "EditBox",
-							label = L["Search"],
+							label = "Search",
 							relativeWidth = 0.18,
 							onTextChanged = true,
 							callback = function(_, _, value)
@@ -168,7 +167,7 @@ function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols,
 						},
 						{
 							type = "GroupBox",
-							label = L["Group"],
+							label = "Group",
 							relativeWidth = 0.19,
 							callback = function(_, _, value)
 								filters.group = value
@@ -177,7 +176,7 @@ function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols,
 						},
 						{
 							type = "Dropdown",
-							label = L["Type"],
+							label = "Type",
 							relativeWidth = 0.13,
 							list = typeList,
 							value = "all",
@@ -192,7 +191,7 @@ function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols,
 						},
 						{
 							type = "Dropdown",
-							label = L["Rarity"],
+							label = "Rarity",
 							relativeWidth = 0.16,
 							list = rarityList,
 							value = -1,
@@ -207,7 +206,7 @@ function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols,
 						},
 						{
 							type = "Dropdown",
-							label = L["Player"],
+							label = "Player",
 							relativeWidth = 0.15,
 							list = playerList,
 							value = "all",
@@ -222,7 +221,7 @@ function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols,
 						},
 						{
 							type = "Dropdown",
-							label = L["Timeframe Filter"],
+							label = "Timeframe Filter",
 							relativeWidth = 0.18,
 							list = timeList,
 							value = filters.time or 99,
@@ -254,15 +253,15 @@ function Viewer:GetItemFiltersInfo(container, dataType, types, dataFunc, stCols,
 end
 
 function Viewer:GetMoneyFiltersInfo(container, dataType, types, dataFunc, stCols, tab, subTab)
-	local timeList = {[99]=L["All"], [0]=L["Today"], [1]=L["Yesterday"]}
+	local timeList = {[99]="All", [0]="Today", [1]="Yesterday"}
 	for _, days in ipairs({7, 14, 30, 60}) do
-		timeList[days] = format(L["Last %d Days"], days)
+		timeList[days] = format("Last %d Days", days)
 	end
 
 	local playerList = CopyTable(TSM.ViewerUtil.playerListCache)
-	playerList["all"] = L["All"]
+	playerList["all"] = "All"
 
-	local typeList = {["all"] = L["All"]}
+	local typeList = {["all"] = "All"}
 	for _, dataType in ipairs(types) do
 		typeList[dataType] = dataType
 	end
@@ -278,8 +277,8 @@ function Viewer:GetMoneyFiltersInfo(container, dataType, types, dataFunc, stCols
                 if data.itemString then
                     GameTooltip:SetHyperlink(TSMAPI.Item:ToWoWItemString(data.itemString))
                 end
-                GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2") .. L["Click for a detailed report on this item."] .. "|r")
-                --GameTooltip:SetText(L["Click for a detailed report on this item."], 1, 0.82, 0, 1)
+                GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2") .. "Click for a detailed report on this item." .. "|r")
+                --GameTooltip:SetText("Click for a detailed report on this item.", 1, 0.82, 0, 1)
                 GameTooltip:Show()
 			end,
 			OnLeave = function()
@@ -300,7 +299,7 @@ function Viewer:GetMoneyFiltersInfo(container, dataType, types, dataFunc, stCols
 					children = {
 						{
 							type = "Dropdown",
-							label = L["Type"],
+							label = "Type",
 							relativeWidth = 0.13,
 							list = typeList,
 							value = "all",
@@ -315,7 +314,7 @@ function Viewer:GetMoneyFiltersInfo(container, dataType, types, dataFunc, stCols
 						},
 						{
 							type = "Dropdown",
-							label = L["Player"],
+							label = "Player",
 							relativeWidth = 0.15,
 							list = playerList,
 							value = "all",
@@ -330,7 +329,7 @@ function Viewer:GetMoneyFiltersInfo(container, dataType, types, dataFunc, stCols
 						},
 						{
 							type = "Dropdown",
-							label = L["Timeframe Filter"],
+							label = "Timeframe Filter",
 							relativeWidth = 0.18,
 							list = timeList,
 							value = filters.time or 99,

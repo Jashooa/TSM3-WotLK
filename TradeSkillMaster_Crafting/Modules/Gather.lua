@@ -10,7 +10,6 @@
 local TSM = select(2, ...)
 local TradeSkill = TSM:GetModule("TradeSkill")
 local Gather = TSM:NewModule("Gather", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
 
 --Professions--
 TSM.spells = {
@@ -60,7 +59,7 @@ function Gather:gatherItems(source, task, disableCrafting, ignoreDE)
 			end
 			Gather:ShoppingSearch(private.shoppingItems[1].itemString, private.shoppingItems[1].quantity, disableCrafting, ignoreDE)
 		else
-			TSM:Printf(L["Please switch to the Shopping Tab to perform the gathering search."])
+			TSM:Printf("Please switch to the Shopping Tab to perform the gathering search.")
 		end
 	end
 end
@@ -68,9 +67,9 @@ end
 function Gather:GatherBank(moveItems)
 	local next = next
 	if next(moveItems) == nil then
-		TSM:Print(L["Nothing to Gather"])
+		TSM:Print("Nothing to Gather")
 	else
-		TSM:Print(L["Gathering Crafting Mats"])
+		TSM:Print("Gathering Crafting Mats")
 		TSMAPI:MoveItems(moveItems, Gather.PrintMsg, false)
 		TSM.db.factionrealm.gathering.gatheredMats = true
 	end
@@ -94,11 +93,11 @@ end
 
 function Gather:MailItems(neededItems)
 	if next(neededItems) == nil then
-		TSM:Print(L["Nothing to Mail"])
+		TSM:Print("Nothing to Mail")
 	else
 		local crafter = TSM.db.factionrealm.gathering.crafter
 		if crafter then
-			TSM:Print(format(L["Mailing Craft Mats to %s"], crafter))
+			TSM:Print(format("Mailing Craft Mats to %s", crafter))
 			TSMAPI:ModuleAPI("Mailing", "mailItems", neededItems, crafter, Gather.PrintMsg)
 			TSM.db.factionrealm.gathering.gatheredMats = true
 		end
@@ -163,7 +162,7 @@ function private.ShoppingCallback(boughtItem, boughtQty)
 	local convertQty
 	if not boughtItem then
 		if next(private.shoppingItems) then
-			TSM:Printf(L["No Auctions found for %s"], TSMAPI.Item:GetLink(private.shoppingItems[1].itemString))
+			TSM:Printf("No Auctions found for %s", TSMAPI.Item:GetLink(private.shoppingItems[1].itemString))
 			tremove(private.shoppingItems, 1)
 			TSMAPI.Delay:AfterTime("shoppingSearchThrottle", 0.5, private.ShoppingNextSearch)
 		end

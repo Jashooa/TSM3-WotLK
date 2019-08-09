@@ -9,7 +9,6 @@
 -- create a local reference to the TradeSkillMaster_Crafting table and register a new module
 local TSM = select(2, ...)
 local TradeSkill = TSM:NewModule("TradeSkill", "AceEvent-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
 local private = {frame=nil, switchBtn=nil, currentProfession=nil, managerThreadId=nil, noHide=nil, noShow=nil, scanSuccess=nil}
 
 
@@ -168,7 +167,7 @@ function private:Create()
 			{
 				type = "Button",
 				key = "professionsBtn",
-				text = L["Professions"],
+				text = "Professions",
 				textHeight = 16,
 				size = {105, 20},
 				points = {{"TOPLEFT", 5, -30}},
@@ -177,7 +176,7 @@ function private:Create()
 			{
 				type = "Button",
 				key = "groupsBtn",
-				text = L["TSM Groups"],
+				text = "TSM Groups",
 				textHeight = 16,
 				size = {105, 0},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}, {"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
@@ -191,7 +190,7 @@ function private:Create()
 			{
 				type = "Button",
 				key = "gatherBtn",
-				text = L["Gather"],
+				text = "Gather",
 				textHeight = 16,
 				size = {80, 0},
 				points = {{"TOPLEFT", "groupsBtn", "TOPRIGHT", 10, 0}, {"BOTTOMLEFT", "groupsBtn", "BOTTOMRIGHT", 10, 0}},
@@ -200,7 +199,7 @@ function private:Create()
 			{
 				type = "Button",
 				key = "queueBtn",
-				text = L["Show Queue"],
+				text = "Show Queue",
 				textHeight = 16,
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}, {"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}, {"TOPRIGHT", -5, -5}},
 				scripts = {"OnClick"},
@@ -218,7 +217,7 @@ function private:Create()
 					{
 						type = "Text",
 						key = "text",
-						text = L["Would you like to automatically create some TradeSkillMaster groups for this profession?"],
+						text = "Would you like to automatically create some TradeSkillMaster groups for this profession?",
 						textFont = {TSMAPI.Design:GetContentFont("normal")},
 						size = {0, 100},
 						points = {{"LEFT", 5, 50}, {"RIGHT", -5, 50}},
@@ -235,7 +234,7 @@ function private:Create()
 					{
 						type = "Button",
 						key = "laterBtn",
-						text = L["Ask Later"],
+						text = "Ask Later",
 						textHeight = 16,
 						size = {100, 20},
 						points = {{"CENTER"}},
@@ -244,7 +243,7 @@ function private:Create()
 					{
 						type = "Button",
 						key = "noBtn",
-						text = L["No Thanks"],
+						text = "No Thanks",
 						textHeight = 16,
 						size = {100, 20},
 						points = {{"CENTER", 110, 0}},
@@ -261,7 +260,7 @@ function private:Create()
 				children = {
 					{
 						type = "Text",
-						text = L["Below is a list of crafts that have been smartly added. You can configure what crafts are listed here in the \"Cooldowns\" tab of the \"Crafting\" page within the main TSM window. Quest items can be removed through the TSM crafting options.\n\nSimply click on the row in the table below to craft it."],
+						text = "Below is a list of crafts that have been smartly added. You can configure what crafts are listed here in the \"Cooldowns\" tab of the \"Crafting\" page within the main TSM window. Quest items can be removed through the TSM crafting options.\n\nSimply click on the row in the table below to craft it.",
 						textFont = {TSMAPI.Design:GetContentFont("normal")},
 						size = {0, 100},
 						points = {{"TOPLEFT", 5, -20}, {"TOPRIGHT", -5, -20}},
@@ -270,7 +269,7 @@ function private:Create()
 						type = "ScrollingTableFrame",
 						key = "craftST",
 						headFontSize = 14,
-						stCols = {{name = L["Smart Crafts"], width = 1, align="CENTER"}},
+						stCols = {{name = "Smart Crafts", width = 1, align="CENTER"}},
 						stDisableSelection = true,
 						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 0, -10}, {"BOTTOMRIGHT", -5, 40}},
 						scripts = {"OnClick"},
@@ -278,7 +277,7 @@ function private:Create()
 					{
 						type = "Button",
 						key = "continueBtn",
-						text = L["Skip Smart Crafts and Continue to Profession"],
+						text = "Skip Smart Crafts and Continue to Profession",
 						textHeight = 18,
 						size = {0, 30},
 						points = {{"BOTTOMLEFT", 5, 5}, {"BOTTOMRIGHT", -5, 5}},
@@ -594,7 +593,7 @@ function private.ScanOpenProfessionThread(self)
 	self:WaitForThread(TSM.TradeSkillScanner:ScanProfession(professionName, playerName, isLinked, private.ProfessionScanCompleteCallback))
 	TSM:LOG_INFO("TradeSkill scanned (success=%s)", tostring(private.scanSuccess))
 	if not private.scanSuccess and not private.noShow then
-		TSM:Print(L["Crafting failed to scan your profession. Please close and re-open it to to allow Crafting to scan and provide pricing info for this profession."])
+		TSM:Print("Crafting failed to scan your profession. Please close and re-open it to to allow Crafting to scan and provide pricing info for this profession.")
 	end
 end
 

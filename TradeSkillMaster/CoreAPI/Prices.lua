@@ -9,7 +9,6 @@
 -- This file contains price related TSMAPI functions.
 
 local TSM = select(2, ...)
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {context={}, itemValueKeyCache={}, moduleObjects=TSM.moduleObjects, customPriceCache={}, priceCache={}, priceCacheActive=nil, mappedWarning={}}
 local ITEM_STRING_PATTERN = "i:[0-9:\-]+"
 local MONEY_PATTERNS = {
@@ -145,7 +144,7 @@ private.customPriceFunctions = {
 	NAN_STR = NAN_STR,
 	isNAN = isNAN,
 	loopError = function(str)
-		TSM:Print(L["Loop detected in the following custom price:"].." "..TSMAPI.Design:GetInlineColor("link")..str.."|r")
+		TSM:Print("Loop detected in the following custom price:".." "..TSMAPI.Design:GetInlineColor("link")..str.."|r")
 	end,
 	_avg = function(...)
 		local total, count = 0, 0
@@ -278,7 +277,7 @@ function private:ParsePriceString(str, badPriceSource)
 		end
 		if minFind.s then
 			local value = TSMAPI:MoneyFromString(minFind.sub)
-			if not value then return nil, L["Invalid function."] end -- sanity check
+			if not value then return nil, "Invalid function." end -- sanity check
 			local preStr = strsub(str, 1, minFind.s-1)
 			local postStr = strsub(str, minFind.e+1)
 			str = preStr .. value .. postStr
@@ -296,7 +295,7 @@ function private:ParsePriceString(str, badPriceSource)
 		if convertItemLink then -- check for itemLink in convert params
 			convertItem = TSMAPI.Item:ToItemString(convertItemLink)
 			if not convertItem then
-				return nil, L["Invalid item link."]  -- there's an invalid item link in the convertParams
+				return nil, "Invalid item link."  -- there's an invalid item link in the convertParams
 			end
 			convertPriceSource = strmatch(convertParams, "^ *(.-) *,")
 		elseif convertItemString then -- check for itemString in convert params
@@ -306,7 +305,7 @@ function private:ParsePriceString(str, badPriceSource)
 			convertPriceSource = gsub(convertParams, ", *$", ""):trim()
 		end
 		if convertPriceSource and convertPriceSource == badPriceSource or convertPriceSource == "matprice" then
-			return nil, format(L["You cannot use %s within convert() as part of this custom price."], convertPriceSource)
+			return nil, format("You cannot use %s within convert() as part of this custom price.", convertPriceSource)
 		end
 
 		-- can't allow custom price sources in convert, so just check regular ones
@@ -318,12 +317,12 @@ function private:ParsePriceString(str, badPriceSource)
 			end
 		end
 		if not isValidPriceSource then
-			return nil, L["Invalid price source in convert."]
+			return nil, "Invalid price source in convert."
 		end
 		local num = 0
 		str, num = gsub(str, "([^a-z])convert%(.-%)", "%1~convert~")
 		if num > 1 then
-			return nil, L["A maximum of 1 convert() function is allowed."]
+			return nil, "A maximum of 1 convert() function is allowed."
 		end
 	end
 
@@ -333,7 +332,7 @@ function private:ParsePriceString(str, badPriceSource)
 		local _, endIndex = strfind(itemLink, "\124r")
 		itemLink = strsub(itemLink, 1, endIndex)
 		local itemString = TSMAPI.Item:ToItemString(itemLink)
-		if not itemString then return nil, L["Invalid item link."] end -- there's an invalid item link in the str
+		if not itemString then return nil, "Invalid item link." end -- there's an invalid item link in the str
 		str = gsub(str, TSMAPI.Util:StrEscape(itemLink), itemString)
 	end
 
@@ -351,7 +350,7 @@ function private:ParsePriceString(str, badPriceSource)
 	str = gsub(str, " [ ]+", " ")
 
 	-- ensure equal number of left/right parenthesis
-	if select(2, gsub(str, "%(", "")) ~= select(2, gsub(str, "%)", "")) then return nil, L["Unbalanced parentheses."] end
+	if select(2, gsub(str, "%(", "")) ~= select(2, gsub(str, "%)", "")) then return nil, "Unbalanced parentheses." end
 
 	-- create array of valid price sources
 	local priceSourceKeys = {}
@@ -369,22 +368,22 @@ function private:ParsePriceString(str, badPriceSource)
 		local word = parts[i]
 		if strmatch(word, "^[%-%+%/%*]$") then
 			if i == #parts then
-				return nil, L["Invalid operator at end of custom price."]
+				return nil, "Invalid operator at end of custom price."
 			end
 			-- valid math operator
 		elseif badPriceSource == word then
 			-- price source that's explicitly invalid
-			return nil, format(L["You cannot use %s as part of this custom price."], word)
+			return nil, format("You cannot use %s as part of this custom price.", word)
 		elseif tContains(priceSourceKeys, word) then
 			-- make sure we're not trying to take the price source of a number
 			if parts[i+1] == "(" and type(parts[i+2]) == "string" and not strfind(parts[i+2], "^i.*:") then
-				return nil, L["Invalid parameter to price source."]
+				return nil, "Invalid parameter to price source."
 			end
 			-- valid price source
 		elseif tonumber(word) then
 			-- make sure it's not an itemID (incorrect)
 			if i > 2 and parts[i-1] == "(" and tContains(priceSourceKeys, parts[i-2]) then
-				return nil, L["Invalid parameter to price source."]
+				return nil, "Invalid parameter to price source."
 			end
 			-- valid number
 		elseif strmatch(word, "^"..ITEM_STRING_PATTERN.."$") then
@@ -392,24 +391,24 @@ function private:ParsePriceString(str, badPriceSource)
 			if i > 1 and tContains(priceSourceKeys, parts[i-1]) then
 				-- valid item parameter
 			else
-				return nil, L["Item links may only be used as parameters to price sources."]
+				return nil, "Item links may only be used as parameters to price sources."
 			end
 		elseif word == "(" then
 			-- empty parenthesis are not allowed
 			if not parts[i+1] or parts[i+1] == ")" then
-				return nil, L["Empty parentheses are not allowed"]
+				return nil, "Empty parentheses are not allowed"
 			end
 		elseif word == ")" then
 			-- valid parenthesis
 		elseif word == "," then
 			if not parts[i+1] or parts[i+1] == ")" then
-				return nil, L["Misplaced comma"]
+				return nil, "Misplaced comma"
 			else
 				-- we're hoping this is a valid comma within a function, will be caught by loadstring otherwise
 			end
 		elseif MATH_FUNCTIONS[word] then
 			if not parts[i+1] or parts[i+1] ~= "(" then
-				return nil, format(L["Invalid word: '%s'"], word)
+				return nil, format("Invalid word: '%s'", word)
 			end
 			-- valid math function
 		elseif word == "~convert~" then
@@ -417,13 +416,13 @@ function private:ParsePriceString(str, badPriceSource)
 		elseif word:trim() == "" then
 			-- harmless extra spaces
 		elseif word == "disenchant" then
-			return nil, format(L["The 'disenchant' price source has been replaced by the more general 'destroy' price source. Please update your custom prices."])
+			return nil, format("The 'disenchant' price source has been replaced by the more general 'destroy' price source. Please update your custom prices.")
 		else
 			-- check if this is an operation export that they tried to use as a custom price
 			if strfind(word, "^%^1%^t%^") then
-				return nil, L["This looks like an exported operation and not a custom price."]
+				return nil, "This looks like an exported operation and not a custom price."
 			end
-			return nil, format(L["Invalid word: '%s'"], word)
+			return nil, format("Invalid word: '%s'", word)
 		end
 		i = i + 1
 	end
@@ -497,17 +496,17 @@ function private:ParsePriceString(str, badPriceSource)
 	local func, loadErr = loadstring(format(funcTemplate, str), "TSMCustomPrice: "..origStr)
 	if loadErr then
 		loadErr = gsub(loadErr:trim(), "([^:]+):.", "")
-		return nil, L["Invalid function."]..L[" Details: "]..loadErr
+		return nil, "Invalid function.".." Details: "..loadErr
 	end
 	local success, func = pcall(func)
-	if not success then return nil, L["Invalid function."] end
+	if not success then return nil, "Invalid function." end
 	return private:CreateCustomPriceObj(func, origStr)
 end
 
 function private:ParseCustomPrice(customPriceStr, badPriceSource)
-	if not customPriceStr then return nil, L["Empty price string."] end
+	if not customPriceStr then return nil, "Empty price string." end
 	customPriceStr = strlower(tostring(customPriceStr):trim())
-	if customPriceStr == "" then return nil, L["Empty price string."] end
+	if customPriceStr == "" then return nil, "Empty price string." end
 
 	if not private.customPriceCache[customPriceStr] then
 		local func, err = private:ParsePriceString(customPriceStr, badPriceSource)

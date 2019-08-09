@@ -9,7 +9,6 @@
 -- create a local reference to the TradeSkillMaster_Accounting table and register a new module
 local TSM = select(2, ...)
 local Trade = TSM:NewModule("Trade", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local private = {tradeInfo=nil}
 
 
@@ -118,7 +117,7 @@ function private.OnChatMsg(_, msg)
 					OnCancel = function() end,
 				}
 			end
-			StaticPopupDialogs["TSMAccountingOnTrade"].text = format(L["TSM_Accounting detected that you just traded %s %s in return for %s. Would you like Accounting to store a record of this trade?"], private.tradeInfo.target.name, private.insertInfo.gaveText, private.insertInfo.gotText)
+			StaticPopupDialogs["TSMAccountingOnTrade"].text = format("TSM_Accounting detected that you just traded %s %s in return for %s. Would you like Accounting to store a record of this trade?", private.tradeInfo.target.name, private.insertInfo.gaveText, private.insertInfo.gotText)
 			TSMAPI.Util:ShowStaticPopupDialog("TSMAccountingOnTrade")
 		end
 	end

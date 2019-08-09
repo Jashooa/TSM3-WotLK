@@ -9,7 +9,6 @@
 -- create a local reference to the TradeSkillMaster_Crafting table and register a new module
 local TSM = select(2, ...)
 local ViewerUtil = TSM:NewModule("ViewerUtil", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local private = {}
 local SECONDS_PER_DAY = 24 * 60 * 60
 
@@ -115,13 +114,13 @@ function ViewerUtil:RemoveOldData(daysOld)
 	end
 
 	TSM:UpdateBaseItemLookup(true)
-	TSM:Printf(L["Removed a total of %s old records and %s items with no remaining records."], numRecords, numItems)
+	TSM:Printf("Removed a total of %s old records and %s items with no remaining records.", numRecords, numItems)
 end
 
 -- returns a formatted time in the format that the user has selected
 function ViewerUtil:GetFormattedTime(rTime)
 	if TSM.db.global.timeFormat == "ago" then
-		return format(L["%s ago"], SecondsToTime(time() - rTime) or "?")
+		return format("%s ago", SecondsToTime(time() - rTime) or "?")
 	elseif TSM.db.global.timeFormat == "usdate" then
 		return date("%m/%d/%y %H:%M", rTime)
 	elseif TSM.db.global.timeFormat == "eudate" then

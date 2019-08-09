@@ -10,7 +10,6 @@
 
 local TSM = select(2, ...)
 local MainFrame = TSM:NewModule("MainFrame")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {icons={}, frame=nil}
 
 
@@ -21,7 +20,7 @@ local private = {icons={}, frame=nil}
 
 function TSMAPI.Operations:ShowOptions(moduleName, operation, groupPath)
 	TSM.loadModuleOptionsTab = {module=moduleName, operation=operation, group=groupPath}
-	MainFrame:SelectIcon("TradeSkillMaster", L["Operations"])
+	MainFrame:SelectIcon("TradeSkillMaster", "Operations")
 	TSM.loadModuleOptionsTab = nil
 end
 
@@ -35,9 +34,9 @@ function MainFrame:Show()
 	if not private.frame then
 		local mainFrame = LibStub("AceGUI-3.0"):Create("TSMMainFrame")
 		mainFrame:SetIconText(TSM._version)
-		mainFrame:SetIconLabels(L["Options / Core Features"], L["Module Features"])
+		mainFrame:SetIconLabels("Options / Core Features", "Module Features")
 		mainFrame:SetLayout("Fill")
-		
+
 		for _, icon in ipairs(private.icons) do
 			icon.texture = icon.icon
 			if icon.side == "options" then
@@ -45,18 +44,18 @@ function MainFrame:Show()
 			else
 				icon.where = "topRight"
 			end
-			
+
 			mainFrame:AddIcon(icon)
 		end
 		private.frame = mainFrame
-		
+
 		TSMAPI.Delay:AfterFrame(1, function() private.frame:SetWidth(private.frame.frame.options.width) private.frame:SetHeight(private.frame.frame.options.height) end)
 	end
 	private.frame:Show()
 	if #private.frame.children > 0 then
 		private.frame:ReleaseChildren()
 	else
-		MainFrame:SelectIcon("TradeSkillMaster", L["TSM Features"])
+		MainFrame:SelectIcon("TradeSkillMaster", "TSM Features")
 	end
 end
 
@@ -64,11 +63,11 @@ function MainFrame:RegisterMainFrameIcon(displayName, icon, loadGUI, moduleName,
 	if not (displayName and icon and loadGUI and moduleName) then
 		return nil, "invalid args", displayName, icon, loadGUI, moduleName
 	end
-	
+
 	if side and not (side == "module" or side == "options") then
 		return nil, "invalid side", side
 	end
-	
+
 	local icon = {name=displayName, moduleName=moduleName, icon=icon, loadGUI=loadGUI, side=(strlower(side or "module"))}
 	if private.frame then
 		icon.texture = icon.icon
@@ -77,10 +76,10 @@ function MainFrame:RegisterMainFrameIcon(displayName, icon, loadGUI, moduleName,
 		else
 			icon.where = "topRight"
 		end
-		
+
 		private.frame:AddIcon(icon)
 	end
-	
+
 	tinsert(private.icons, icon)
 end
 

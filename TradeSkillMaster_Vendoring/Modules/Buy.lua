@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local Buy = TSM:NewModule("Buy", "AceEvent-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Vendoring") -- loads the localization table
 
 local private = { quantity = 1, frame = nil, tooltipFrame = nil, nameFilter = nil, vendorItems = {}, inspecting = false, hovering = false, splitIndex= nil }
 
@@ -76,7 +75,7 @@ function Buy:CreateTab(parent)
 											{
 												type = "Button",
 												key = "buyStackBtn",
-												text = L["Stack"],
+												text = "Stack",
 												textHeight = 12,
 												size = {40, 20},
 												points = {{"TOPLEFT", 45, -60 } },
@@ -85,7 +84,7 @@ function Buy:CreateTab(parent)
 											{
 												type = "Button",
 												key = "buyMaxBtn",
-												text = L["Max"],
+												text = "Max",
 												textHeight = 12,
 												size = {40, 20},
 												points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0} },
@@ -94,7 +93,7 @@ function Buy:CreateTab(parent)
 											{
 												type = "Button",
 												key = "okayBtn",
-												text = L["Okay"],
+												text = "Okay",
 												textHeight = 16,
 												size = {80, 20},
 												points = {{"TOPLEFT", 5, -90}},
@@ -103,7 +102,7 @@ function Buy:CreateTab(parent)
 											{
 												type = "Button",
 												key = "closeBtn",
-												text = L["Cancel"],
+												text = "Cancel",
 												textHeight = 16,
 												size = {80, 20},
 												points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0} },
@@ -182,7 +181,7 @@ function Buy:CreateTab(parent)
 				type = "Button",
 				key = "clearFilterBtn",
 				name = "VendoringClearFilterBtn",
-				text = L["Clear Filters"],
+				text = "Clear Filters",
 				textHeight = 14,
 				size = { nil, 24 },
 				points = { { "TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0 }, {"TOPRIGHT", -5, -5 }} ,
@@ -193,11 +192,11 @@ function Buy:CreateTab(parent)
 				key = "buyST",
 				stCols = {
 						{
-							name = L["Item"],
+							name = "Item",
 							width = 0.7,
 						},
 						{
-							name = L["Cost"],
+							name = "Cost",
 							width = 0.3,
 							align="RIGHT"
 						},

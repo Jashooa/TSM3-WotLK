@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local Groups = TSM:NewModule("Groups", "AceEvent-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Vendoring") -- loads the localization table
 
 local private = { sellThreadId = nil, buyThreadId = nil, processing = false, frame = nil, sellProfit = 0}
 
@@ -31,7 +30,7 @@ function Groups:CreateTab()
 			{
 				type = "Button",
 				key = "buyButton",
-				text = L["Buy Selected Groups"],
+				text = "Buy Selected Groups",
 				textHeight = 15,
 				size = {180, 25},
 				points = {{"BOTTOMLEFT", 5, 30}},
@@ -40,7 +39,7 @@ function Groups:CreateTab()
 			{
 				type = "Button",
 				key = "sellButton",
-				text = L["Sell Selected Groups"],
+				text = "Sell Selected Groups",
 				textHeight = 15,
 				size = {180, 25},
 				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5,0}},
@@ -179,7 +178,7 @@ function private.SellThread(self)
 										else
 											-- the player's bags are full
 											if not printedBagsFullMsg then
-												TSM:Print(L["Could not vendor due to not having free bag space available to split a stack of items."])
+												TSM:Print("Could not vendor due to not having free bag space available to split a stack of items.")
 												printedBagsFullMsg = true
 											end
 										end
@@ -204,7 +203,7 @@ function private:DoneSelling()
 	private:EnableButtons()
 
 	if TSM.db.global.displayMoneyCollected then
-		TSM:Printf(L["Collected: %s"],TSMAPI:MoneyToString(private.sellProfit, "OPT_TRIM"))
+		TSM:Printf("Collected: %s",TSMAPI:MoneyToString(private.sellProfit, "OPT_TRIM"))
 	end
 end
 

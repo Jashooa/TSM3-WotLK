@@ -9,7 +9,6 @@
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
 local GUI = TSM:NewModule("GUI")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_AuctionDB") -- loads the localization table
 local private = {frame=nil}
 
 
@@ -92,9 +91,9 @@ function private:Create(parent)
 							{
 								type = "Button",
 								key = "getAllBtn",
-								text = L["Run GetAll Scan"],
+								text = "Run GetAll Scan",
 								textHeight = 18,
-								tooltip = L["A GetAll scan is the fastest in-game method for scanning every item on the auction house. However, there are many possible bugs on Blizzard's end with it including the chance for it to disconnect you from the game. Also, it has a 15 minute cooldown."],
+								tooltip = "A GetAll scan is the fastest in-game method for scanning every item on the auction house. However, there are many possible bugs on Blizzard's end with it including the chance for it to disconnect you from the game. Also, it has a 15 minute cooldown.",
 								size = {0, 22},
 								points = {{"TOPLEFT", 6, -50}, {"TOPRIGHT", -6, -50}},
 								scripts = {"OnClick"},
@@ -115,9 +114,9 @@ function private:Create(parent)
 							{
 								type = "Button",
 								key = "fullBtn",
-								text = L["Run Full Scan"],
+								text = "Run Full Scan",
 								textHeight = 18,
-								tooltip = L["A full auction house scan will scan every item on the auction house but is far slower than a GetAll scan. Expect this scan to take several minutes or longer."],
+								tooltip = "A full auction house scan will scan every item on the auction house but is far slower than a GetAll scan. Expect this scan to take several minutes or longer.",
 								size = {0, 22},
 								points = {{"TOPLEFT", 6, -150}, {"TOPRIGHT", -6, -150}},
 								scripts = {"OnClick"},
@@ -130,9 +129,9 @@ function private:Create(parent)
 							{
 								type = "Button",
 								key = "groupBtn",
-								text = L["Scan Selected Groups"],
+								text = "Scan Selected Groups",
 								textHeight = 18,
-								tooltip = L["This will do a slow auction house scan of every item in the selected groups and update their AuctionDB prices. This may take several minutes."],
+								tooltip = "This will do a slow auction house scan of every item in the selected groups and update their AuctionDB prices. This may take several minutes.",
 								size = {0, 22},
 								points = {{"TOPLEFT", 6, -225}, {"TOPRIGHT", -6, -225}},
 								scripts = {"OnClick"},
@@ -164,7 +163,7 @@ function private:Create(parent)
 								end
 							end
 							if #items == 0 then
-								TSM:Print(L["You must select at least one group before starting the group scan."])
+								TSM:Print("You must select at least one group before starting the group scan.")
 								return
 							end
 							TSM.Scan:StartGroupScan(items)
@@ -198,7 +197,7 @@ function private:UpdateGetAllStatus()
             local diffSec = diff - diffMin*60
             private.frame.content.buttonFrame.getAllStatusText:SetText("|cff990000"..format("Ready in %s min and %s sec", diffMin, diffSec))
         else
-            private.frame.content.buttonFrame.getAllStatusText:SetText("|cff990000"..L["Not Ready"])
+            private.frame.content.buttonFrame.getAllStatusText:SetText("|cff990000".."Not Ready")
         end
 		private.frame.content.buttonFrame.getAllBtn:Disable()
 		private.frame.content.buttonFrame.fullBtn:Enable()
@@ -207,6 +206,6 @@ function private:UpdateGetAllStatus()
 		private.frame.content.buttonFrame.getAllBtn:Enable()
 		private.frame.content.buttonFrame.fullBtn:Enable()
 		private.frame.content.buttonFrame.groupBtn:Enable()
-		private.frame.content.buttonFrame.getAllStatusText:SetText("|cff009900"..L["Ready"])
+		private.frame.content.buttonFrame.getAllStatusText:SetText("|cff009900".."Ready")
 	end
 end

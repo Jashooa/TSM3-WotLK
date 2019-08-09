@@ -11,7 +11,6 @@
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
 local BankUI = TSM:NewModule("BankUI", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {registeredModules={}, bankUiButtons={}, bankType=nil, ui = nil, bankFrame = nil, bFrame = nil}
 
 function BankUI:OnEnable()
@@ -195,7 +194,7 @@ function BankUI:getFrame(frameType)
 	title2:SetPoint("TOPRIGHT", title, "BOTTOMRIGHT")
 	title2:SetJustifyH("CENTER")
 	title2:SetJustifyV("CENTER")
-	title2:SetText(L["BankUI"])
+	title2:SetText("BankUI")
 	TSMAPI.Design:SetTitleTextColor(title2)
 
 
@@ -204,7 +203,7 @@ function BankUI:getFrame(frameType)
 	private.bFrame.btnClose:SetScript("OnClick", function(self)
 		if private.bFrame then private.bFrame:Hide() end
 		TSM.db.profile.isBankui = false
-		TSM:Print(L["You have closed the bankui. Use '/tsm bankui' to view again."])
+		TSM:Print("You have closed the bankui. Use '/tsm bankui' to view again.")
 	end)
 
 	-- module buttons
@@ -318,7 +317,7 @@ function TSM:toggleBankUI()
 			TSM.db.profile.isBankui = true
 		end
 	else
-		TSM:Print(L["There are no visible banks."])
+		TSM:Print("There are no visible banks.")
 	end
 end
 

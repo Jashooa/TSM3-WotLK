@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {customPriceFrame=nil}
 
 
@@ -89,7 +88,7 @@ function TSM.AddGUIElement(parent, args)
 					self:ClearFocus()
 					args.callback(self, event, value)
 				else
-					TSM:Print(L["Invalid custom price."].." "..err)
+					TSM:Print("Invalid custom price.".." "..err)
 					self:SetFocus()
 				end
 			else
@@ -242,7 +241,7 @@ function private:CreateCustomPriceFrame()
 		children = {
 			{
 				type = "Text",
-				text = L["Below are various ways you can set the value of the current editbox. Any combination of these methods is also supported."],
+				text = "Below are various ways you can set the value of the current editbox. Any combination of these methods is also supported.",
 				size = {0, 55},
 				points = {{"TOPLEFT", 5, -5}, {"TOPRIGHT", -5, -5}},
 			},
@@ -252,14 +251,14 @@ function private:CreateCustomPriceFrame()
 			},
 			{
 				type = "Text",
-				text = TSMAPI.Design:GetInlineColor("category")..L["Fixed Gold Value"].."|r",
+				text = TSMAPI.Design:GetInlineColor("category").."Fixed Gold Value".."|r",
 				justify = {"LEFT", "MIDDLE"},
 				size = {0, 20},
 				points = {{"TOPLEFT", 5, -70}, {"TOPRIGHT", -5, -70}},
 			},
 			{
 				type = "Text",
-				text = L["A simple, fixed gold amount."],
+				text = "A simple, fixed gold amount.",
 				justify = {"LEFT", "MIDDLE"},
 				size = {0, 20},
 				points = {{"TOPLEFT", 5, -95}, {"TOPRIGHT", -5, -95}},
@@ -270,14 +269,14 @@ function private:CreateCustomPriceFrame()
 			},
 			{
 				type = "Text",
-				text = TSMAPI.Design:GetInlineColor("category")..L["Percent of Price Source"].."|r",
+				text = TSMAPI.Design:GetInlineColor("category").."Percent of Price Source".."|r",
 				justify = {"LEFT", "MIDDLE"},
 				size = {0, 20},
 				points = {{"TOPLEFT", 5, -125}, {"TOPRIGHT", -5, -125}},
 			},
 			{
 				type = "Text",
-				text = L["Type '/tsm sources' to print out all available price sources."],
+				text = "Type '/tsm sources' to print out all available price sources.",
 				justify = {"LEFT", "MIDDLE"},
 				size = {0, 35},
 				points = {{"TOPLEFT", 5, -150}, {"TOPRIGHT", -5, -150}},
@@ -288,14 +287,14 @@ function private:CreateCustomPriceFrame()
 			},
 			{
 				type = "Text",
-				text = TSMAPI.Design:GetInlineColor("category")..L["More Advanced Methods"].."|r",
+				text = TSMAPI.Design:GetInlineColor("category").."More Advanced Methods".."|r",
 				justify = {"LEFT", "MIDDLE"},
 				size = {0, 20},
 				points = {{"TOPLEFT", 5, -195}, {"TOPRIGHT", -5, -195}},
 			},
 			{
 				type = "Text",
-				text = L["See the following URL for more info."].."\n"..TSMAPI.Design:GetInlineColor("link").."https://tradeskillmaster.com/addon/custom-price|r",
+				text = "See the following URL for more info.".."\n"..TSMAPI.Design:GetInlineColor("link").."https://tradeskillmaster.com/addon/custom-price|r",
 				justify = {"LEFT", "MIDDLE"},
 				size = {0, 35},
 				points = {{"TOPLEFT", 5, -220}, {"TOPRIGHT", -5, -220}},
@@ -306,7 +305,7 @@ function private:CreateCustomPriceFrame()
 			},
 			{
 				type = "Text",
-				text = TSMAPI.Design:GetInlineColor("category")..L["Examples"].."|r",
+				text = TSMAPI.Design:GetInlineColor("category").."Examples".."|r",
 				justify = {"LEFT", "MIDDLE"},
 				size = {0, 20},
 				points = {{"TOPLEFT", 5, -265}, {"TOPRIGHT", -5, -265}},
@@ -352,7 +351,7 @@ function private:CreateCustomPriceFrame()
 			},
 			{
 				type = "Text",
-				text = TSMAPI.Design:GetInlineColor("category")..L["Custom Price Sources"].."|r",
+				text = TSMAPI.Design:GetInlineColor("category").."Custom Price Sources".."|r",
 				justify = {"LEFT", "MIDDLE"},
 				size = {0, 20},
 				points = {{"TOPLEFT", 5, -400}, {"TOPRIGHT", -5, -400}},

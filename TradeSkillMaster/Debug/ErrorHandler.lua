@@ -10,7 +10,6 @@
 
 local TSM = select(2, ...)
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster")
 local private = {isErrorFrameVisible=nil}
 local ADDON_SUITES = {
 	"ArkInventory",
@@ -81,10 +80,10 @@ function TSM:ShowConfigError(err)
 
 	tinsert(TSMERRORLOG, err)
 	if not private.isErrorFrameVisible then
-		TSM:Print(L["Looks like TradeSkillMaster has detected an error with your configuration. Please address this in order to ensure TSM remains functional."])
+		TSM:Print("Looks like TradeSkillMaster has detected an error with your configuration. Please address this in order to ensure TSM remains functional.")
 		private:ShowError(err, true)
 	elseif private.isErrorFrameVisible == true then
-		TSM:Print(L["Additional error suppressed"])
+		TSM:Print("Additional error suppressed")
 		private.isErrorFrameVisible = 1
 	end
 
@@ -107,7 +106,7 @@ function private:ShowError(msg, isVerify, isUnofficial)
 
 	local f = AceGUI:Create("TSMWindow")
 	f:SetCallback("OnClose", function(self) private.isErrorFrameVisible = false AceGUI:Release(self) end)
-	f:SetTitle(L["TradeSkillMaster Error Window"])
+	f:SetTitle("TradeSkillMaster Error Window")
 	f:SetLayout("Flow")
 	f:SetWidth(500)
 	f:SetHeight(400)
@@ -116,11 +115,11 @@ function private:ShowError(msg, isVerify, isUnofficial)
 	l:SetFullWidth(true)
 	l:SetFontObject(GameFontNormal)
 	if isVerify then
-		l:SetText(L["Looks like TradeSkillMaster has detected an error with your configuration. Please address this in order to ensure TSM remains functional."].."\n"..L["|cffffff00DO NOT report this as an error to the developers.|r If you require assistance with this, join our IRC channel or make a post on the TSM forums instead."].."|r")
+		l:SetText("Looks like TradeSkillMaster has detected an error with your configuration. Please address this in order to ensure TSM remains functional.".."\n".."|cffffff00DO NOT report this as an error to the developers.|r If you require assistance with this, join our IRC channel or make a post on the TSM forums instead.".."|r")
 	elseif isUnofficial then
-		l:SetText(L["Looks like an |cffff0000unofficial|r TSM module has encountered an error. Please do not report this to the TSM team, but instead report it to the author of the addon. If it's affecting the operation of TSM, you may want to disable it."])
+		l:SetText("Looks like an |cffff0000unofficial|r TSM module has encountered an error. Please do not report this to the TSM team, but instead report it to the author of the addon. If it's affecting the operation of TSM, you may want to disable it.")
 	else
-		l:SetText(L["Looks like TradeSkillMaster has encountered an error. Please help the author fix this error by copying the entire error below and following the instructions for reporting lua errors listed at the following URL:"].." |cffffff00http://tradeskillmaster.com/site/getting-help|r")
+		l:SetText("Looks like TradeSkillMaster has encountered an error. Please help the author fix this error by copying the entire error below and following the instructions for reporting lua errors listed at the following URL:".." |cffffff00http://tradeskillmaster.com/site/getting-help|r")
 	end
 	f:AddChild(l)
 
@@ -130,7 +129,7 @@ function private:ShowError(msg, isVerify, isUnofficial)
 	f:AddChild(heading)
 
 	local eb = AceGUI:Create("MultiLineEditBox")
-	eb:SetLabel(L["Error Info:"])
+	eb:SetLabel("Error Info:")
 	eb:SetMaxLetters(0)
 	eb:SetFullWidth(true)
 	eb:SetText(msg)
@@ -276,11 +275,11 @@ function private.ErrorHandler(msg, thread)
 			TSM:LOG_ERR(msg)
 			TSM:AnalyticsEvent("ERROR", msg)
 		end
-		TSM:Print(L["Looks like TradeSkillMaster has encountered an error. Please help the author fix this error by following the instructions shown."])
+		TSM:Print("Looks like TradeSkillMaster has encountered an error. Please help the author fix this error by following the instructions shown.")
 		private:ShowError(TSMERRORLOG[#TSMERRORLOG], nil, not isOfficial)
 	elseif private.isErrorFrameVisible == true then
 		TSM:LOG_ERR(msg)
-		TSM:Print(L["Additional error suppressed"])
+		TSM:Print("Additional error suppressed")
 		private.isErrorFrameVisible = 1
 	end
 

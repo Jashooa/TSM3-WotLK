@@ -10,7 +10,6 @@
 local TSM = select(2, ...)
 local Auction = TSM.modules.Viewer:NewModule("Auction")
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local private = {filters={}}
 
 
@@ -20,11 +19,11 @@ local private = {filters={}}
 -- ============================================================================
 
 local ITEM_AUCTION_ST_COLS = {
-	{name=L["Item Name"], width=0.5, headAlign="LEFT"},
-	{name=L["Player"], width=0.15, headAlign="LEFT"},
-	{name=L["Stack"], width=0.1, headAlign="LEFT"},
-	{name=L["Aucs"], width=0.1, headAlign="LEFT"},
-	{name=L["Time"], width=0.15, headAlign="LEFT"},
+	{name="Item Name", width=0.5, headAlign="LEFT"},
+	{name="Player", width=0.15, headAlign="LEFT"},
+	{name="Stack", width=0.1, headAlign="LEFT"},
+	{name="Aucs", width=0.1, headAlign="LEFT"},
+	{name="Time", width=0.15, headAlign="LEFT"},
 	defaultSort = -5,
 }
 
@@ -41,7 +40,7 @@ function Auction:Draw(container)
 
 	local tabGroup = AceGUI:Create("TSMTabGroup")
 	tabGroup:SetLayout("Fill")
-	tabGroup:SetTabs({ { text = L["Expired"], value = 1 }, { text = L["Cancelled"], value = 2 } })
+	tabGroup:SetTabs({ { text = "Expired", value = 1 }, { text = "Cancelled", value = 2 } })
 	tabGroup:SetCallback("OnGroupSelected", function(self, _, value)
 		tabGroup:ReleaseChildren()
 		TSM.Viewer:HideScrollingTables()

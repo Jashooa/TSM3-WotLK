@@ -10,7 +10,6 @@
 
 local TSM = select(2, ...)
 local Mover = TSM:NewModule("Mover", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
 local private = {}
 
@@ -656,15 +655,15 @@ end
 
 function private:DoneSending()
 	if private.cancelled then
-		private.callback(L["Cancelled - You must be at a bank or GuildVault"])
+		private.callback("Cancelled - You must be at a bank or GuildVault")
 	elseif private.bagsFull and not private.bankFull then
-		private.callback(L["Cancelled - Bags are full"])
+		private.callback("Cancelled - Bags are full")
 	elseif private.bankFull and not private.bagsFull then
-		private.callback(L["Cancelled - Bank / Guild Vault is full"])
+		private.callback("Cancelled - Bank / Guild Vault is full")
 	elseif private.bagsFull and private.bankFull then
-		private.callback(L["Cancelled - Bags and Bank / Guild Vault are full"])
+		private.callback("Cancelled - Bags and Bank / Guild Vault are full")
 	else
-		private.callback(L["Done"])
+		private.callback("Done")
 	end
 	private.bagState, private.moves, private.splitMoves = {}, {}, {}
 	private.moveThreadId = nil

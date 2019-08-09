@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local Util = TSM:NewModule("Util", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Vendoring") -- loads the localization table
 local private = {}
 
 Util.Currencies = {

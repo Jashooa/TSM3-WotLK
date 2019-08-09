@@ -9,7 +9,6 @@
 -- create a local reference to the TradeSkillMaster_Accounting table and register a new module
 local TSM = select(2, ...)
 local ItemCache = TSM:NewModule("ItemCache", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local private = {}
 
 

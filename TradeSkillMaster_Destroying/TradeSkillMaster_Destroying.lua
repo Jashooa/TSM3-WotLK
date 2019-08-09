@@ -9,7 +9,6 @@
 -- register this file with Ace Libraries
 local TSM = select(2, ...)
 TSM = LibStub("AceAddon-3.0"):NewAddon(TSM, "TSM_Destroying", "AceConsole-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Destroying") -- loads the localization table
 
 --Professions--
 TSM.spells = {
@@ -75,7 +74,7 @@ function TSM:RegisterModule()
 	}
 	TSM.moduleOptions = { callback = "Options:LoadOptions" }
 	TSM.slashCommands = {
-		{ key = "destroy", label = L["Opens the Destroying frame if there's stuff in your bags to be destroyed."], callback = "GUI:ShowFrame" },
+		{ key = "destroy", label = "Opens the Destroying frame if there's stuff in your bags to be destroyed.", callback = "GUI:ShowFrame" },
 	}
 
 	TSMAPI:NewModule(TSM)

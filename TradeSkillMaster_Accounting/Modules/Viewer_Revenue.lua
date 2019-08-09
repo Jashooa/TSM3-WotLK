@@ -10,7 +10,6 @@
 local TSM = select(2, ...)
 local Revenue = TSM.modules.Viewer:NewModule("Revenue")
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local private = {filters={}}
 
 
@@ -20,40 +19,40 @@ local private = {filters={}}
 -- ============================================================================
 
 local ITEM_SELL_BUY_ST_COLS = {
-	{name=L["Item Name"], width=0.34, headAlign="LEFT"},
-	{name=L["Player"], width=0.1, headAlign="LEFT"},
-	{name=L["Type"], width=0.06, headAlign="LEFT"},
-	{name=L["Stack"], width=0.05, headAlign="LEFT"},
-	{name=L["Aucs"], width=0.05, headAlign="LEFT"},
-	{name=L["Per Item"], width=0.12, headAlign="LEFT"},
-	{name=L["Total Price"], width=0.13, headAlign="LEFT"},
-	{name=L["Time"], width=0.14, headAlign="LEFT"},
+	{name="Item Name", width=0.34, headAlign="LEFT"},
+	{name="Player", width=0.1, headAlign="LEFT"},
+	{name="Type", width=0.06, headAlign="LEFT"},
+	{name="Stack", width=0.05, headAlign="LEFT"},
+	{name="Aucs", width=0.05, headAlign="LEFT"},
+	{name="Per Item", width=0.12, headAlign="LEFT"},
+	{name="Total Price", width=0.13, headAlign="LEFT"},
+	{name="Time", width=0.14, headAlign="LEFT"},
 	defaultSort = -8,
 }
 local ITEM_MONEY_ST_COLS = {
-	{name=L["Type"], width=0.2, headAlign="LEFT"},
-	{name=L["Player"], width=0.2, headAlign="LEFT"},
-	{name=L["Other Player"], width=0.2, headAlign="LEFT"},
-	{name=L["Amount"], width=0.15, headAlign="LEFT"},
-	{name=L["Time"], width=0.15, headAlign="LEFT"},
+	{name="Type", width=0.2, headAlign="LEFT"},
+	{name="Player", width=0.2, headAlign="LEFT"},
+	{name="Other Player", width=0.2, headAlign="LEFT"},
+	{name="Amount", width=0.15, headAlign="LEFT"},
+	{name="Time", width=0.15, headAlign="LEFT"},
 	defaultSort = -5,
 }
 local ITEM_RESALE_ST_COLS_AVG = {
-	{name=L["Item Name"], width=0.37, headAlign="LEFT"},
-	{name=L["Sold"], width=0.06, headAlign="LEFT"},
-	{name=L["Avg Sell Price"], width=0.14, headAlign="LEFT"},
-	{name=L["Bought"], width=0.07, headAlign="LEFT"},
-	{name=L["Avg Buy Price"], width=0.14, headAlign="LEFT"},
-	{name=L["Avg Resale Profit"], width=0.21, headAlign="LEFT"},
+	{name="Item Name", width=0.37, headAlign="LEFT"},
+	{name="Sold", width=0.06, headAlign="LEFT"},
+	{name="Avg Sell Price", width=0.14, headAlign="LEFT"},
+	{name="Bought", width=0.07, headAlign="LEFT"},
+	{name="Avg Buy Price", width=0.14, headAlign="LEFT"},
+	{name="Avg Resale Profit", width=0.21, headAlign="LEFT"},
 	defaultSort = -6,
 }
 local ITEM_RESALE_ST_COLS_TOTAL = {
-	{name=L["Item Name"], width=0.37, headAlign="LEFT"},
-	{name=L["Sold"], width=0.06, headAlign="LEFT"},
-	{name=L["Total Sale Price"], width=0.14, headAlign="LEFT"},
-	{name=L["Bought"], width=0.07, headAlign="LEFT"},
-	{name=L["Total Buy Price"], width=0.14, headAlign="LEFT"},
-	{name=L["Avg Resale Profit"], width=0.21, headAlign="LEFT"},
+	{name="Item Name", width=0.37, headAlign="LEFT"},
+	{name="Sold", width=0.06, headAlign="LEFT"},
+	{name="Total Sale Price", width=0.14, headAlign="LEFT"},
+	{name="Bought", width=0.07, headAlign="LEFT"},
+	{name="Total Buy Price", width=0.14, headAlign="LEFT"},
+	{name="Avg Resale Profit", width=0.21, headAlign="LEFT"},
 	defaultSort = -6,
 }
 
@@ -70,7 +69,7 @@ function Revenue:Draw(container)
 
 	local tabGroup = AceGUI:Create("TSMTabGroup")
 	tabGroup:SetLayout("Fill")
-	tabGroup:SetTabs({ { text = L["Sales"], value = 1 }, { text = L["Other Income"], value = 2 }, { text = L["Resale"], value = 3 } })
+	tabGroup:SetTabs({ { text = "Sales", value = 1 }, { text = "Other Income", value = 2 }, { text = "Resale", value = 3 } })
 	tabGroup:SetCallback("OnGroupSelected", function(self, _, value)
 		tabGroup:ReleaseChildren()
 		TSM.Viewer:HideScrollingTables()

@@ -10,7 +10,6 @@
 
 local TSM = select(2, ...)
 local Tooltips = TSM:NewModule("Tooltips")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local moduleObjects = TSM.moduleObjects
 local private = {tooltipInfo={}, tooltipLines={lastUpdate=0, modifier=0}}
 
@@ -43,7 +42,7 @@ function Tooltips:RegisterInfo(module, info)
 	TSM.db.profile.tooltipOptions[module] = TSM.db.profile.tooltipOptions[module] or info.defaults
 	if TSM.db.profile.tooltipOptions[module]._version ~= info.defaults._version then
 		StaticPopupDialogs["TSMTooltipReset"..module] = {
-			text = format(L["TradeSkillMaster tooltip options for |cff99ffff%s|r have changed and therefore been reset to their default values."], module),
+			text = format("TradeSkillMaster tooltip options for |cff99ffff%s|r have changed and therefore been reset to their default values.", module),
 			button1 = OKAY,
 			timeout = 0,
 		}
@@ -81,7 +80,7 @@ function private.LoadTooltip(tipFrame, link, quantity)
 	if private.tooltipLines.itemString ~= itemString or private.tooltipLines.quantity ~= quantity or (private.tooltipLines.lastUpdate + 5) < GetTime() then
 		wipe(private.tooltipLines)
 		if InCombatLockdown() then
-			tinsert(private.tooltipLines, L["Can't load TSM tooltip while in combat"])
+			tinsert(private.tooltipLines, "Can't load TSM tooltip while in combat")
 			private.tooltipLines.lastUpdate = 0
 			private.tooltipLines.modifier = modifier
 		else
@@ -131,7 +130,7 @@ function Tooltips:GetTreeInfo(value)
 		tinsert(childInfo, { value = i, text = info.module })
 	end
 	sort(childInfo, function(a, b) return a.text < b.text end)
-	return {value = value, text = L["Tooltip Options"], children = childInfo}
+	return {value = value, text = "Tooltip Options", children = childInfo}
 end
 
 function Tooltips:LoadOptions(parent, moduleIndex)
@@ -172,129 +171,129 @@ function private:DrawTooltipGeneral(container)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["General Options"],
+					title = "General Options",
 					children = {
 						{
 							type = "Dropdown",
-							label = L["Tooltip Price Format:"],
-							list = {icon=format(L["Coins (%s)"], TSMAPI:MoneyToString(3451267, "OPT_ICON")), text=format(L["Text (%s)"], TSMAPI:MoneyToString(3451267))},
+							label = "Tooltip Price Format:",
+							list = {icon=format("Coins (%s)", TSMAPI:MoneyToString(3451267, "OPT_ICON")), text=format("Text (%s)", TSMAPI:MoneyToString(3451267))},
 							settingInfo = {TSM.db.profile, "tooltipPriceFormat"},
 							relativeWidth = 0.35,
-							tooltip = L["Select how TSM will format prices in item tooltips."],
+							tooltip = "Select how TSM will format prices in item tooltips.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Embed TSM Tooltips"],
+							label = "Embed TSM Tooltips",
 							settingInfo = {TSM.db.profile, "embeddedTooltip"},
 							relativeWidth = 0.29,
-							tooltip = L["If checked, TSM's tooltip lines will be embedded in the item tooltip. Otherwise, it will show as a separate box below the item's tooltip."],
+							tooltip = "If checked, TSM's tooltip lines will be embedded in the item tooltip. Otherwise, it will show as a separate box below the item's tooltip.",
 						},
 						{
 							type = "Dropdown",
-							label = L["Show on Modifier:"],
-							list = {none=L["None (Always Show)"], alt=ALT_KEY, ctrl=CTRL_KEY},
+							label = "Show on Modifier:",
+							list = {none="None (Always Show)", alt=ALT_KEY, ctrl=CTRL_KEY},
 							settingInfo = {TSM.db.profile, "tooltipShowModifier"},
 							relativeWidth = 0.35,
-							tooltip = L["Only show TSM's tooltip when the selected modifier is pressed."],
+							tooltip = "Only show TSM's tooltip when the selected modifier is pressed.",
 						},
 						{
 							type = "HeadingLine",
 						},
 						{
 							type = "Dropdown",
-							label = L["Inventory Tooltip Format:"],
-							list = {none=L["None"], simple=L["Simple"], full=L["Full"]},
+							label = "Inventory Tooltip Format:",
+							list = {none="None", simple="Simple", full="Full"},
 							settingInfo = {TSM.db.profile, "inventoryTooltipFormat"},
 							relativeWidth = 0.5,
-							tooltip = L["Select how much detail should be shown in item tooltips with respect to inventory information."],
+							tooltip = "Select how much detail should be shown in item tooltips with respect to inventory information.",
 						},
 						{
 							type = "HeadingLine",
 						},
 						{
 							type = "CheckBox",
-							label = L["Display group name in tooltip"],
+							label = "Display group name in tooltip",
 							relativeWidth = 0.49,
 							settingInfo = {TSM.db.profile, "groupOperationTooltip"},
 						},
 						{
 							type = "Dropdown",
-							label = L["Display Operation Names in Tooltip for Modules:"],
+							label = "Display Operation Names in Tooltip for Modules:",
 							list = operationModules,
 							multiselect = true,
 							settingInfo = {TSM.db.profile, "operationTooltips"},
 							relativeWidth = 0.5,
-							tooltip = L["The operations for the selected module(s) will be displaed in item tooltips."],
+							tooltip = "The operations for the selected module(s) will be displaed in item tooltips.",
 						},
 						{
 							type = "HeadingLine",
 						},
 						{
 							type = "CheckBox",
-							label = L["Display vendor buy price in tooltip."],
+							label = "Display vendor buy price in tooltip.",
 							settingInfo = { TSM.db.profile, "vendorBuyTooltip" },
 							relativeWidth = 0.5,
-							tooltip = L["If checked, the price of buying the item from a vendor is displayed."],
+							tooltip = "If checked, the price of buying the item from a vendor is displayed.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Display vendor sell price in tooltip."],
+							label = "Display vendor sell price in tooltip.",
 							settingInfo = { TSM.db.profile, "vendorSellTooltip" },
 							relativeWidth = 0.49,
-							tooltip = L["If checked, the price of selling the item to a vendor displayed."],
+							tooltip = "If checked, the price of selling the item to a vendor displayed.",
 						},
 					},
 				},
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Destroy Values"],
+					title = "Destroy Values",
 					children = {
 						{
 							type = "Dropdown",
-							label = L["Destroy Value Source:"],
+							label = "Destroy Value Source:",
 							settingInfo = {TSM.db.profile, "destroyValueSource"},
 							list = priceSources,
 							relativeWidth = 0.5,
-							tooltip = L["Select the price source for calculating destroy values."],
+							tooltip = "Select the price source for calculating destroy values.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Display Detailed Destroy Tooltips"],
+							label = "Display Detailed Destroy Tooltips",
 							settingInfo = { TSM.db.profile, "detailedDestroyTooltip" },
 							relativeWidth = 0.49,
-							tooltip = L["If checked, a detailed list of items which an item destroys into will be displayed below the destroy value in the tooltip."],
+							tooltip = "If checked, a detailed list of items which an item destroys into will be displayed below the destroy value in the tooltip.",
 						},
 						{
 							type = "HeadingLine",
 						},
 						{
 							type = "CheckBox",
-							label = L["Display mill value in tooltip."],
+							label = "Display mill value in tooltip.",
 							settingInfo = { TSM.db.profile, "millTooltip" },
 							relativeWidth = 0.5,
-							tooltip = L["If checked, the mill value of the item will be shown. This value is calculated using the average market value of materials the item will mill into."],
+							tooltip = "If checked, the mill value of the item will be shown. This value is calculated using the average market value of materials the item will mill into.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Display prospect value in tooltip."],
+							label = "Display prospect value in tooltip.",
 							settingInfo = { TSM.db.profile, "prospectTooltip" },
 							relativeWidth = 0.5,
-							tooltip = L["If checked, the prospect value of the item will be shown. This value is calculated using the average market value of materials the item will prospect into."],
+							tooltip = "If checked, the prospect value of the item will be shown. This value is calculated using the average market value of materials the item will prospect into.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Display disenchant value in tooltip."],
+							label = "Display disenchant value in tooltip.",
 							settingInfo = { TSM.db.profile, "deTooltip" },
 							relativeWidth = 0.5,
-							tooltip = L["If checked, the disenchant value of the item will be shown. This value is calculated using the average market value of materials the item will disenchant into."],
+							tooltip = "If checked, the disenchant value of the item will be shown. This value is calculated using the average market value of materials the item will disenchant into.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Display transform value in tooltip."],
+							label = "Display transform value in tooltip.",
 							settingInfo = { TSM.db.profile, "transformTooltip" },
 							relativeWidth = 0.5,
-							tooltip = L["If checked, the transform value of the item will be shown. This value is calculated using the average market value of materials the item will disenchant into."],
+							tooltip = "If checked, the transform value of the item will be shown. This value is calculated using the average market value of materials the item will disenchant into.",
 						},
 					},
 				},
@@ -306,11 +305,11 @@ function private:DrawTooltipGeneral(container)
 		local inlineGroup = {
 			type = "InlineGroup",
 			layout = "flow",
-			title = L["Custom Price Sources"],
+			title = "Custom Price Sources",
 			children = {
 				{
 					type = "Label",
-					text = L["Custom price sources to display in item tooltips:"],
+					text = "Custom price sources to display in item tooltips:",
 					relativeWidth = 1,
 				},
 			},
@@ -321,7 +320,7 @@ function private:DrawTooltipGeneral(container)
 				label = name,
 				relativeWidth = 0.5,
 				settingInfo = { TSM.db.global.customPriceTooltips, name },
-				tooltip = L["If checked, this custom price will be displayed in item tooltips."],
+				tooltip = "If checked, this custom price will be displayed in item tooltips.",
 			}
 			tinsert(inlineGroup.children, checkbox)
 		end

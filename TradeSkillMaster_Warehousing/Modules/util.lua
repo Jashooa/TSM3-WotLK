@@ -7,14 +7,13 @@
 -- ------------------------------------------------------------------------------ --
 
 -- loads the localization table --
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Warehousing")
 
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
 local util = TSM:NewModule("util", "AceEvent-3.0")
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
 
--- this is a set of wrapper functions so that I can switch 
+-- this is a set of wrapper functions so that I can switch
 -- between guildbank and bank function easily
 
 

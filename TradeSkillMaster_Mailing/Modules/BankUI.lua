@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local BankUI = TSM:NewModule("BankUI", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Mailing") -- loads the localization table
 local private = {frame=nil, currentBank=nil}
 
 
@@ -53,7 +52,7 @@ function BankUI:createTab(parent)
 					{
 						type = "Button",
 						key = "btnToBank",
-						text = L["Move Group to Bank"],
+						text = "Move Group to Bank",
 						textHeight = 16,
 						size = {0, 26},
 						points = {{"TOPLEFT", 5, -5}, {"TOPRIGHT", -5, -5}},
@@ -62,7 +61,7 @@ function BankUI:createTab(parent)
 					{
 						type = "Button",
 						key = "btnNonGroup",
-						text = L["Move Non Group Items to Bank"],
+						text = "Move Non Group Items to Bank",
 						textHeight = 16,
 						size = {0, 26},
 						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 0, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", 0, -5}},
@@ -76,7 +75,7 @@ function BankUI:createTab(parent)
 					{
 						type = "Button",
 						key = "btnTargetToBags",
-						text = L["Move Target Shortfall To Bags"],
+						text = "Move Target Shortfall To Bags",
 						textHeight = 16,
 						size = {0, 26},
 						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 5, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", -5, -5}},
@@ -85,7 +84,7 @@ function BankUI:createTab(parent)
 					{
 						type = "Button",
 						key = "btnAllToBags",
-						text = L["Move Group To Bags"],
+						text = "Move Group To Bags",
 						textHeight = 16,
 						size = {0, 27},
 						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 0, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", 0, -5}},
@@ -200,9 +199,9 @@ function BankUI:groupTree(grpInfo, src, all)
 
 
 	if next(newgrp) == nil then
-		TSM:Print(L["Nothing to Move"])
+		TSM:Print("Nothing to Move")
 	else
-		TSM:Print(L["Preparing to Move"])
+		TSM:Print("Preparing to Move")
 		TSMAPI:MoveItems(newgrp, BankUI.PrintMsg, false)
 	end
 end
@@ -240,9 +239,9 @@ function BankUI:nonGroupTree(grpInfo, src)
 	end
 
 	if next(newgrp) == nil then
-		TSM:Print(L["Nothing to Move"])
+		TSM:Print("Nothing to Move")
 	else
-		TSM:Print(L["Preparing to Move"])
+		TSM:Print("Preparing to Move")
 		TSMAPI:MoveItems(newgrp, BankUI.PrintMsg)
 	end
 end

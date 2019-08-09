@@ -10,7 +10,6 @@
 -- This EditBox widget is modified to fit TSM's theme / needs
 local TSM = select(2, ...)
 local Type, Version = "TSMGroupBox", 2
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -39,21 +38,21 @@ local function CreateGroupSelectionFrame()
 	groupSelectionFrame:SetWidth(300)
 	groupSelectionFrame:SetHeight(400)
 	groupSelectionFrame:SetPoint("CENTER")
-	
+
 	local label = TSM.GUI:CreateLabel(groupSelectionFrame)
 	label:SetPoint("TOPLEFT", 5, -2)
 	label:SetPoint("TOPRIGHT", -5, -2)
 	label:SetHeight(40)
 	label:SetJustifyV("CENTER")
 	label:SetJustifyH("CENTER")
-	label:SetText(L["Select a group from the list below and click 'OK' at the bottom."])
-	
+	label:SetText("Select a group from the list below and click 'OK' at the bottom.")
+
 	local container = CreateFrame("Frame", nil, groupSelectionFrame)
 	container:SetPoint("TOPLEFT", 5, -45)
 	container:SetPoint("BOTTOMRIGHT", -5, 45)
 	TSMAPI.Design:SetFrameColor(container)
 	groupSelectionFrame.groupTree = TSM:CreateGroupTree(container, nil, nil, true)
-	
+
 	local function OnBtnClick(btn)
 		if btn.which == "clear" then
 			groupSelectionFrame.groupTree:ClearSelection()
@@ -67,16 +66,16 @@ local function CreateGroupSelectionFrame()
 			groupSelectionFrame:Hide()
 		end
 	end
-	
+
 	local btn = TSM.GUI:CreateButton(groupSelectionFrame, 14)
 	btn:SetPoint("BOTTOMLEFT", 5, 5)
 	btn:SetWidth(90)
 	btn:SetHeight(24)
-	btn:SetText(L["Clear"])
+	btn:SetText("Clear")
 	btn:SetScript("OnClick", OnBtnClick)
 	btn.which = "clear"
 	groupSelectionFrame.clearBtn = btn
-	
+
 	local btn = TSM.GUI:CreateButton(groupSelectionFrame, 14)
 	btn:SetPoint("BOTTOMLEFT", groupSelectionFrame.clearBtn, "BOTTOMRIGHT", 5, 0)
 	btn:SetWidth(90)
@@ -85,7 +84,7 @@ local function CreateGroupSelectionFrame()
 	btn:SetScript("OnClick", OnBtnClick)
 	btn.which = "cancel"
 	groupSelectionFrame.cancelBtn = btn
-	
+
 	local btn = TSM.GUI:CreateButton(groupSelectionFrame, 14)
 	btn:SetPoint("BOTTOMLEFT", groupSelectionFrame.cancelBtn, "BOTTOMRIGHT", 5, 0)
 	btn:SetPoint("BOTTOMRIGHT", -5, 5)
@@ -95,7 +94,7 @@ local function CreateGroupSelectionFrame()
 	btn:SetScript("OnClick", OnBtnClick)
 	btn.which = "okay"
 	groupSelectionFrame.okBtn = btn
-	
+
 	groupSelectionFrame:Hide()
 end
 

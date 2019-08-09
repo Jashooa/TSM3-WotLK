@@ -7,7 +7,6 @@
 -- ------------------------------------------------------------------------------ --
 
 local TSM = select(2, ...)
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local ST_COUNT = 0
 
 local ST_ROW_HEIGHT = 15

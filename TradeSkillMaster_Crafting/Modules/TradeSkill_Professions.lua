@@ -9,7 +9,6 @@
 local TSM = select(2, ...)
 local TradeSkill = TSM:GetModule("TradeSkill")
 local Professions = TradeSkill:NewModule("Professions", "AceHook-3.0", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
 local private = { priceTextCache = { lastClear = 0 }, craftTimeInfo = { timeout = 0, endTime = 0 } }
 
 
@@ -131,12 +130,12 @@ function Professions:GetFrameInfo()
 				key = "dropdown",
 				points = { { "TOPLEFT", 3, -4 }, { "TOPRIGHT", -47, -4 } },
 				scripts = { "OnValueChanged" },
-				tooltip = L["Select one of your characters' professions to browse."],
+				tooltip = "Select one of your characters' professions to browse.",
 			},
 			{
 				type = "Button",
 				key = "linkBtn",
-				text = L["Link"],
+				text = "Link",
 				textHeight = 14,
 				size = { 44, 26 },
 				points = { { "TOPRIGHT", -5, -4 } },
@@ -155,7 +154,7 @@ function Professions:GetFrameInfo()
 			{
 				type = "Button",
 				key = "clearFilterBtn",
-				text = L["Clear Filters"],
+				text = "Clear Filters",
 				textHeight = 14,
 				size = { 80, 24 },
 				points = { { "TOPLEFT", "searchBar", "TOPRIGHT", 5, 0 } },
@@ -165,7 +164,7 @@ function Professions:GetFrameInfo()
 				type = "Button",
 				key = "filterBtn",
 				name = "TSMCraftingFilterButton",
-				text = L["Filters >>"],
+				text = "Filters >>",
 				textHeight = 14,
 				size = { nil, 24 },
 				points = { { "TOPLEFT", "clearFilterBtn", "TOPRIGHT", 5, 0 }, { "TOPRIGHT", -5, -35 } },
@@ -178,7 +177,7 @@ function Professions:GetFrameInfo()
 			{
 				type = "ScrollingTableFrame",
 				key = "st",
-				stCols = { { name = L["Name"], width = 0.8 }, { name = private:GetProfessionsTabPriceColumnText(), width = 0.2 } },
+				stCols = { { name = "Name", width = 0.8 }, { name = private:GetProfessionsTabPriceColumnText(), width = 0.2 } },
 				points = { { "TOPLEFT", 5, -70 }, { "BOTTOMRIGHT", -5, 177 } },
 				scripts = { "OnClick", "OnColumnClick" },
 			},
@@ -263,7 +262,7 @@ function Professions:GetFrameInfo()
 							{
 								type = "Text",
 								key = "matsText",
-								text = TSMAPI.Design:GetInlineColor("link") .. L["Materials:"] .. "|r",
+								text = TSMAPI.Design:GetInlineColor("link") .. "Materials:" .. "|r",
 								textSize = "small",
 								justify = { "LEFT", "TOP" },
 								points = { { "TOPLEFT" }, { "TOPRIGHT" } },
@@ -324,10 +323,10 @@ function Professions:GetFrameInfo()
 							{
 								type = "Button",
 								key = "queueBtn",
-								text = L["Queue"],
+								text = "Queue",
 								textHeight = 15,
 								clicks = "AnyUp",
-								tooltip = strjoin("\n", queueBtnTooltipColor .. L["Left-Click|r to add this craft to the queue."], queueBtnTooltipColor .. L["Shift-Left-Click|r to queue all you can craft."], queueBtnTooltipColor .. L["Right-Click|r to subtract this craft from the queue."], queueBtnTooltipColor .. L["Shift-Right-Click|r to remove all from queue."]),
+								tooltip = strjoin("\n", queueBtnTooltipColor .. "Left-Click|r to add this craft to the queue.", queueBtnTooltipColor .. "Shift-Left-Click|r to queue all you can craft.", queueBtnTooltipColor .. "Right-Click|r to subtract this craft from the queue.", queueBtnTooltipColor .. "Shift-Right-Click|r to remove all from queue."),
 								points = { { "TOPLEFT", "moreBtn", "TOPRIGHT", 0, -4 }, { "BOTTOMLEFT", "moreBtn", "BOTTOMRIGHT", 0, 4 }, { "TOPRIGHT" } },
 								scripts = { "OnClick" },
 							},
@@ -385,7 +384,7 @@ function Professions:GetFrameInfo()
 			linkBtn = {
 				OnClick = function(self)
 					local link = GetTradeSkillListLink()
-					if not link then return TSM:Print(L["Could not get link for profession."]) end
+					if not link then return TSM:Print("Could not get link for profession.") end
 
 					local activeEditBox = ChatEdit_GetActiveWindow()
 					if MacroFrameText and MacroFrameText:IsShown() and MacroFrameText:HasFocus() then
@@ -625,11 +624,11 @@ end
 
 function private:GetProfessionsTabPriceColumnText()
 	if TSM.db.global.priceColumn == 1 then
-		return L["Crafting Cost"]
+		return "Crafting Cost"
 	elseif TSM.db.global.priceColumn == 2 then
-		return L["Item Value"]
+		return "Item Value"
 	elseif TSM.db.global.priceColumn == 3 then
-		return L["Profit"]
+		return "Profit"
 	end
 end
 
@@ -823,7 +822,7 @@ function Professions:UpdateSelectedTradeSkill(forceUpdate)
 
         if altVerb == ENSCRIBE then
             local vellum = TSM:GetVellum(spellId)
-			frame.craftInfoFrame.buttonsFrame.createAllBtn:SetText(L["Enchant Vellum"])
+			frame.craftInfoFrame.buttonsFrame.createAllBtn:SetText("Enchant Vellum")
 			frame.craftInfoFrame.buttonsFrame.createAllBtn.vellum = TSMAPI.Item:GetName(vellum)
 		else
 			frame.craftInfoFrame.buttonsFrame.createAllBtn:SetText(CREATE_ALL)

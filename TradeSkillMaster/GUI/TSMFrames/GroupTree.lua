@@ -7,7 +7,6 @@
 -- ------------------------------------------------------------------------------ --
 
 local TSM = select(2, ...)
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local NUM_GT = 0
 local ROW_HEIGHT = 14
 
@@ -46,9 +45,9 @@ local function UpdateTree(self)
 
 	if #rowData == 0 then
 		if #groupPathList == 0 then
-			self.statusText:SetText(L["You currently don't have any groups setup. Type '/tsm' and click on the 'TradeSkillMaster Groups' button to setup TSM groups."])
+			self.statusText:SetText("You currently don't have any groups setup. Type '/tsm' and click on the 'TradeSkillMaster Groups' button to setup TSM groups.")
 		else
-			self.statusText:SetText(format(L["None of your groups have %s operations assigned. Type '/tsm' and click on the 'TradeSkillMaster Groups' button to assign operations to your TSM groups."], self.module))
+			self.statusText:SetText(format("None of your groups have %s operations assigned. Type '/tsm' and click on the 'TradeSkillMaster Groups' button to assign operations to your TSM groups.", self.module))
 		end
 	else
 		self.statusText:SetText("")
@@ -96,15 +95,15 @@ end
 local defaultColScripts = {
 	OnEnter = function(self)
 		local tooltipLines = {}
-		tinsert(tooltipLines, format(L["%sLeft-Click|r to select / deselect this group."], TSMAPI.Design:GetInlineColor("link")))
+		tinsert(tooltipLines, format("%sLeft-Click|r to select / deselect this group.", TSMAPI.Design:GetInlineColor("link")))
 		if self.data.hasSubGroups then
-			tinsert(tooltipLines, format(L["%sRight-Click|r to collapse / expand this group."], TSMAPI.Design:GetInlineColor("link")))
+			tinsert(tooltipLines, format("%sRight-Click|r to collapse / expand this group.", TSMAPI.Design:GetInlineColor("link")))
 		end
 
 		local operations = TSM.Groups:GetGroupOperations(self.data.groupPath, self.st.module)
-		local operationLine = operations and table.concat(operations, ", ") or L["<No Operation>"]
+		local operationLine = operations and table.concat(operations, ", ") or "<No Operation>"
 		tinsert(tooltipLines, "")
-		tinsert(tooltipLines, format(L["Operations: %s"], operationLine))
+		tinsert(tooltipLines, format("Operations: %s", operationLine))
 
 		GameTooltip:SetOwner(self, "ANCHOR_TOP")
 		GameTooltip:AddLine(table.concat(tooltipLines, "\n"), 1, 1, 1)
@@ -289,7 +288,7 @@ local methods = {
 }
 
 function TSM:CreateGroupTree(parent, module, label, isGroupBox)
-	assert(type(parent) == "table", format(L["Invalid parent argument type. Expected table, got %s."], type(parent)))
+	assert(type(parent) == "table", format("Invalid parent argument type. Expected table, got %s.", type(parent)))
 
 	NUM_GT = NUM_GT + 1
 	local st = CreateFrame("Frame", "TSMGroupTree"..NUM_GT, parent)
@@ -325,7 +324,7 @@ function TSM:CreateGroupTree(parent, module, label, isGroupBox)
 		btn:SetPoint("BOTTOMLEFT", 0, 2)
 		btn:SetPoint("BOTTOMRIGHT", st, "BOTTOM", -2, 2)
 		btn:SetHeight(16)
-		btn:SetText(L["Select All Groups"])
+		btn:SetText("Select All Groups")
 		btn:SetScript("OnClick", SelectAll)
 		btn.st = st
 
@@ -333,7 +332,7 @@ function TSM:CreateGroupTree(parent, module, label, isGroupBox)
 		btn:SetPoint("BOTTOMLEFT", st, "BOTTOM", 2, 2)
 		btn:SetPoint("BOTTOMRIGHT", 0, 2)
 		btn:SetHeight(16)
-		btn:SetText(L["Deselect All Groups"])
+		btn:SetText("Deselect All Groups")
 		btn:SetScript("OnClick", DeselectAll)
 		btn.st = st
 	end

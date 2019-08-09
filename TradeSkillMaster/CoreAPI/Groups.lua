@@ -9,7 +9,6 @@
 local TSM = select(2, ...)
 TSM.GROUP_SEP = "`"
 local Groups = TSM:NewModule("Groups")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {operationInfo=TSM.moduleOperationInfo}
 local GROUP_LEVEL_COLORS = {
 	"FCF141",

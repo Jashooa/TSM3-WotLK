@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local MerchantTab = TSM:NewModule("MerchantTab", "AceEvent-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Vendoring") -- loads the localization table
 
 local private = {frame=nil}
 
@@ -190,7 +189,7 @@ function private:CreateMerchantTab()
 			{
 				type = "Button",
 				key = "buyBtn",
-				text = L["Buy"],
+				text = "Buy",
 				textHeight = 15,
 				size = {55, 20},
 				points = {{"TOPLEFT", 70, -40}},
@@ -199,7 +198,7 @@ function private:CreateMerchantTab()
 			{
 				type = "Button",
 				key = "buybackBtn",
-				text = L["Buyback"],
+				text = "Buyback",
 				textHeight = 15,
 				size = {65, 20},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}},
@@ -208,7 +207,7 @@ function private:CreateMerchantTab()
 			{
 				type = "Button",
 				key = "groupsBtn",
-				text = L["TSM Groups"],
+				text = "TSM Groups",
 				textHeight = 15,
 				size = {90, 20},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}},
@@ -217,7 +216,7 @@ function private:CreateMerchantTab()
 			{
 				type = "Button",
 				key = "quickSellBtn",
-				text = L["Quick Sell"],
+				text = "Quick Sell",
 				textHeight = 15,
 				size = {75, 20},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}},
@@ -251,7 +250,7 @@ function private:CreateMerchantTab()
 			{
 				type = "Button",
 				key = "repairBtn",
-				text = L["Repair"],
+				text = "Repair",
 				textHeight = 15,
 				size = {50,20},
 				points = {{"BOTTOMRIGHT", BFC.PARENT, -5, 5}},
@@ -303,7 +302,7 @@ function private:CreateMerchantTab()
 							SetTooltipMoney(GameTooltip, amount, "GUILD_REPAIR");
 
 							GameTooltip:AddLine(" ",nil,nil,nil,false)
-							GameTooltip:AddLine(L["Hold shift to repair with guild bank"],1,1,1,1)
+							GameTooltip:AddLine("Hold shift to repair with guild bank",1,1,1,1)
 						end
 
 						GameTooltip:Show()

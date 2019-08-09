@@ -10,7 +10,6 @@
 local TSM = select(2, ...)
 local Summary = TSM.modules.Viewer:NewModule("Summary")
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local private = {filters={}}
 local SECONDS_PER_DAY = 24 * 60 * 60
 
@@ -76,7 +75,7 @@ function Summary:Draw(container)
 	goldData.weekTime = ceil(goldData.weekTime / SECONDS_PER_DAY)
 
 	local playerList = CopyTable(TSM.ViewerUtil.playerListCache)
-	playerList["all"] = L["All"]
+	playerList["all"] = "All"
 
 	local color, color2 = TSMAPI.Design:GetInlineColor("link2"), TSMAPI.Design:GetInlineColor("category2")
 	local page = {
@@ -90,7 +89,7 @@ function Summary:Draw(container)
 					children = {
 						{
 							type = "GroupBox",
-							label = L["Group"],
+							label = "Group",
 							relativeWidth = 0.5,
 							value = TSMAPI.Groups:FormatPath(private.filters.group),
 							callback = function(_, _, value)
@@ -101,7 +100,7 @@ function Summary:Draw(container)
 						},
 						{
 							type = "Dropdown",
-							label = L["Player"],
+							label = "Player",
 							relativeWidth = 0.2,
 							list = playerList,
 							value = private.filters.player or "all",
@@ -117,7 +116,7 @@ function Summary:Draw(container)
 						},
 						{
 							type = "Dropdown",
-							label = L["Timeframe (Days)"],
+							label = "Timeframe (Days)",
 							relativeWidth = 0.29,
 							list = timeframes,
 							value = private.filters.timeframe,
@@ -135,23 +134,23 @@ function Summary:Draw(container)
 				{
 					type = "InlineGroup",
 					layout = "Flow",
-					title = L["Sales"],
+					title = "Sales",
 					backdrop = true,
 					children = {
 						{
 							type = "MultiLabel",
-							labelInfo = TSM.Viewer:GetMultiLabelLine(L["Gold Earned:"], goldData, "sales", nil, nil, timeframe1, timeframe2),
+							labelInfo = TSM.Viewer:GetMultiLabelLine("Gold Earned:", goldData, "sales", nil, nil, timeframe1, timeframe2),
 							relativeWidth = 1,
 						},
 						{
 							type = "MultiLabel",
-							labelInfo = TSM.Viewer:GetMultiLabelLine(L["Earned Per Day:"], goldData, "sales", true, nil, timeframe1, timeframe2),
+							labelInfo = TSM.Viewer:GetMultiLabelLine("Earned Per Day:", goldData, "sales", true, nil, timeframe1, timeframe2),
 							relativeWidth = 1,
 						},
 						{
 							type = "Label",
 							relativeWidth = 0.28,
-							text = color2 .. L["Top Item by Gold / Quantity:"] .. "|r",
+							text = color2 .. "Top Item by Gold / Quantity:" .. "|r",
 						},
 						{
 							type = "InteractiveLabel",
@@ -172,32 +171,32 @@ function Summary:Draw(container)
 				{
 					type = "InlineGroup",
 					layout = "Flow",
-					title = L["Other Income"],
+					title = "Other Income",
 					backdrop = true,
 					children = {
 						{
 							type = "MultiLabel",
-							labelInfo = TSM.Viewer:GetMultiLabelLine(L["Gold Earned:"], goldData, "income", nil, nil, timeframe1, timeframe2),
+							labelInfo = TSM.Viewer:GetMultiLabelLine("Gold Earned:", goldData, "income", nil, nil, timeframe1, timeframe2),
 							relativeWidth = 1,
 						},
 						{
 							type = "MultiLabel",
-							labelInfo = TSM.Viewer:GetMultiLabelLine(L["Earned Per Day:"], goldData, "income", true, nil, timeframe1, timeframe2),
+							labelInfo = TSM.Viewer:GetMultiLabelLine("Earned Per Day:", goldData, "income", true, nil, timeframe1, timeframe2),
 							relativeWidth = 1,
 						},
 						{
 							type = "Label",
 							relativeWidth = 0.28,
-							text = color2 .. L["Top Income by Gold / Quantity:"] .. "|r",
+							text = color2 .. "Top Income by Gold / Quantity:" .. "|r",
 						},
 						{
 							type = "Label",
-							text = (goldData.income.topGold.key or L["none"]) .. " (" .. (TSMAPI:MoneyToString(goldData.income.topGold.copper) or "---") .. ")",
+							text = (goldData.income.topGold.key or "none") .. " (" .. (TSMAPI:MoneyToString(goldData.income.topGold.copper) or "---") .. ")",
 							relativeWidth = 0.36,
 						},
 						{
 							type = "Label",
-							text = (goldData.income.topQuantity.key or L["none"]) .. " (" .. (goldData.income.topQuantity.num or "---") .. ")",
+							text = (goldData.income.topQuantity.key or "none") .. " (" .. (goldData.income.topQuantity.num or "---") .. ")",
 							relativeWidth = 0.36,
 						},
 					},
@@ -205,23 +204,23 @@ function Summary:Draw(container)
 				{
 					type = "InlineGroup",
 					layout = "Flow",
-					title = L["Purchases"],
+					title = "Purchases",
 					backdrop = true,
 					children = {
 						{
 							type = "MultiLabel",
-							labelInfo = TSM.Viewer:GetMultiLabelLine(L["Gold Spent:"], goldData, "buys", nil, nil, timeframe1, timeframe2),
+							labelInfo = TSM.Viewer:GetMultiLabelLine("Gold Spent:", goldData, "buys", nil, nil, timeframe1, timeframe2),
 							relativeWidth = 1,
 						},
 						{
 							type = "MultiLabel",
-							labelInfo = TSM.Viewer:GetMultiLabelLine(L["Spent Per Day:"], goldData, "buys", true, nil, timeframe1, timeframe2),
+							labelInfo = TSM.Viewer:GetMultiLabelLine("Spent Per Day:", goldData, "buys", true, nil, timeframe1, timeframe2),
 							relativeWidth = 1,
 						},
 						{
 							type = "Label",
 							relativeWidth = 0.28,
-							text = color2 .. L["Top Item by Gold / Quantity:"] .. "|r",
+							text = color2 .. "Top Item by Gold / Quantity:" .. "|r",
 						},
 						{
 							type = "InteractiveLabel",
@@ -242,32 +241,32 @@ function Summary:Draw(container)
 				{
 					type = "InlineGroup",
 					layout = "Flow",
-					title = L["Expenses"],
+					title = "Expenses",
 					backdrop = true,
 					children = {
 						{
 							type = "MultiLabel",
-							labelInfo = TSM.Viewer:GetMultiLabelLine(L["Gold Spent:"], goldData, "expense", nil, nil, timeframe1, timeframe2),
+							labelInfo = TSM.Viewer:GetMultiLabelLine("Gold Spent:", goldData, "expense", nil, nil, timeframe1, timeframe2),
 							relativeWidth = 1,
 						},
 						{
 							type = "MultiLabel",
-							labelInfo = TSM.Viewer:GetMultiLabelLine(L["Spent Per Day:"], goldData, "expense", true, nil, timeframe1, timeframe2),
+							labelInfo = TSM.Viewer:GetMultiLabelLine("Spent Per Day:", goldData, "expense", true, nil, timeframe1, timeframe2),
 							relativeWidth = 1,
 						},
 						{
 							type = "Label",
 							relativeWidth = 0.28,
-							text = color2 .. L["Top Expense by Gold / Quantity:"] .. "|r",
+							text = color2 .. "Top Expense by Gold / Quantity:" .. "|r",
 						},
 						{
 							type = "Label",
-							text = (goldData.expense.topGold.key or L["none"]) .. " (" .. (TSMAPI:MoneyToString(goldData.expense.topGold.copper) or "---") .. ")",
+							text = (goldData.expense.topGold.key or "none") .. " (" .. (TSMAPI:MoneyToString(goldData.expense.topGold.copper) or "---") .. ")",
 							relativeWidth = 0.36,
 						},
 						{
 							type = "Label",
-							text = (goldData.expense.topQuantity.key or L["none"]) .. " (" .. (goldData.expense.topQuantity.num or "---") .. ")",
+							text = (goldData.expense.topQuantity.key or "none") .. " (" .. (goldData.expense.topQuantity.num or "---") .. ")",
 							relativeWidth = 0.36,
 						},
 					},
@@ -275,17 +274,17 @@ function Summary:Draw(container)
 				{
 					type = "InlineGroup",
 					layout = "Flow",
-					title = L["Balance"],
+					title = "Balance",
 					backdrop = true,
 					children = {
 						{
 							type = "MultiLabel",
-							labelInfo = TSM.Viewer:GetMultiLabelLine(L["Profit:"], goldData, "profit", nil, nil, timeframe1, timeframe2),
+							labelInfo = TSM.Viewer:GetMultiLabelLine("Profit:", goldData, "profit", nil, nil, timeframe1, timeframe2),
 							relativeWidth = 1,
 						},
 						{
 							type = "MultiLabel",
-							labelInfo = TSM.Viewer:GetMultiLabelLine(L["Profit Per Day:"], goldData, "profit", true, nil, timeframe1, timeframe2),
+							labelInfo = TSM.Viewer:GetMultiLabelLine("Profit Per Day:", goldData, "profit", true, nil, timeframe1, timeframe2),
 							relativeWidth = 1,
 						},
 					},
@@ -376,6 +375,6 @@ function private:ProcessSummaryMoneyData(moneyData, resultTbl, goldData, timefra
 end
 
 function private:GetItemDisplayLink(itemString)
-	if not itemString then return L["none"] end
-	return TSMAPI.Item:GetLink(itemString) or (TSM.items[itemString] and TSM.items[itemString].name) or L["none"]
+	if not itemString then return "none" end
+	return TSMAPI.Item:GetLink(itemString) or (TSM.items[itemString] and TSM.items[itemString].name) or "none"
 end

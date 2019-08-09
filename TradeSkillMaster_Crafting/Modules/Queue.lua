@@ -9,7 +9,6 @@
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
 local Queue = TSM:NewModule("Queue")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
 local private = { isQueued = {}, notified = {} }
 
 
@@ -87,7 +86,7 @@ function private:IsOperationValid(operation, opName)
 		-- invalid cause min > max restock quantity (shouldn't happen)
 		if not private.notified[opName] then
 			private.notified[opName] = true
-			TSM:Printf(L["'%s' is an invalid operation! Min restock of %d is higher than max restock of %d."], opName, operation.minRestock, operation.maxRestock)
+			TSM:Printf("'%s' is an invalid operation! Min restock of %d is higher than max restock of %d.", opName, operation.minRestock, operation.maxRestock)
 		end
 		return
 	end

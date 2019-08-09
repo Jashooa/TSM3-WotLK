@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local QuickSell = TSM:NewModule("QuickSell", "AceEvent-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Vendoring") -- loads the localization table
 
 local private = { ignore = {}, sellAmount = 0, sellIndex = 0, sellQueue = {}, sellInfo = {}, sellThreadId = nil, sellProfit = 0, frame = nil, inspecting = false, hovering = false }
 
@@ -25,7 +24,7 @@ function QuickSell:CreateTab(parent)
 		children = {
 			{
 				type = "Text",
-				text = format(L["%sLeft-Click|r to ignore an item for this session. Hold %sshift|r to ignore permanently. You can remove items from permanent ignore in the Vendoring options."], color, color),
+				text = format("%sLeft-Click|r to ignore an item for this session. Hold %sshift|r to ignore permanently. You can remove items from permanent ignore in the Vendoring options.", color, color),
 				textFont = { TSMAPI.Design:GetContentFont("small") },
 				justify = { "LEFT", "TOP" },
 				points = { { "TOPLEFT", 5, -5 }, { "TOPRIGHT", -5, -5 } },
@@ -35,15 +34,15 @@ function QuickSell:CreateTab(parent)
 				key = "quicksellST",
 				stCols = {
 						{
-							name = L["Item"],
+							name = "Item",
 							width = 0.5,
 						},
 						{
-							name = L["Vendor"],
+							name = "Vendor",
 							width = 0.25,
 						},
 						{
-							name = L["Potential"],
+							name = "Potential",
 							width = 0.25
 						},
 					},
@@ -55,14 +54,14 @@ function QuickSell:CreateTab(parent)
 			{
 				type = "CheckBox",
 				key = "hideGroupedChk",
-				label = L["Hide Grouped Items"],
+				label = "Hide Grouped Items",
 				scripts = {"OnValueChanged"},
 				points = {{"TOPLEFT",  BFC.PREV, "BOTTOMLEFT", 0, -2 }}
 			},
 			{
 				type = "CheckBox",
 				key = "hideSoulboundChk",
-				label = L["Hide Soulbound Items"],
+				label = "Hide Soulbound Items",
 				scripts = {"OnValueChanged"},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}}
 			},
@@ -70,7 +69,7 @@ function QuickSell:CreateTab(parent)
 				type = "Button",
 				name = "TSMVendoringSellAllButton",
 				key = "sellAllBtn",
-				text = L["Sell All"],
+				text = "Sell All",
 				textHeight = 25,
 				size = {25, 35},
 				points = {{"BOTTOMLEFT", 170, 25}, {"BOTTOMRIGHT", -5, 25}},
@@ -78,7 +77,7 @@ function QuickSell:CreateTab(parent)
 			},
 			{
 				type = "Text",
-				text = L["Sell Only:"],
+				text = "Sell Only:",
 				textSize = "small",
 				justify = {"LEFT", "CENTER"},
 				size = {0, 20},
@@ -87,7 +86,7 @@ function QuickSell:CreateTab(parent)
 			{
 				type = "Button",
 				key = "sellTrashBtn",
-				text = L["Trash"],
+				text = "Trash",
 				textHeight = 15,
 				size = {40, 20},
 				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 10,0}},
@@ -96,7 +95,7 @@ function QuickSell:CreateTab(parent)
 			{
 				type = "Button",
 				key = "sellBOEBtn",
-				text = L["BOEs"],
+				text = "BOEs",
 				textHeight = 15,
 				size = {40, 20},
 				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 10,0}},
@@ -157,11 +156,11 @@ function QuickSell:CreateTab(parent)
 					if button == "LeftButton" then
 						if IsShiftKeyDown() then
 							TSM.db.global.ignore[data.itemString] = true
-							TSM:Printf(L["Ignoring all %s permanently. You can undo this in the Vendoring options."], data.itemLink)
+							TSM:Printf("Ignoring all %s permanently. You can undo this in the Vendoring options.", data.itemLink)
 							TSM.Options:UpdateIgnoreST()
 						else
 							private.ignore[data.itemString] = true
-							TSM:Printf(L["Ignoring all %s this session (until your UI is reloaded)."], data.itemLink)
+							TSM:Printf("Ignoring all %s this session (until your UI is reloaded).", data.itemLink)
 						end
 						private:UpdateQuicksellST()
 					end

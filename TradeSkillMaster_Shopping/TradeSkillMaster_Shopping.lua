@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 TSM = LibStub("AceAddon-3.0"):NewAddon(TSM, "TSM_Shopping", "AceEvent-3.0", "AceConsole-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Shopping") -- loads the localization table
 local AceGUI = LibStub("AceGUI-3.0")
 
 local settingsInfo = {
@@ -85,13 +84,13 @@ function TSM:GetOperationInfo(operationName)
 	if not operation then return end
 
 	if operation.showAboveMaxPrice and operation.evenStacks then
-		return format(L["Shopping for even stacks including those above the max price"])
+		return format("Shopping for even stacks including those above the max price")
 	elseif operation.showAboveMaxPrice then
-		return format(L["Shopping for auctions including those above the max price."])
+		return format("Shopping for auctions including those above the max price.")
 	elseif operation.evenStacks then
-		return format(L["Shopping for even stacks with a max price set."])
+		return format("Shopping for even stacks with a max price set.")
 	else
-		return format(L["Shopping for auctions with a max price set."])
+		return format("Shopping for auctions with a max price set.")
 	end
 end
 
@@ -107,7 +106,7 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 	local maxPrice = TSMAPI:GetCustomPriceValue(TSM.operations[operationName].maxPrice, itemString)
 	if maxPrice then
 		local priceText = (TSMAPI:MoneyToString(maxPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff---|r")
-		tinsert(lines, { left = "  " .. L["Max Shopping Price:"], right = format("%s", priceText) })
+		tinsert(lines, { left = "  " .. "Max Shopping Price:", right = format("%s", priceText) })
 	end
 
 	if #lines > numStartingLines then
@@ -117,7 +116,7 @@ end
 
 function TSM:StartSearchGathering(itemString, quantity, callback, disableCrafting, ignoreDE, even)
 	TSMAPI:Assert(itemString and quantity and callback)
-	local searchInfo = { item = itemString, extraInfo = { searchType = "apiGathering", maxQuantity = quantity, buyCallback = callback }, searchBoxText = "~"..L["gathering"].."~" }
+	local searchInfo = { item = itemString, extraInfo = { searchType = "apiGathering", maxQuantity = quantity, buyCallback = callback }, searchBoxText = "~".."gathering".."~" }
 	if even then
 		searchInfo.extraInfo.evenOnly = true
 	end
@@ -136,6 +135,6 @@ end
 
 function TSM:StartSearchAuctioning(itemString, database, callback, filterFunc)
 	TSMAPI:Assert(itemString and database and callback)
-	local searchInfo = { item = itemString, searchMode = "normal", extraInfo = { searchType = "apiAuctioning", database = database, filterFunc = filterFunc, buyCallback = callback }, searchBoxText = "~"..L["auctioning"].."~" }
+	local searchInfo = { item = itemString, searchMode = "normal", extraInfo = { searchType = "apiAuctioning", database = database, filterFunc = filterFunc, buyCallback = callback }, searchBoxText = "~".."auctioning".."~" }
 	return TSM.AuctionTab:StartSearch(searchInfo)
 end

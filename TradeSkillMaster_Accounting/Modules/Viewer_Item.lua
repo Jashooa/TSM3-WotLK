@@ -10,7 +10,6 @@
 local TSM = select(2, ...)
 local Item = TSM.modules.Viewer:NewModule("Item")
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local private = {filters={}}
 local SECONDS_PER_DAY = 24 * 60 * 60
 
@@ -21,23 +20,23 @@ local SECONDS_PER_DAY = 24 * 60 * 60
 -- ============================================================================
 
 local ITEM_SUMMARY_ST_COLS_AVG = {
-	{name=L["Item Name"], width=0.30, headAlign="LEFT"},
-	{name=L["Market Value"], width=0.12, headAlign="LEFT"},
-	{name=L["Sold"], width=0.07, headAlign="LEFT"},
-	{name=L["Avg Sale"], width=0.12, headAlign="LEFT"},
-	{name=L["Bought"], width=0.07, headAlign="LEFT"},
-	{name=L["Avg Buy"], width=0.12, headAlign="LEFT"},
-	{name=L["Failed Since Last Sale"], width=0.20, headAlign="LEFT"},
+	{name="Item Name", width=0.30, headAlign="LEFT"},
+	{name="Market Value", width=0.12, headAlign="LEFT"},
+	{name="Sold", width=0.07, headAlign="LEFT"},
+	{name="Avg Sale", width=0.12, headAlign="LEFT"},
+	{name="Bought", width=0.07, headAlign="LEFT"},
+	{name="Avg Buy", width=0.12, headAlign="LEFT"},
+	{name="Failed Since Last Sale", width=0.20, headAlign="LEFT"},
 	defaultSort = 1,
 }
 local ITEM_SUMMARY_ST_COLS_TOTAL = {
-	{name=L["Item Name"], width=0.30, headAlign="LEFT"},
-	{name=L["Market Value"], width=0.12, headAlign="LEFT"},
-	{name=L["Sold"], width=0.07, headAlign="LEFT"},
-	{name=L["Total Sale"], width=0.12, headAlign="LEFT"},
-	{name=L["Bought"], width=0.07, headAlign="LEFT"},
-	{name=L["Total Buy"], width=0.12, headAlign="LEFT"},
-	{name=L["Failed Since Last Sale"], width=0.20, headAlign="LEFT"},
+	{name="Item Name", width=0.30, headAlign="LEFT"},
+	{name="Market Value", width=0.12, headAlign="LEFT"},
+	{name="Sold", width=0.07, headAlign="LEFT"},
+	{name="Total Sale", width=0.12, headAlign="LEFT"},
+	{name="Bought", width=0.07, headAlign="LEFT"},
+	{name="Total Buy", width=0.12, headAlign="LEFT"},
+	{name="Failed Since Last Sale", width=0.20, headAlign="LEFT"},
 	defaultSort = 1,
 }
 
@@ -81,43 +80,43 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 
 	local stCols = {
 		{
-			name = L["Activity Type"],
+			name = "Activity Type",
 			width = 0.15,
 			align = "LEFT",
 			headAlign = "LEFT",
 		},
 		{
-			name = L["Source"],
+			name = "Source",
 			width = 0.14,
 			align = "LEFT",
 			headAlign = "LEFT",
 		},
 		{
-			name = L["Buyer/Seller"],
+			name = "Buyer/Seller",
 			width = 0.15,
 			align = "LEFT",
 			headAlign = "LEFT",
 		},
 		{
-			name = L["Quantity"],
+			name = "Quantity",
 			width = 0.1,
 			align = "LEFT",
 			headAlign = "LEFT",
 		},
 		{
-			name = L["Per Item"],
+			name = "Per Item",
 			width = 0.15,
 			align = "LEFT",
 			headAlign = "LEFT",
 		},
 		{
-			name = L["Total Price"],
+			name = "Total Price",
 			width = 0.15,
 			align = "LEFT",
 			headAlign = "LEFT",
 		},
 		{
-			name = L["Time"],
+			name = "Time",
 			width = 0.15,
 			align = "LEFT",
 			headAlign = "LEFT",
@@ -149,15 +148,15 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 					end
 				end
 				TSMAPI.GUI:UpdateTSMScrollingTableData("TSM_ACCOUNTING_ITEM", itemData.stData)
-				TSM:Print(L["Removed record."])
+				TSM:Print("Removed record.")
 			end
 		end,
 		OnEnter = function(_, data, self)
 			if not data then return end
 
             GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-            GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2") .. L["Shift-Right-Click to delete this record."] .. "|r")
-			--GameTooltip:SetText(L["Shift-Right-Click to delete this record."], 1, .82, 0, 1)
+            GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2") .. "Shift-Right-Click to delete this record." .. "|r")
+			--GameTooltip:SetText("Shift-Right-Click to delete this record.", 1, .82, 0, 1)
 			GameTooltip:Show()
 		end,
 		OnLeave = function()
@@ -193,7 +192,7 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 						},
 						{
 							type = "Button",
-							text = L["Back to Previous Page"],
+							text = "Back to Previous Page",
 							relativeWidth = 0.29,
 							callback = function()
 								if returnSubTab then
@@ -218,14 +217,14 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 				},
 				{
 					type = "InlineGroup",
-					title = L["Sale Data"],
+					title = "Sale Data",
 					layout = "Flow",
 					backdrop = true,
 					children = {},
 				},
 				{
 					type = "InlineGroup",
-					title = L["Purchase Data"],
+					title = "Purchase Data",
 					layout = "Flow",
 					backdrop = true,
 					children = {},
@@ -247,23 +246,23 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 		sellWidgets = {
 			{
 				type = "MultiLabel",
-				labelInfo = TSM.Viewer:GetMultiLabelLine(L["Average Prices:"], itemData.sales, "avg"),
+				labelInfo = TSM.Viewer:GetMultiLabelLine("Average Prices:", itemData.sales, "avg"),
 				relativeWidth = 1,
 			},
 			{
 				type = "MultiLabel",
-				labelInfo = TSM.Viewer:GetMultiLabelLine(L["Quantity Sold:"], itemData.sales, "num", nil, true),
+				labelInfo = TSM.Viewer:GetMultiLabelLine("Quantity Sold:", itemData.sales, "num", nil, true),
 				relativeWidth = 1,
 			},
 			{
 				type = "MultiLabel",
-				labelInfo = TSM.Viewer:GetMultiLabelLine(L["Gold Earned:"], itemData.sales, "price"),
+				labelInfo = TSM.Viewer:GetMultiLabelLine("Gold Earned:", itemData.sales, "price"),
 				relativeWidth = 1,
 			},
 			{
 				type = "Label",
 				relativeWidth = 1,
-				text = color2 .. L["Top Buyers:"] .. " |r" .. buyersText,
+				text = color2 .. "Top Buyers:" .. " |r" .. buyersText,
 			},
 		}
 	else
@@ -271,7 +270,7 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 			{
 				type = "Label",
 				relativeWidth = 1,
-				text = "|cffffffff" .. L["There is no sale data for this item."] .. "|r",
+				text = "|cffffffff" .. "There is no sale data for this item." .. "|r",
 			},
 		}
 	end
@@ -280,23 +279,23 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 		buyWidgets = {
 			{
 				type = "MultiLabel",
-				labelInfo = TSM.Viewer:GetMultiLabelLine(L["Average Prices:"], itemData.buys, "avg"),
+				labelInfo = TSM.Viewer:GetMultiLabelLine("Average Prices:", itemData.buys, "avg"),
 				relativeWidth = 1,
 			},
 			{
 				type = "MultiLabel",
-				labelInfo = TSM.Viewer:GetMultiLabelLine(L["Quantity Bought:"], itemData.buys, "num", nil, true),
+				labelInfo = TSM.Viewer:GetMultiLabelLine("Quantity Bought:", itemData.buys, "num", nil, true),
 				relativeWidth = 1,
 			},
 			{
 				type = "MultiLabel",
-				labelInfo = TSM.Viewer:GetMultiLabelLine(L["Total Spent:"], itemData.buys, "price"),
+				labelInfo = TSM.Viewer:GetMultiLabelLine("Total Spent:", itemData.buys, "price"),
 				relativeWidth = 1,
 			},
 			{
 				type = "Label",
 				relativeWidth = 1,
-				text = color2 .. L["Top Sellers:"] .. " |r" .. sellersText,
+				text = color2 .. "Top Sellers:" .. " |r" .. sellersText,
 			},
 		}
 	else
@@ -304,7 +303,7 @@ function Item:DrawLookup(container, itemString, returnTab, returnSubTab)
 			{
 				type = "Label",
 				relativeWidth = 1,
-				text = "|cffffffff" .. L["There is no purchase data for this item."] .. "|r",
+				text = "|cffffffff" .. "There is no purchase data for this item." .. "|r",
 			},
 		}
 	end

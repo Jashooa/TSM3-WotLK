@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local Inbox = TSM:NewModule("Inbox", "AceEvent-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Mailing") -- loads the localization table
 local private = {recheckTime=1, allowTimerStart=true, moneyCollected=0, threadId=nil, frame=nil, mode=nil, modeModified=nil}
 
 
@@ -49,9 +48,9 @@ function Inbox:CreateTab()
 			{
 				type = "Button",
 				key = "allBtn",
-				text = L["Open All Mail"],
+				text = "Open All Mail",
 				textHeight = 18,
-				tooltip = L["Opens all mail in your inbox. If you have more than 50 items in your inbox, the opening will automatically continue when the inbox refreshes."].."\n\n"..TSMAPI.Design:GetInlineColor("link")..L["Shift-Click|r to leave mail with gold."],
+				tooltip = "Opens all mail in your inbox. If you have more than 50 items in your inbox, the opening will automatically continue when the inbox refreshes.".."\n\n"..TSMAPI.Design:GetInlineColor("link").."Shift-Click|r to leave mail with gold.",
 				size = {0, 20},
 				points = {{"BOTTOMLEFT", 5, 30}, {"BOTTOMRIGHT", -5, 30}},
 				scripts = {"OnClick"},
@@ -59,7 +58,7 @@ function Inbox:CreateTab()
 			{
 				type = "Text",
 				key = "ahMailLabel",
-				text = L["AH Mail:"],
+				text = "AH Mail:",
 				textFont = {TSMAPI.Design:GetContentFont("normal")},
 				justify = {"RIGHT", "CENTER"},
 				size = {70, 20},
@@ -68,9 +67,9 @@ function Inbox:CreateTab()
 			{
 				type = "Button",
 				key = "salesBtn",
-				text = L["Sales"],
+				text = "Sales",
 				textHeight = 18,
-				tooltip = L["Opens all mail containing gold from sales."].."\n\n"..format(L["%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox."], TSMAPI.Design:GetInlineColor("link")),
+				tooltip = "Opens all mail containing gold from sales.".."\n\n"..format("%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox.", TSMAPI.Design:GetInlineColor("link")),
 				size = {70, 20},
 				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
 				scripts = {"OnClick"},
@@ -78,8 +77,8 @@ function Inbox:CreateTab()
 			{
 				type = "Button",
 				key = "buysBtn",
-				text = L["Buys"],
-				tooltip = L["Opens all mail containing items you have bought."].."\n\n"..format(L["%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox."], TSMAPI.Design:GetInlineColor("link")),
+				text = "Buys",
+				tooltip = "Opens all mail containing items you have bought.".."\n\n"..format("%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox.", TSMAPI.Design:GetInlineColor("link")),
 				textHeight = 18,
 				size = {70, 20},
 				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
@@ -88,9 +87,9 @@ function Inbox:CreateTab()
 			{
 				type = "Button",
 				key = "cancelsBtn",
-				text = L["Cancels"],
+				text = "Cancels",
 				textHeight = 18,
-				tooltip = L["Opens all mail containing canceled auctions."].."\n\n"..format(L["%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox."], TSMAPI.Design:GetInlineColor("link")),
+				tooltip = "Opens all mail containing canceled auctions.".."\n\n"..format("%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox.", TSMAPI.Design:GetInlineColor("link")),
 				size = {70, 20},
 				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
 				scripts = {"OnClick"},
@@ -98,9 +97,9 @@ function Inbox:CreateTab()
 			{
 				type = "Button",
 				key = "expiresBtn",
-				text = L["Expires"],
+				text = "Expires",
 				textHeight = 18,
-				tooltip = L["Opens all mail containing expired auctions."].."\n\n"..format(L["%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox."], TSMAPI.Design:GetInlineColor("link")),
+				tooltip = "Opens all mail containing expired auctions.".."\n\n"..format("%sShift-Click|r to continue opening after an inbox refresh if you have more than 50 items in your inbox.", TSMAPI.Design:GetInlineColor("link")),
 				size = {0, 20},
 				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}, {"BOTTOMRIGHT", -5, 5}},
 				scripts = {"OnClick"},
@@ -108,7 +107,7 @@ function Inbox:CreateTab()
 			{
 				type = "Button",
 				key = "reloadBtn",
-				text = L["Reload UI"],
+				text = "Reload UI",
 				textHeight = 16,
 				size = {150, 20},
 				points = {{"CENTER"}},
@@ -131,7 +130,7 @@ function Inbox:CreateTab()
 							private:PrintOpenMailMessage(data.index)
 							AutoLootMailItem(data.index)
 						else
-							TSM:Print(L["Could not loot item from mail because your bags are full."])
+							TSM:Print("Could not loot item from mail because your bags are full.")
 						end
 					end
 
@@ -244,14 +243,14 @@ function private:UpdateTopLabel()
 
 	local numMail, totalMail = GetInboxNumItems()
 	if totalMail == numMail then
-		tinsert(parts, format(L["Showing all %d mail."], numMail))
+		tinsert(parts, format("Showing all %d mail.", numMail))
 	else
-		tinsert(parts, format(L["Showing %d of %d mail."], numMail, totalMail))
+		tinsert(parts, format("Showing %d of %d mail.", numMail, totalMail))
 	end
 
 	local collectGold = private.collectGold or 0
 	if collectGold > 0 then
-		tinsert(parts, format(L["%s to collect."], TSMAPI:MoneyToString(collectGold)))
+		tinsert(parts, format("%s to collect.", TSMAPI:MoneyToString(collectGold)))
 	end
 
 	local nextRefresh = private.cacheFrame:IsVisible() and private.cacheFrame.endTime
@@ -259,7 +258,7 @@ function private:UpdateTopLabel()
 		if numMail == 0 and TSM.db.global.showReloadBtn then
 			private.frame.reloadBtn:Show()
 		end
-		tinsert(parts, format(L["Inbox update in %d seconds."], max(ceil(nextRefresh - GetTime()), 0)))
+		tinsert(parts, format("Inbox update in %d seconds.", max(ceil(nextRefresh - GetTime()), 0)))
 	end
 
 	private.frame.topLabel:SetText(table.concat(parts, " "))
@@ -282,12 +281,12 @@ function private:InboxUpdate()
 			if invoiceType == "buyer" then
                 local itemLink = private:GetFirstInboxItemLink(i) or itemName
                 local quantity = select(3, GetInboxItem(i, 1))
-				mailInfo[i] = format(L["Buy: %s (%d) | %s | %s"], itemLink, quantity, TSMAPI:MoneyToString(bid, redColor), FormatDaysLeft(daysLeft, i))
+				mailInfo[i] = format("Buy: %s (%d) | %s | %s", itemLink, quantity, TSMAPI:MoneyToString(bid, redColor), FormatDaysLeft(daysLeft, i))
 			elseif invoiceType == "seller" then
 				collectGold = collectGold + bid - ahcut
-				mailInfo[i] = format(L["Sale: %s | %s | %s"], itemName, TSMAPI:MoneyToString(bid - ahcut, greenColor), FormatDaysLeft(daysLeft, i))
+				mailInfo[i] = format("Sale: %s | %s | %s", itemName, TSMAPI:MoneyToString(bid - ahcut, greenColor), FormatDaysLeft(daysLeft, i))
 			elseif invoiceType == "seller_temp_invoice" then
-				mailInfo[i] = format(L["Sale Pending: %s | %s | %s"], itemName, TSMAPI:MoneyToString(bid - ahcut, yellowColor), FormatDaysLeft(daysLeft, i))
+				mailInfo[i] = format("Sale Pending: %s | %s | %s", itemName, TSMAPI:MoneyToString(bid - ahcut, yellowColor), FormatDaysLeft(daysLeft, i))
 			end
 		elseif hasItem then
 			local itemLink
@@ -297,7 +296,7 @@ function private:InboxUpdate()
 				itemLink = itemLink or link
 				quantity = quantity + (select(3, GetInboxItem(i, j)) or 0)
 				if TSMAPI.Item:ToItemString(itemLink) ~= TSMAPI.Item:ToItemString(link) then
-					itemLink = L["Multiple Items"]
+					itemLink = "Multiple Items"
 					quantity = -1
 					break
 				end
@@ -305,13 +304,13 @@ function private:InboxUpdate()
 			if hasItem == 1 then
 				itemLink = private:GetFirstInboxItemLink(i) or itemLink
 			end
-			local itemDesc = (quantity > 0 and format("%s (%d)", itemLink, quantity)) or (quantity == -1 and L["Multiple Items"]) or "---"
+			local itemDesc = (quantity > 0 and format("%s (%d)", itemLink, quantity)) or (quantity == -1 and "Multiple Items") or "---"
 
 			local name = TSMAPI.Item:GetName(itemLink) or "?"
 			if hasItem == 1 and itemLink and strfind(subject, "^" .. TSMAPI.Util:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, name))) then
-				mailInfo[i] = format(L["Expired: %s | %s"], itemDesc, FormatDaysLeft(daysLeft, i))
+				mailInfo[i] = format("Expired: %s | %s", itemDesc, FormatDaysLeft(daysLeft, i))
 			elseif cod > 0 then
-				mailInfo[i] = format(L["COD: %s | %s | (%s) | %s | %s"], itemDesc, TSMAPI:MoneyToString(cod, redColor), quantity > 0 and TSMAPI:MoneyToString(floor(cod / quantity + 0.5), redColor) or "---", sender or "---", FormatDaysLeft(daysLeft, i))
+				mailInfo[i] = format("COD: %s | %s | (%s) | %s | %s", itemDesc, TSMAPI:MoneyToString(cod, redColor), quantity > 0 and TSMAPI:MoneyToString(floor(cod / quantity + 0.5), redColor) or "---", sender or "---", FormatDaysLeft(daysLeft, i))
 			elseif money > 0 then
 				collectGold = collectGold + money
 				mailInfo[i] = format("%s + %s | %s | %s", itemDesc, TSMAPI:MoneyToString(money, greenColor), sender or "---", FormatDaysLeft(daysLeft, i))
@@ -554,11 +553,11 @@ function private:PrintOpenMailMessage(index)
 		if invoiceType == "buyer" then
             local itemLink = private:GetFirstInboxItemLink(index) or itemName
             local quantity = select(3, GetInboxItem(index, 1))
-			TSM:Printf(L["Bought %sx%d for %s from %s"], itemLink, quantity, TSMAPI:MoneyToString(bid, redColor), playerName)
+			TSM:Printf("Bought %sx%d for %s from %s", itemLink, quantity, TSMAPI:MoneyToString(bid, redColor), playerName)
 		elseif invoiceType == "seller" then
-			TSM:Printf(L["Sold [%s] for %s to %s"], itemName, TSMAPI:MoneyToString(bid - ahcut, greenColor), playerName)
+			TSM:Printf("Sold [%s] for %s to %s", itemName, TSMAPI:MoneyToString(bid - ahcut, greenColor), playerName)
         elseif invoiceType == "seller_temp_invoice" then
-            TSM:Printf(L["Deleted sale pending of %s for %s."], itemName, TSMAPI:MoneyToString(bid - ahcut, yellowColor))
+            TSM:Printf("Deleted sale pending of %s for %s.", itemName, TSMAPI:MoneyToString(bid - ahcut, yellowColor))
             DeleteInboxItem(index)
 		end
 	elseif hasItem then
@@ -569,7 +568,7 @@ function private:PrintOpenMailMessage(index)
 			itemLink = itemLink or link
 			quantity = quantity + (select(3, GetInboxItem(index, i)) or 0)
 			if TSMAPI.Item:ToItemString(itemLink) ~= TSMAPI.Item:ToItemString(link) then
-				itemLink = L["Multiple Items"]
+				itemLink = "Multiple Items"
 				quantity = -1
 				break
 			end
@@ -580,20 +579,20 @@ function private:PrintOpenMailMessage(index)
 		local itemName = TSMAPI.Item:GetName(itemLink) or "?"
 		local itemDesc = (quantity > 0 and format("%s (%d)", itemLink, quantity)) or (quantity == -1 and "Multiple Items") or "?"
 		if hasItem == 1 and itemLink and strfind(subject, "^" .. TSMAPI.Util:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, itemName))) then
-			TSM:Printf(L["Your auction of %s expired"], itemDesc)
+			TSM:Printf("Your auction of %s expired", itemDesc)
 		elseif hasItem == 1 and quantity > 0 and (subject == format(AUCTION_REMOVED_MAIL_SUBJECT.." (%d)", itemName, quantity) or subject == format(AUCTION_REMOVED_MAIL_SUBJECT, itemName)) then
-			TSM:Printf(L["Cancelled auction of %sx%d"], itemLink, quantity)
+			TSM:Printf("Cancelled auction of %sx%d", itemLink, quantity)
 		elseif cod > 0 then
-			TSM:Printf(L["%s sent you a COD of %s for %s"], sender, TSMAPI:MoneyToString(cod, redColor), itemDesc)
+			TSM:Printf("%s sent you a COD of %s for %s", sender, TSMAPI:MoneyToString(cod, redColor), itemDesc)
 		elseif money > 0 then
-			TSM:Printf(L["%s sent you %s and %s"], sender, itemDesc, TSMAPI:MoneyToString(money, greenColor))
+			TSM:Printf("%s sent you %s and %s", sender, itemDesc, TSMAPI:MoneyToString(money, greenColor))
 		else
-			TSM:Printf(L["%s sent you %s"], sender, itemDesc)
+			TSM:Printf("%s sent you %s", sender, itemDesc)
 		end
 	elseif money > 0 then
-		TSM:Printf(L["%s sent you %s"], sender, TSMAPI:MoneyToString(money, greenColor))
+		TSM:Printf("%s sent you %s", sender, TSMAPI:MoneyToString(money, greenColor))
 	else
-		TSM:Printf(L["%s sent you a message: %s"], sender, subject)
+		TSM:Printf("%s sent you a message: %s", sender, subject)
 	end
 end
 
@@ -695,7 +694,7 @@ function private.OpenMailThread(self)
 			end
 			self:Sleep(1)
 		elseif not attemptedToOpenMail and encounteredError then
-			TSM:Print(L["Cannot finish auto looting, inventory is full or too many unique items."])
+			TSM:Print("Cannot finish auto looting, inventory is full or too many unique items.")
 		else
 			shouldWait = true
 		end
@@ -703,12 +702,12 @@ function private.OpenMailThread(self)
 
 	-- check if we ran out of
 	if private.keepFreeSlots then
-		TSM:Printf(L["Stopped opening mail to keep %d slots free."], TSM.db.global.keepMailSpace)
+		TSM:Printf("Stopped opening mail to keep %d slots free.", TSM.db.global.keepMailSpace)
 		private.keepFreeSlots = nil
 	end
 
 	if private.inventoryFull then
-		TSM:Print(L["Cannot finish auto looting, inventory is full or too many unique items."])
+		TSM:Print("Cannot finish auto looting, inventory is full or too many unique items.")
 		private.inventoryFull = nil
 	end
 
@@ -720,7 +719,7 @@ function private:MailThreadDone()
 	if not private.threadId then return end
 	-- Tell user how much money has been collected if enabled
 	if private.moneyCollected > 0 and TSM.db.global.displayMoneyCollected then
-		TSM:Printf(L["Total Gold Collected: %s"], TSMAPI:MoneyToString(private.moneyCollected))
+		TSM:Printf("Total Gold Collected: %s", TSMAPI:MoneyToString(private.moneyCollected))
 		private.moneyCollected = 0
 	end
 

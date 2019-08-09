@@ -8,7 +8,6 @@
 
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Warehousing") -- loads the localization table
 local BankUI = TSM:NewModule("BankUI", "AceEvent-3.0")
 local private = {frame=nil, currentBank=nil}
 
@@ -43,7 +42,7 @@ function BankUI:createTab(parent)
 					{
 						type = "Button",
 						key = "btnToBank",
-						text = L["Move Group to Bank"],
+						text = "Move Group to Bank",
 						textHeight = 16,
 						size = {0, 20},
 						points = {{"TOPLEFT", 5, -5}, {"TOPRIGHT", -5, -5}},
@@ -52,7 +51,7 @@ function BankUI:createTab(parent)
 					{
 						type = "Button",
 						key = "btnToBags",
-						text = L["Move Group to Bags"],
+						text = "Move Group to Bags",
 						textHeight = 16,
 						size = {0, 20},
 						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 0, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", 0, -5}},
@@ -66,7 +65,7 @@ function BankUI:createTab(parent)
 					{
 						type = "Button",
 						key = "btnRestock",
-						text = L["Restock Bags"],
+						text = "Restock Bags",
 						textHeight = 16,
 						size = {0, 20},
 						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 5, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", -5, -5}},
@@ -75,7 +74,7 @@ function BankUI:createTab(parent)
 					{
 						type = "Button",
 						key = "btnEmpty",
-						text = L["Empty Bags"],
+						text = "Empty Bags",
 						textHeight = 16,
 						size = {0, 20},
 						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 0, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", 0, -5}},
@@ -84,7 +83,7 @@ function BankUI:createTab(parent)
 					{
 						type = "Button",
 						key = "btnRestore",
-						text = L["Restore Bags"],
+						text = "Restore Bags",
 						textHeight = 16,
 						size = {0, 20},
 						points = {{"TOPLEFT", BFC.PREV, "BOTTOMLEFT", 0, -5}, {"TOPRIGHT", BFC.PREV, "BOTTOMRIGHT", 0, -5}},

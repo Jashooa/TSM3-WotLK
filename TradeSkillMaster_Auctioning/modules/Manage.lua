@@ -10,14 +10,13 @@
 
 local TSM = select(2, ...)
 local Manage = TSM:NewModule("Manage", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
 local private = {mode=nil, scanStatus={}, currentItem=nil}
 
 function Manage:StartScan(options, mode, isGroup)
 	private.mode = mode
 	private.currentItem = nil
 	wipe(private.scanStatus)
-	
+
 	local scanStarted = false
 	if mode == "Post" then
 		scanStarted = TSM.Post:StartScan(isGroup, options)
@@ -27,8 +26,8 @@ function Manage:StartScan(options, mode, isGroup)
 		scanStarted = TSM.Reset:StartScan(options)
 	end
 	if scanStarted then
-		TSM.GUI:SetStatusBar(L["Starting Scan..."], 0, 0)
-		TSM.GUI:SetInfo(L["Running Scan..."])
+		TSM.GUI:SetStatusBar("Starting Scan...", 0, 0)
+		TSM.GUI:SetInfo("Running Scan...")
 	else
 		TSM.GUI:Stopped()
 	end
@@ -45,56 +44,56 @@ function Manage:UpdateStatus(statusType, current, total)
 	private.scanStatus[statusType] = {current, total}
 	if statusType == "query" then
 		if total >= 0 then
-			TSM.GUI:SetStatusBar(format(L["Preparing Filter %d / %d"], current, total))
+			TSM.GUI:SetStatusBar(format("Preparing Filter %d / %d", current, total))
 		else
-			TSM.GUI:SetStatusBar(L["Preparing Filters..."])
+			TSM.GUI:SetStatusBar("Preparing Filters...")
 		end
 	elseif IsStepDone("scan") and IsStepDone("manage") and IsStepDone("confirm") then -- scan complete
-		TSM.GUI:SetStatusBar(L["Scan Complete!"])
+		TSM.GUI:SetStatusBar("Scan Complete!")
 	else
 		local parts = {}
 		if IsStepDone("scan") then
 			if IsStepDone("manage") then
 				if private.mode == "Post" then
-					tinsert(parts, L["Done Posting"])
+					tinsert(parts, "Done Posting")
 				elseif private.mode == "Cancel" then
-					tinsert(parts, L["Done Canceling"])
+					tinsert(parts, "Done Canceling")
 				elseif private.mode == "Reset" then
-					tinsert(parts, L["Done Resetting"])
+					tinsert(parts, "Done Resetting")
 				end
 				if private.mode ~= "Reset" then
 					if IsStepStarted("confirm") then
-						tinsert(parts, format(L["Confirming %d / %d"], private.scanStatus.confirm[1]+1, private.scanStatus.confirm[2]))
+						tinsert(parts, format("Confirming %d / %d", private.scanStatus.confirm[1]+1, private.scanStatus.confirm[2]))
 					else
-						tinsert(parts, format(L["Confirming %d / %d"], 1, private.scanStatus.manage[2]))
+						tinsert(parts, format("Confirming %d / %d", 1, private.scanStatus.manage[2]))
 					end
 				end
 			elseif IsStepStarted("manage") then
 				if private.mode == "Post" then
-					tinsert(parts, format(L["Posting %d / %d"], private.scanStatus.manage[1]+1, private.scanStatus.manage[2]))
+					tinsert(parts, format("Posting %d / %d", private.scanStatus.manage[1]+1, private.scanStatus.manage[2]))
 				elseif private.mode == "Cancel" then
-					tinsert(parts, format(L["Canceling %d / %d"], private.scanStatus.manage[1]+1, private.scanStatus.manage[2]))
+					tinsert(parts, format("Canceling %d / %d", private.scanStatus.manage[1]+1, private.scanStatus.manage[2]))
 				elseif private.mode == "Reset" then
-					tinsert(parts, format(L["Resetting %d / %d"], private.scanStatus.manage[1]+1, private.scanStatus.manage[2]))
+					tinsert(parts, format("Resetting %d / %d", private.scanStatus.manage[1]+1, private.scanStatus.manage[2]))
 				end
 				if private.mode ~= "Reset" then
 					if IsStepStarted("confirm") then
-						tinsert(parts, format(L["Confirming %d / %d"], private.scanStatus.confirm[1]+1, private.scanStatus.confirm[2]))
+						tinsert(parts, format("Confirming %d / %d", private.scanStatus.confirm[1]+1, private.scanStatus.confirm[2]))
 					else
-						tinsert(parts, format(L["Confirming %d / %d"], 1, private.scanStatus.manage[2]))
+						tinsert(parts, format("Confirming %d / %d", 1, private.scanStatus.manage[2]))
 					end
 				end
 			end
 		elseif IsStepStarted("scan") then
 			if IsStepStarted("page") then
-				tinsert(parts, format(L["Scanning %d / %d (Page %d / %d)"], private.scanStatus.scan[1]+1, private.scanStatus.scan[2], private.scanStatus.page[1]+1, private.scanStatus.page[2]))
+				tinsert(parts, format("Scanning %d / %d (Page %d / %d)", private.scanStatus.scan[1]+1, private.scanStatus.scan[2], private.scanStatus.page[1]+1, private.scanStatus.page[2]))
 			else
-				tinsert(parts, format(L["Scanning %d / %d"], private.scanStatus.scan[1]+1, private.scanStatus.scan[2]))
+				tinsert(parts, format("Scanning %d / %d", private.scanStatus.scan[1]+1, private.scanStatus.scan[2]))
 			end
 		end
 		TSM.GUI:SetStatusBar(table.concat(parts, "  -  "))
 	end
-	
+
 	if IsStepDone("query") then
 		local scanCurrent = private.scanStatus.scan and private.scanStatus.scan[1] or 0
 		local scanTotal = private.scanStatus.scan and private.scanStatus.scan[2] or 1
@@ -111,7 +110,7 @@ function Manage:SetCurrentItem(currentItem)
 	end
 end
 
-function Manage:GetCurrentItem()	
+function Manage:GetCurrentItem()
 	return private.currentItem
 end
 
@@ -130,7 +129,7 @@ function Manage:StopScan()
 	end
 	TSM.Scan:StopScanning()
 	TSMAPI.Auction:StopScan("Auctioning")
-	
+
 	-- clean up local variables
 	private.currentItem = nil
 	private.mode = nil

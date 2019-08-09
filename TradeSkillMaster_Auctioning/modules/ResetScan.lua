@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local Reset = TSM:NewModule("Reset", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
 local private = {queue={}, threadId=nil, filterItem=nil, summarySTCache={}}
 
 
@@ -25,7 +24,7 @@ function Reset:Show(frame)
 	private.frame.auctionST:Hide()
 	private.frame.auctionST:SetData({})
 	private.frame.buttonsFrame.stop:Enable()
-	private.frame.buttonsFrame.stop:SetText(L["Stop"])
+	private.frame.buttonsFrame.stop:SetText("Stop")
 	private.frame.buttonsFrame.buyout:Disable()
 	private.frame.buttonsFrame.cancel:Disable()
 	private.frame.summaryBtn:Disable()
@@ -93,7 +92,7 @@ function private:CreateResetFrame(parent)
 			{
 				type = "ScrollingTableFrame",
 				key = "summaryST",
-				stCols = {{name=L["Item"], width=0.31}, {name=L["Operation"], width=0.17}, {name=L["Quantity (Yours)"], width=0.13, align="CENTER"}, {name=L["Total Cost"], width=0.12, align="RIGHT"}, {name=L["Target Price"], width=0.12, align="RIGHT"}, {name=L["Profit Per Item"], width=0.12, align="RIGHT"}},
+				stCols = {{name="Item", width=0.31}, {name="Operation", width=0.17}, {name="Quantity (Yours)", width=0.13, align="CENTER"}, {name="Total Cost", width=0.12, align="RIGHT"}, {name="Target Price", width=0.12, align="RIGHT"}, {name="Profit Per Item", width=0.12, align="RIGHT"}},
 				sortInfo = {true, 1},
 				stDisableSelection = true,
 				points = {{"TOPLEFT", parent.content}, {"BOTTOMRIGHT", parent.content}},
@@ -102,14 +101,14 @@ function private:CreateResetFrame(parent)
 			{
 				type = "ScrollingTableFrame",
 				key = "auctionST",
-				stCols = {{name=L["Seller"], width=0.4}, {name=L["Stack Size"], width=0.2, align="CENTER"}, {name = L["Auction Buyout"], width=0.35, align="RIGHT"}},
+				stCols = {{name="Seller", width=0.4}, {name="Stack Size", width=0.2, align="CENTER"}, {name = "Auction Buyout", width=0.35, align="RIGHT"}},
 				points = {{"TOPLEFT", parent.content}, {"BOTTOMRIGHT", parent.content}},
 				scripts = {"OnClick"},
 			},
 			{
 				type = "Button",
 				key = "summaryBtn",
-				text = L["Return to Summary"],
+				text = "Return to Summary",
 				textHeight = 16,
 				size = {150, 20},
 				points = {{"TOPRIGHT", -10, -50}},
@@ -145,7 +144,7 @@ function private:CreateResetFrame(parent)
 						type = "Button",
 						key = "stop",
 						name = "TSMAuctioningResetStopButton",
-						text = L["Stop"],
+						text = "Stop",
 						textHeight = 18,
 						size = {60, 24},
 						points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}},
@@ -162,16 +161,16 @@ function private:CreateResetFrame(parent)
 					GameTooltip:SetOwner(self, "ANCHOR_NONE")
 					GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT")
 					GameTooltip:AddLine(data.itemLink)
-					GameTooltip:AddLine(L["Max Cost:"].." "..(TSMAPI:MoneyToString(prices.resetMaxCost, "|cffffffff") or "---"))
-					GameTooltip:AddLine(L["Min Profit:"].." "..(TSMAPI:MoneyToString(prices.resetMinProfit, "|cffffffff") or "---"))
-					GameTooltip:AddLine(L["Max Quantity:"].." |cffffffff"..data.operation.resetMaxQuantity.."|r")
-					GameTooltip:AddLine(L["Max Price Per:"].." "..(TSMAPI:MoneyToString(data.operation.resetMaxPricePer, "|cffffffff") or "---"))
+					GameTooltip:AddLine("Max Cost:".." "..(TSMAPI:MoneyToString(prices.resetMaxCost, "|cffffffff") or "---"))
+					GameTooltip:AddLine("Min Profit:".." "..(TSMAPI:MoneyToString(prices.resetMinProfit, "|cffffffff") or "---"))
+					GameTooltip:AddLine("Max Quantity:".." |cffffffff"..data.operation.resetMaxQuantity.."|r")
+					GameTooltip:AddLine("Max Price Per:".." "..(TSMAPI:MoneyToString(data.operation.resetMaxPricePer, "|cffffffff") or "---"))
 
 					if self.enabled then
-						GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2").."\n"..L["Click to show auctions for this item."].."|r")
-						GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..L["Shift-Right-Click to show the options for this item's Auctioning group."].."|r")
+						GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2").."\n".."Click to show auctions for this item.".."|r")
+						GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2").."Shift-Right-Click to show the options for this item's Auctioning group.".."|r")
 					else
-						GameTooltip:AddLine("\n"..L["Must wait for scan to finish before starting to reset."])
+						GameTooltip:AddLine("\n".."Must wait for scan to finish before starting to reset.")
 					end
 					GameTooltip:Show()
 				end,
@@ -273,7 +272,7 @@ function private:UpdateAuctionST(currentItem)
 		local rowInfo = {
 			cols = {
 				{
-					value = (TSMAPI.Player:IsPlayer(record.seller, true, true, true) and ("|cff99ffff"..record.seller.."|r")) or (TSM.db.factionrealm.whitelist[strlower(record.seller)] and (record.seller.." |cffff2222("..L["Whitelist"]..")|r")) or record.seller,
+					value = (TSMAPI.Player:IsPlayer(record.seller, true, true, true) and ("|cff99ffff"..record.seller.."|r")) or (TSM.db.factionrealm.whitelist[strlower(record.seller)] and (record.seller.." |cffff2222(".."Whitelist"..")|r")) or record.seller,
 					sortArg = record.seller,
 				},
 				{
@@ -304,7 +303,7 @@ function private.ResetScanThread(self, scanList)
 	self:SetThreadName("AUCTIONING_RESET_SCAN")
 	local numToReset, numReset = 0, 0
 	local doneScanning, currentItem, targetAuction
-	local summaryInfoText = L["Running Scan..."]
+	local summaryInfoText = "Running Scan..."
 	local cancelConfirmed, buyoutConfirmed = nil, nil
 	self:RegisterEvent("CHAT_MSG_SYSTEM", function(_, msg)
 		if msg == ERR_AUCTION_REMOVED then
@@ -349,8 +348,8 @@ function private.ResetScanThread(self, scanList)
 					totalProfit = totalProfit + data.profit * data.quantity
 				end
 			end
-			private.frame.buttonsFrame.stop:SetText(L["Restart"])
-			summaryInfoText = format(L["Done Scanning!\n\nCould potentially reset %d items for %s profit."], num, TSMAPI:MoneyToString(totalProfit, "OPT_ICON"))
+			private.frame.buttonsFrame.stop:SetText("Restart")
+			summaryInfoText = format("Done Scanning!\n\nCould potentially reset %d items for %s profit.", num, TSMAPI:MoneyToString(totalProfit, "OPT_ICON"))
 			self:SendMsgToSelf("SHOW_SUMMARY")
 			TSMAPI:DoPlaySound(TSM.db.global.scanCompleteSound)
 		elseif event == "SHOW_SUMMARY" then
@@ -391,7 +390,7 @@ function private.ResetScanThread(self, scanList)
 			if index then
 				private.frame.buttonsFrame.buyout:Enable()
 			else
-				TSM:Print(L["Auction not found. Skipped."])
+				TSM:Print("Auction not found. Skipped.")
 				currentItem.shouldRemove = true
 			end
 		elseif event == "BUY_AUCTION" then
@@ -419,7 +418,7 @@ function private.ResetScanThread(self, scanList)
 				cancelConfirmed = nil
 				while not cancelConfirmed do self:Yield(true) end
 			else
-				TSM:Print(L["Auction not found. Skipped."])
+				TSM:Print("Auction not found. Skipped.")
 			end
 			currentItem.shouldRemove = true
 		elseif event == "INTERRUPTED" then
@@ -542,25 +541,25 @@ function private:ValidateOperation(itemString, operation)
 
 	-- don't reset this item if their settings are invalid
 	if not prices.minPrice then
-		errMsg = format(L["Did not reset %s because your minimum price (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.minPrice)
+		errMsg = format("Did not reset %s because your minimum price (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.minPrice)
 	elseif not prices.maxPrice then
-		errMsg = format(L["Did not reset %s because your maximum price (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.maxPrice)
+		errMsg = format("Did not reset %s because your maximum price (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.maxPrice)
 	elseif not prices.normalPrice then
-		errMsg = format(L["Did not reset %s because your normal price (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.normalPrice)
+		errMsg = format("Did not reset %s because your normal price (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.normalPrice)
 	elseif not prices.resetMaxCost then
-		errMsg = format(L["Did not reset %s because your reset max cost (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.resetMaxCost)
+		errMsg = format("Did not reset %s because your reset max cost (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.resetMaxCost)
 	elseif not prices.resetMinProfit then
-		errMsg = format(L["Did not reset %s because your reset min profit (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.resetMinProfit)
+		errMsg = format("Did not reset %s because your reset min profit (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.resetMinProfit)
 	elseif not prices.resetResolution then
-		errMsg = format(L["Did not reset %s because your reset resolution (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.resetResolution)
+		errMsg = format("Did not reset %s because your reset resolution (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.resetResolution)
 	elseif not prices.resetMaxItemCost then
-		errMsg = format(L["Did not reset %s because your reset max item cost (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.resetMaxItemCost)
+		errMsg = format("Did not reset %s because your reset max item cost (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.resetMaxItemCost)
 	elseif not prices.undercut then
-		errMsg = format(L["Did not reset %s because your undercut (%s) is invalid. Check your settings."], TSMAPI.Item:GetLink(itemString), operation.undercut)
+		errMsg = format("Did not reset %s because your undercut (%s) is invalid. Check your settings.", TSMAPI.Item:GetLink(itemString), operation.undercut)
 	elseif prices.maxPrice < prices.minPrice then
-		errMsg = format(L["Did not reset %s because your maximum price (%s) is lower than your minimum price (%s). Check your settings."], TSMAPI.Item:GetLink(itemString), operation.maxPrice, operation.minPrice)
+		errMsg = format("Did not reset %s because your maximum price (%s) is lower than your minimum price (%s). Check your settings.", TSMAPI.Item:GetLink(itemString), operation.maxPrice, operation.minPrice)
 	elseif prices.normalPrice < prices.minPrice then
-		errMsg = format(L["Did not reset %s because your normal price (%s) is lower than your minimum price (%s). Check your settings."], TSMAPI.Item:GetLink(itemString), operation.normalPrice, operation.minPrice)
+		errMsg = format("Did not reset %s because your normal price (%s) is lower than your minimum price (%s). Check your settings.", TSMAPI.Item:GetLink(itemString), operation.normalPrice, operation.minPrice)
 	end
 
 	if errMsg then

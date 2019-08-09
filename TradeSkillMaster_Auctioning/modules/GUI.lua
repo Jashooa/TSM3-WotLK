@@ -7,7 +7,6 @@
 -- ------------------------------------------------------------------------------ --
 
 local TSM = select(2, ...)
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
 local GUI = TSM:NewModule("GUI", "AceEvent-3.0", "AceHook-3.0")
 local AceGUI = LibStub("AceGUI-3.0")
 local private = {scanThreadId=nil, logSTCache={}}
@@ -19,7 +18,7 @@ function private:CreateSelectionFrame(parent)
 
 	local actionBtnWidth = (parent.content:GetWidth() - 240) / 3
 	local durationList = {}
-	local durationText = {L["Under 30min"], L["30min to 2hrs"], L["2 to 12 hrs"]} -- use our own short-hand strings
+	local durationText = {"Under 30min", "30min to 2hrs", "2 to 12 hrs"} -- use our own short-hand strings
 	for i=1, 3 do -- go up to long duration
 		durationList[i] = format("%s (%s)", _G["AUCTION_TIME_LEFT"..i], durationText[i])
 	end
@@ -38,7 +37,7 @@ function private:CreateSelectionFrame(parent)
 			},
 			{
 				type = "Text",
-				text = L["Select the groups which you would like to include in the scan."],
+				text = "Select the groups which you would like to include in the scan.",
 				textFont = {TSMAPI.Design:GetContentFont("normal")},
 				justify = {"CENTER", "MIDDLE"},
 				points = {{"BOTTOM", BFC.PREV, "TOP", 0, 2}},
@@ -46,7 +45,7 @@ function private:CreateSelectionFrame(parent)
 			{
 				type = "Button",
 				key = "postBtn",
-				text = L["Start Post Scan"],
+				text = "Start Post Scan",
 				textHeight = 18,
 				size = {actionBtnWidth, 25},
 				points = {{"BOTTOMLEFT", 5, 5}},
@@ -55,7 +54,7 @@ function private:CreateSelectionFrame(parent)
 			{
 				type = "Button",
 				key = "cancelBtn",
-				text = L["Start Cancel Scan"],
+				text = "Start Cancel Scan",
 				textHeight = 18,
 				size = {actionBtnWidth, 25},
 				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
@@ -64,7 +63,7 @@ function private:CreateSelectionFrame(parent)
 			{
 				type = "Button",
 				key = "resetBtn",
-				text = L["Start Reset Scan"],
+				text = "Start Reset Scan",
 				textHeight = 18,
 				size = {actionBtnWidth, 25},
 				points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}},
@@ -77,7 +76,7 @@ function private:CreateSelectionFrame(parent)
 				children = {
 					{
 						type = "Text",
-						text = L["Other Auctioning Searches"],
+						text = "Other Auctioning Searches",
 						textFont = {TSMAPI.Design:GetContentFont("normal")},
 						justify = {"CENTER", "MIDDLE"},
 						points = {{"TOP", 0, -2}},
@@ -89,9 +88,9 @@ function private:CreateSelectionFrame(parent)
 					{
 						type = "Button",
 						key = "cancelAllBtn",
-						text = L["Cancel All Auctions"],
+						text = "Cancel All Auctions",
 						textHeight = 16,
-						tooltip = L["Will cancel all your auctions, including ones which you didn't post with Auctioning."],
+						tooltip = "Will cancel all your auctions, including ones which you didn't post with Auctioning.",
 						size = {0, 20},
 						points = {{"TOPLEFT", 4, -24}, {"TOPRIGHT", -4, -24}},
 						scripts = {"OnClick"},
@@ -102,7 +101,7 @@ function private:CreateSelectionFrame(parent)
 					},
 					{
 						type = "Text",
-						text = L["Cancel Filter:"],
+						text = "Cancel Filter:",
 						textFont = {TSMAPI.Design:GetContentFont("small")},
 						justify = {"LEFT", "MIDDLE"},
 						points = {{"TOPLEFT", 4, -52}, {"TOPRIGHT", -4, -52}},
@@ -117,9 +116,9 @@ function private:CreateSelectionFrame(parent)
 					{
 						type = "Button",
 						key = "cancelFilterBtn",
-						text = L["Cancel Items Matching Filter"],
+						text = "Cancel Items Matching Filter",
 						textHeight = 16,
-						tooltip = L["Will cancel all your auctions which match the specified filter, including ones which you didn't post with Auctioning."],
+						tooltip = "Will cancel all your auctions which match the specified filter, including ones which you didn't post with Auctioning.",
 						size = {0, 20},
 						points = {{"TOPLEFT", 4, -96}, {"TOPRIGHT", -4, -96}},
 						scripts = {"OnClick"},
@@ -131,18 +130,18 @@ function private:CreateSelectionFrame(parent)
 					{
 						type = "Dropdown",
 						key = "cancelDurationDropdown",
-						label = L["Low Duration"],
+						label = "Low Duration",
 						list = durationList,
 						value = 1,
-						tooltip = L["Select a duration in this dropdown and click on the button below to cancel all auctions at or below this duration."],
+						tooltip = "Select a duration in this dropdown and click on the button below to cancel all auctions at or below this duration.",
 						points = {{"TOPLEFT", 2, -124}, {"TOPRIGHT", 0, -124}},
 					},
 					{
 						type = "Button",
 						key = "cancelDurationBtn",
-						text = L["Cancel Low Duration"],
+						text = "Cancel Low Duration",
 						textHeight = 16,
-						tooltip = L["Will cancel all your auctions at or below the specified duration, including ones you didn't post with Auctioning."],
+						tooltip = "Will cancel all your auctions at or below the specified duration, including ones you didn't post with Auctioning.",
 						size = {0, 20},
 						points = {{"TOPLEFT", 4, -172}, {"TOPRIGHT", -4, -172}},
 						scripts = {"OnClick"},
@@ -153,7 +152,7 @@ function private:CreateSelectionFrame(parent)
 					},
 					{
 						type = "Text",
-						text = L["No-Group Posting:"],
+						text = "No-Group Posting:",
 						textFont = {TSMAPI.Design:GetContentFont("small")},
 						justify = {"LEFT", "MIDDLE"},
 						points = {{"TOPLEFT", 4, -202}, {"TOPRIGHT", -4, -202}},
@@ -161,9 +160,9 @@ function private:CreateSelectionFrame(parent)
 					{
 						type = "Button",
 						key = "quickPostBtn",
-						text = L["Quick Post from Bags"],
+						text = "Quick Post from Bags",
 						textHeight = 18,
-						tooltip = L["Will do a post scan for any items in your bags which aren't in a group with an Auctioning operation using some generic settings."],
+						tooltip = "Will do a post scan for any items in your bags which aren't in a group with an Auctioning operation using some generic settings.",
 						size = {0, 25},
 						points = {{"TOPLEFT", 4, -216}, {"TOPRIGHT", -4, -216}},
 						scripts = {"OnClick"},
@@ -193,7 +192,7 @@ function private:CreateSelectionFrame(parent)
 					OnClick = function(self)
 						local filter = self:GetParent().filterEditBox:GetText()
 						if filter:trim() == "" then
-							TSM:Print(L["The filter cannot be empty. If you'd like to cancel all auctions, use the 'Cancel All Auctions' button."])
+							TSM:Print("The filter cannot be empty. If you'd like to cancel all auctions, use the 'Cancel All Auctions' button.")
 							return
 						end
 						private:StartScan(parent, "Cancel", {filter=filter})
@@ -245,7 +244,7 @@ function private:CreateScanFrame(parent)
 					{
 						type = "ScrollingTableFrame",
 						key = "logST",
-						stCols = {{name=L["Item"], width=0.31}, {name=L["Operation"], width=0.17, align="CENTER"}, {name=private:GetLogSTPriceColumnText(), width=0.12, align="RIGHT"}, {name=L["Seller"], width=0.11, align="CENTER"}, {name=L["Info"], width=0.28}, {name="", width=0}},
+						stCols = {{name="Item", width=0.31}, {name="Operation", width=0.17, align="CENTER"}, {name=private:GetLogSTPriceColumnText(), width=0.12, align="RIGHT"}, {name="Seller", width=0.11, align="CENTER"}, {name="Info", width=0.28}, {name="", width=0}},
 						sortInfo = {true, 6},
 						stDisableSelection = true,
 						points = "ALL",
@@ -264,7 +263,7 @@ function private:CreateScanFrame(parent)
 						key = "post",
 						name = "TSMAuctioningPostButton",
 						isSecure = true,
-						text = L["Post"],
+						text = "Post",
 						textHeight = 22,
 						size = {80, 24},
 						points = {{"TOPLEFT"}},
@@ -284,7 +283,7 @@ function private:CreateScanFrame(parent)
 					{
 						type = "Button",
 						key = "skip",
-						text = L["Skip"],
+						text = "Skip",
 						textHeight = 18,
 						size = {60, 24},
 						points = {{"TOPLEFT", "post", "TOPRIGHT", 4, 0}},
@@ -293,7 +292,7 @@ function private:CreateScanFrame(parent)
 					{
 						type = "Button",
 						key = "stop",
-						text = L["Stop"],
+						text = "Stop",
 						textHeight = 18,
 						size = {70, 24},
 						points = {{"TOPLEFT", "skip", "TOPRIGHT", 4, 0}},
@@ -302,7 +301,7 @@ function private:CreateScanFrame(parent)
 					{
 						type = "Button",
 						key = "restart",
-						text = L["Restart"],
+						text = "Restart",
 						textHeight = 18,
 						size = {70, 24},
 						points = {{"TOPLEFT", "skip", "TOPRIGHT", 4, 0}},
@@ -318,7 +317,7 @@ function private:CreateScanFrame(parent)
 					{
 						type = "Button",
 						key = "auctionsButton",
-						text = L["Show All Auctions"],
+						text = "Show All Auctions",
 						textHeight = 16,
 						size = {150, 17},
 						points = {{"TOPRIGHT", -10, -20}},
@@ -327,7 +326,7 @@ function private:CreateScanFrame(parent)
 					{
 						type = "Button",
 						key = "currAuctionsButton",
-						text = L["Show Item Auctions"],
+						text = "Show Item Auctions",
 						textHeight = 16,
 						size = {150, 17},
 						points = {{"TOPRIGHT", -170, -20}},
@@ -336,7 +335,7 @@ function private:CreateScanFrame(parent)
 					{
 						type = "Button",
 						key = "logButton",
-						text = L["Show Log"],
+						text = "Show Log",
 						textHeight = 16,
 						size = {150, 17},
 						points = {{"TOPRIGHT", -10, -45}},
@@ -345,7 +344,7 @@ function private:CreateScanFrame(parent)
 					{
 						type = "Button",
 						key = "editPriceButton",
-						text = L["Edit Post Price"],
+						text = "Edit Post Price",
 						textHeight = 16,
 						size = {150, 17},
 						points = {{"TOPRIGHT", -170, -45}},
@@ -374,7 +373,7 @@ function private:CreateScanFrame(parent)
 					},
 					{
 						type = "Text",
-						text = L["Auction Buyout (Stack Price):"],
+						text = "Auction Buyout (Stack Price):",
 						textHeight = 12,
 						points = {{"TOPLEFT", 14, -40}},
 					},
@@ -388,7 +387,7 @@ function private:CreateScanFrame(parent)
 					{
 						type = "Dropdown",
 						key = "durationDropdown",
-						label = L["Duration"],
+						label = "Duration",
 						list = {[12]=AUCTION_DURATION_ONE, [24]=AUCTION_DURATION_TWO, [48]=AUCTION_DURATION_THREE},
 						value = 12,
 						size = {140, 40},
@@ -397,7 +396,7 @@ function private:CreateScanFrame(parent)
 					{
 						type = "Button",
 						key = "saveButton",
-						text = L["Save New Price"],
+						text = "Save New Price",
 						textHeight = 16,
 						size = {0, 20},
 						points = {{"BOTTOMRIGHT", BFC.PARENT, "BOTTOM", -2, 10}, {"BOTTOMLEFT", 10, 10}},
@@ -494,31 +493,31 @@ function private:CreateScanFrame(parent)
 						GameTooltip:SetOwner(self, "ANCHOR_NONE")
 						GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT")
 						GameTooltip:AddLine(data.link)
-						GameTooltip:AddLine(L["Group:"].." |cffffffff"..(TSMAPI.Groups:FormatPath(TSMAPI.Groups:GetPath(data.itemString)) or "---").."|r")
-						GameTooltip:AddLine(L["Minimum Price:"].." "..(TSMAPI:MoneyToString(prices.minPrice, "|cffffffff") or "---"))
-						GameTooltip:AddLine(L["Maximum Price:"].." "..(TSMAPI:MoneyToString(prices.maxPrice, "|cffffffff") or "---"))
-						GameTooltip:AddLine(L["Normal Price:"].." "..(TSMAPI:MoneyToString(prices.normalPrice, "|cffffffff") or "---"))
-						GameTooltip:AddLine(L["Lowest Buyout:"].." "..(TSMAPI:MoneyToString(data.lowestBuyout, "|cffffffff") or "---"))
+						GameTooltip:AddLine("Group:".." |cffffffff"..(TSMAPI.Groups:FormatPath(TSMAPI.Groups:GetPath(data.itemString)) or "---").."|r")
+						GameTooltip:AddLine("Minimum Price:".." "..(TSMAPI:MoneyToString(prices.minPrice, "|cffffffff") or "---"))
+						GameTooltip:AddLine("Maximum Price:".." "..(TSMAPI:MoneyToString(prices.maxPrice, "|cffffffff") or "---"))
+						GameTooltip:AddLine("Normal Price:".." "..(TSMAPI:MoneyToString(prices.normalPrice, "|cffffffff") or "---"))
+						GameTooltip:AddLine("Lowest Buyout:".." "..(TSMAPI:MoneyToString(data.lowestBuyout, "|cffffffff") or "---"))
 						if TSMAPI:HasModule("Accounting") then
 							local numExpires = select(2, TSMAPI:ModuleAPI("Accounting", "getAuctionStatsSinceLastSale", data.itemString))
 							if type(numExpires) ~= "number" then
 								numExpires = 0
 							end
 							if data.operation.maxExpires > 0 then
-								GameTooltip:AddLine(L["Expires / Max Expires:"].." |cffffffff("..numExpires.."/"..data.operation.maxExpires..")")
+								GameTooltip:AddLine("Expires / Max Expires:".." |cffffffff("..numExpires.."/"..data.operation.maxExpires..")")
 							else
-								GameTooltip:AddLine(L["Expires:"].." |cffffffff"..numExpires)
+								GameTooltip:AddLine("Expires:".." |cffffffff"..numExpires)
 							end
 						end
-						GameTooltip:AddLine(L["Log Info:"].." "..data.info)
+						GameTooltip:AddLine("Log Info:".." "..data.info)
 						GameTooltip:AddLine("")
-						GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..L["Click to show auctions for this item."].."|r")
+						GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2").."Click to show auctions for this item.".."|r")
 						if private.mode == "Post" then
-							GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..L["Shift-Click to buy auctions for this item."].."|r")
+							GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2").."Shift-Click to buy auctions for this item.".."|r")
 						end
-						GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..format(L["Right-Click to add %s to your friends list."], "|r"..(data.seller or "---")..TSMAPI.Design:GetInlineColor("link2")).."|r")
+						GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..format("Right-Click to add %s to your friends list.", "|r"..(data.seller or "---")..TSMAPI.Design:GetInlineColor("link2")).."|r")
 						if not data.operation.isFake then
-							GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2")..L["Shift-Right-Click to show the options for this operation."].."|r")
+							GameTooltip:AddLine(TSMAPI.Design:GetInlineColor("link2").."Shift-Right-Click to show the options for this operation.".."|r")
 						end
 						GameTooltip:Show()
 					end,
@@ -530,16 +529,16 @@ function private:CreateScanFrame(parent)
 						if button == "LeftButton" then
 							if IsShiftKeyDown() and private.mode == "Post" then
 								if not TSMAPI:HasModule("Shopping") then
-									TSM:Print(L["This feature requires the TSM_Shopping module."])
+									TSM:Print("This feature requires the TSM_Shopping module.")
 									return
 								end
 								local canBuy, reason = TSM.Post:CanBuyAuction(data.itemString)
 								if canBuy then
 									TSMAPI:ModuleAPI("Shopping", "startSearchAuctioning", TSMAPI.Item:ToItemString(data.itemString), TSM.Scan:GetDatabase(), function() private:DoCallbackAsync("REPROCESS_ITEM", data.itemString) end, TSM.Scan:GetFilterFunction(data.itemString, data.operation))
 								elseif reason == "scanning" then
-									TSM:Print(L["Cannot buy items until the post scan is complete."])
+									TSM:Print("Cannot buy items until the post scan is complete.")
 								elseif reason == "posted" then
-									TSM:Print(L["Cannot buy this item because you have already posted it."])
+									TSM:Print("Cannot buy this item because you have already posted it.")
 								end
 							else
 								private.scanFrame.contentButtonsFrame.auctionsButton:UnlockHighlight()
@@ -559,7 +558,7 @@ function private:CreateScanFrame(parent)
 								if data.seller then
 									AddFriend(data.seller)
 								else
-									TSM:Print(L["This item does not have any seller data."])
+									TSM:Print("This item does not have any seller data.")
 								end
 							end
 						end
@@ -684,7 +683,7 @@ function private:CreateScanFrame(parent)
 	TSMAPI.Design:SetFrameBackdropColor(private.scanFrame.editPriceFrame)
 	local auctionRTInfo = {
 		headers = {{"Auction Bid\n(per item)", "Auction Bid\n(per stack)"}, {"Auction Buyout\n(per item)", "Auction Buyout\n(per stack)"}},
-		pctHeader = L["% Market Value"],
+		pctHeader = "% Market Value",
 		GetRowPrices = function(record, isPerItem)
 			if isPerItem then
 				return record.itemDisplayedBid, record.itemBuyout, record.isHighBidder and "|cffffff00" or nil
@@ -724,9 +723,9 @@ end
 
 function private:GetLogSTPriceColumnText()
 	if TSM.db.global.priceColumn == 1 then
-		return L["Your Buyout"]
+		return "Your Buyout"
 	elseif TSM.db.global.priceColumn == 2 then
-		return L["Lowest Buyout"]
+		return "Lowest Buyout"
 	end
 end
 
@@ -869,7 +868,7 @@ function private:SetGoldText()
 			incomingTotal = incomingTotal + buyoutAmount
 		end
 	end
-	local text = format(L["Done Posting\n\nTotal value of your auctions: %s\nIncoming Gold: %s"], TSMAPI:MoneyToString(total, "OPT_ICON"), TSMAPI:MoneyToString(incomingTotal, "OPT_ICON"))
+	local text = format("Done Posting\n\nTotal value of your auctions: %s\nIncoming Gold: %s", TSMAPI:MoneyToString(total, "OPT_ICON"), TSMAPI:MoneyToString(incomingTotal, "OPT_ICON"))
 	GUI:SetInfo(text)
 end
 
@@ -912,7 +911,7 @@ function private:StartScan(frame, mode, options)
 				local opSettings = TSM.operations[opName]
 				if not opSettings then
 					-- operation doesn't exist anymore in Auctioning
-					TSM:Printf(L["'%s' has an Auctioning operation of '%s' which no longer exists. Auctioning will ignore this group until this is fixed."], groupName, opName)
+					TSM:Printf("'%s' has an Auctioning operation of '%s' which no longer exists. Auctioning will ignore this group until this is fixed.", groupName, opName)
 				else
 					-- it's a valid operation
 					TSM.operationNameLookup[opSettings] = opName
@@ -1004,7 +1003,7 @@ function GUI:SetInfo(info)
 		local itemID = TSMAPI.Item:ToItemID(info.itemString)
 		local total = TSMAPI.Inventory:GetTotalQuantity(info.itemString)
 		private.scanFrame.infoTextFrame.quantityText:Show()
-		private.scanFrame.infoTextFrame.quantityText:SetText(TSMAPI.Design:GetInlineColor("link")..L["Currently Owned:"].."|r "..total)
+		private.scanFrame.infoTextFrame.quantityText:SetText(TSMAPI.Design:GetInlineColor("link").."Currently Owned:".."|r "..total)
 
 		local link = TSMAPI.Item:GetLink(info.itemString)
 		private.scanFrame.infoTextFrame.linkText:SetText(link)
@@ -1015,9 +1014,9 @@ function GUI:SetInfo(info)
 		end
 		private.scanFrame.infoTextFrame.icon.link = link
 		private.scanFrame.infoTextFrame.icon:SetTexture(TSMAPI.Item:GetTexture(info.itemString))
-		private.scanFrame.infoTextFrame.stackText:SetText(format(L["%s item(s) to buy/cancel"], info.num..TSMAPI.Design:GetInlineColor("link")))
-		private.scanFrame.infoTextFrame.bidText:SetText(TSMAPI.Design:GetInlineColor("link")..L["Target Price:"].."|r "..TSMAPI:MoneyToString(info.targetPrice, "OPT_ICON"))
-		private.scanFrame.infoTextFrame.buyoutText:SetText(TSMAPI.Design:GetInlineColor("link")..L["Profit:"].."|r "..TSMAPI:MoneyToString(info.profit, "OPT_ICON"))
+		private.scanFrame.infoTextFrame.stackText:SetText(format("%s item(s) to buy/cancel", info.num..TSMAPI.Design:GetInlineColor("link")))
+		private.scanFrame.infoTextFrame.bidText:SetText(TSMAPI.Design:GetInlineColor("link").."Target Price:".."|r "..TSMAPI:MoneyToString(info.targetPrice, "OPT_ICON"))
+		private.scanFrame.infoTextFrame.buyoutText:SetText(TSMAPI.Design:GetInlineColor("link").."Profit:".."|r "..TSMAPI:MoneyToString(info.profit, "OPT_ICON"))
 	else
 		private.scanFrame.infoTextFrame.icon:Show()
 		private.scanFrame.infoTextFrame.linkText:Show()
@@ -1039,7 +1038,7 @@ function GUI:SetInfo(info)
 		private.scanFrame.infoTextFrame.icon.link = link
 		private.scanFrame.infoTextFrame.icon:SetTexture(TSMAPI.Item:GetTexture(info.itemString))
 
-		local sText = format("%s "..TSMAPI.Design:GetInlineColor("link")..L["auctions of|r %s"], info.numStacks, info.stackSize)
+		local sText = format("%s "..TSMAPI.Design:GetInlineColor("link").."auctions of|r %s", info.numStacks, info.stackSize)
 		private.scanFrame.infoTextFrame.stackText:SetText(sText)
 
 		private.scanFrame.infoTextFrame.bidText:SetText(TSMAPI.Design:GetInlineColor("link")..BID..":|r "..TSMAPI:MoneyToString(info.bid, "OPT_ICON"))
@@ -1076,15 +1075,15 @@ function GUI:Stopped(notDone)
 	if private.mode == "Post" then
 		TSMAPI.Delay:AfterTime(0.5, private.SetGoldText)
 		private.SetGoldText()
-		private.scanFrame.content.statusBar:SetStatusText(L["Post Scan Finished"])
+		private.scanFrame.content.statusBar:SetStatusText("Post Scan Finished")
 	elseif private.mode == "Cancel" then
-		GUI:SetInfo(L["Done Canceling"])
-		private.scanFrame.content.statusBar:SetStatusText(L["Cancel Scan Finished"])
+		GUI:SetInfo("Done Canceling")
+		private.scanFrame.content.statusBar:SetStatusText("Cancel Scan Finished")
 	elseif private.mode == "Reset" then
 		if not notDone then
-			GUI:SetInfo(L["No Items to Reset"])
+			GUI:SetInfo("No Items to Reset")
 		end
-		private.scanFrame.content.statusBar:SetStatusText(L["Reset Scan Finished"])
+		private.scanFrame.content.statusBar:SetStatusText("Reset Scan Finished")
 	end
 	private.scanFrame.actionButtonsFrame.stop:Hide()
 	private.scanFrame.actionButtonsFrame.restart:Show()

@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local GroupOptions = TSM:NewModule("GroupOptions", "AceSerializer-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
 local private = {operationInfo=TSM.moduleOperationInfo, moduleObjects=TSM.moduleObjects, groupTreeGroup=nil, scrollFrameStatus={}, alreadyLoadedGroupItems={}, groupTreeCache={}}
 
@@ -95,7 +94,7 @@ function GroupOptions:UpdateTree()
 	end
 	sort(groupChildren, function(a, b) return strlower(a.text) < strlower(b.text) end)
 
-	private.groupTreeGroup:SetTree({{value=1, text=L["Groups"], children=groupChildren}})
+	private.groupTreeGroup:SetTree({{value=1, text="Groups", children=groupChildren}})
 end
 
 function private:SelectGroup(name)
@@ -119,7 +118,7 @@ function private:SelectTree(treeGroup, _, selection)
 		local group = selection[#selection]
 		local tabGroup =  AceGUI:Create("TSMTabGroup")
 		tabGroup:SetLayout("Fill")
-		tabGroup:SetTabs({{text=L["Operations"], value=1}, {text=L["Items"], value=2}, {text=L["Import/Export"], value=3}, {text=L["Management"], value=4}})
+		tabGroup:SetTabs({{text="Operations", value=1}, {text="Items", value=2}, {text="Import/Export", value=3}, {text="Management", value=4}})
 		tabGroup:SetCallback("OnGroupSelected", function(self, _, value)
 				tabGroup:ReleaseChildren()
 				if value == 1 then
@@ -152,28 +151,28 @@ function private:DrawNewGroup(container)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["New Group"],
+					title = "New Group",
 					children = {
 						{
 							type = "Label",
 							relativeWidth = 1,
-							text = L["A group is a collection of items which will be treated in a similar way by TSM's modules."],
+							text = "A group is a collection of items which will be treated in a similar way by TSM's modules.",
 						},
 						{
 							type = "HeadingLine",
 						},
 						{
 							type = "EditBox",
-							label = L["Group Name"],
+							label = "Group Name",
 							relativeWidth = 1,
 							callback = function(self,_,value)
 									value = (value or ""):trim()
 									if value == "" then return end
 									if strfind(value, TSM.GROUP_SEP) then
-										return TSM:Printf(L["Group names cannot contain %s characters."], TSM.GROUP_SEP)
+										return TSM:Printf("Group names cannot contain %s characters.", TSM.GROUP_SEP)
 									end
 									if TSM.db.profile.groups[value] then
-										return TSM:Printf(L["Error creating group. Group with name '%s' already exists."], value)
+										return TSM:Printf("Error creating group. Group with name '%s' already exists.", value)
 									end
 									TSM:AnalyticsEvent("GROUP_CREATED")
 									TSM.Groups:Create(value)
@@ -185,11 +184,11 @@ function private:DrawNewGroup(container)
 										self:SetFocus()
 									end
 								end,
-							tooltip = L["Give the new group a name. A descriptive name will help you find this group later."],
+							tooltip = "Give the new group a name. A descriptive name will help you find this group later.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Switch to New Group After Creation"],
+							label = "Switch to New Group After Creation",
 							relativeWidth = 1,
 							settingInfo = {TSM.db.profile, "gotoNewGroup"},
 						},
@@ -201,23 +200,23 @@ function private:DrawNewGroup(container)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Settings"],
+					title = "Settings",
 					children = {
 						{
 							type = "Dropdown",
-							label = L["Default Group Tab"],
+							label = "Default Group Tab",
 							relativeWidth = 0.5,
-							list = {L["Operations"], L["Items"], L["Import/Export"], L["Management"]},
+							list = {"Operations", "Items", "Import/Export", "Management"},
 							settingInfo = {TSM.db.profile, "defaultGroupTab"},
-							tooltip = L["This dropdown determines the default tab when you visit a group."],
+							tooltip = "This dropdown determines the default tab when you visit a group.",
 						},
 						{
 							type = "EditBox",
-							label = L["Group Item Filter Value"],
+							label = "Group Item Filter Value",
 							settingInfo = {TSM.db.profile, "groupFilterPrice"},
 							relativeWidth = 0.5,
 							acceptCustom = true,
-							tooltip = L["When adding items to groups, you can filter by items with a value below a certain value. This custom price determines the value of items for the purpose of filter. For example, if you set this to 'dbmarket' and entered '/2000g' into the filter box, only items with a market value of at least 2000g will be shown. You can also specify a price range, such as '/200g/500g'."],
+							tooltip = "When adding items to groups, you can filter by items with a value below a certain value. This custom price determines the value of items for the purpose of filter. For example, if you set this to 'dbmarket' and entered '/2000g' into the filter box, only items with a market value of at least 2000g will be shown. You can also specify a price range, such as '/200g/500g'.",
 						},
 					},
 				},
@@ -235,7 +234,7 @@ function private:DrawGroupOperationsPage(container, groupPath)
 	for _, info in ipairs(private.operationInfo) do
 		local moduleName = info.module
 		local ddList = {}
-		ddList[""] = TSMAPI.Design:GetInlineColor("link")..L["<No Operation>"].."|r"
+		ddList[""] = TSMAPI.Design:GetInlineColor("link").."<No Operation>".."|r"
 		for name in pairs(TSM.operations[moduleName] or {}) do
 			ddList[name] = name
 		end
@@ -249,7 +248,7 @@ function private:DrawGroupOperationsPage(container, groupPath)
 		end
 		operations[1] = operations[1] or ""
 		if #operations > 1 then
-			ddList["\001"] = TSMAPI.Design:GetInlineColor("link")..L["<Remove Operation>"].."|r"
+			ddList["\001"] = TSMAPI.Design:GetInlineColor("link").."<Remove Operation>".."|r"
 		end
 
 		local moduleInline = {
@@ -263,7 +262,7 @@ function private:DrawGroupOperationsPage(container, groupPath)
 		if #operations < info.maxOperations then
 			addOperationWidget = {
 				type = "Button",
-				text = L["Add Additional Operation"],
+				text = "Add Additional Operation",
 				relativeWidth = 1,
 				disabled = isSubGroup and not operations.override,
 				callback = function()
@@ -277,7 +276,7 @@ function private:DrawGroupOperationsPage(container, groupPath)
 		if isSubGroup then
 			tinsert(moduleInline.children, {
 					type = "CheckBox",
-					label = L["Override Module Operations"],
+					label = "Override Module Operations",
 					value = operations.override,
 					relativeWidth = 1,
 					callback = function(_,_,value)
@@ -285,7 +284,7 @@ function private:DrawGroupOperationsPage(container, groupPath)
 							TSM.Groups:SetOperationOverride(groupPath, moduleName, value)
 							container:Reload()
 						end,
-					tooltip = L["Check this box to override this group's operation(s) for this module."],
+					tooltip = "Check this box to override this group's operation(s) for this module.",
 				})
 		else
 			tinsert(moduleInline.children, {type="Label", relativeWidth=1})
@@ -294,7 +293,7 @@ function private:DrawGroupOperationsPage(container, groupPath)
 		for i=1, #operations do
 			tinsert(moduleInline.children, {
 					type = "Dropdown",
-					label = format(L["Operation #%d"], i),
+					label = format("Operation #%d", i),
 					list = ddList,
 					value = operations[i],
 					relativeWidth = 0.6,
@@ -310,29 +309,29 @@ function private:DrawGroupOperationsPage(container, groupPath)
 						end
 						container:Reload()
 					end,
-					tooltip = L["Select an operation to apply to this group."],
+					tooltip = "Select an operation to apply to this group.",
 				})
 			if operations[i] ~= "" then
 				tinsert(moduleInline.children, {
 						type = "Button",
-						text = L["View Operation Options"],
+						text = "View Operation Options",
 						relativeWidth = 0.39,
 						callback = function()
 							TSM:AnalyticsEvent("GROUP_VIEW_OPERATION")
 							TSMAPI.Operations:ShowOptions(moduleName, operations[i])
 						end,
-						tooltip = L["Click this button to configure the currently selected operation."],
+						tooltip = "Click this button to configure the currently selected operation.",
 					})
 			elseif not isSubGroup or operations.override then
 				tinsert(moduleInline.children, {
 						type = "Button",
-						text = L["Create New Operation"],
+						text = "Create New Operation",
 						relativeWidth = 0.39,
 						callback = function()
 							TSM:AnalyticsEvent("GROUP_CREATE_OPERATION")
 							TSMAPI.Operations:ShowOptions(moduleName, "", groupPath)
 						end,
-						tooltip = L["Click this button to create a new operation for this module."],
+						tooltip = "Click this button to create a new operation for this module.",
 					})
 			end
 		end
@@ -348,7 +347,7 @@ function private:DrawGroupOperationsPage(container, groupPath)
 		tinsert(moduleInline.children, {type="HeadingLine"})
 		tinsert(moduleInline.children, {
 				type = "Label",
-				text = #opStrs > 0 and table.concat(opStrs, "\n") or format(L["Select a %s operation using the dropdown above."], moduleName),
+				text = #opStrs > 0 and table.concat(opStrs, "\n") or format("Select a %s operation using the dropdown above.", moduleName),
 				relativeWidth = 1,
 			})
 
@@ -385,13 +384,13 @@ function private:DrawGroupItemsPage(container, groupPath)
 	local parentPath, groupName = TSM.Groups:SplitGroupPath(groupPath)
 	local titleInfo = {}
 	if parentPath then
-		titleInfo.leftTitleList = {L["Parent/Ungrouped Items:"], L["Parent Group Items:"], L["Ungrouped Items:"]}
+		titleInfo.leftTitleList = {"Parent/Ungrouped Items:", "Parent Group Items:", "Ungrouped Items:"}
 		titleInfo.left = {{parent=true, ungrouped=true}, {parent=true}, {ungrouped=true}}
-		titleInfo.rightTitleList = {L["Subgroup Items:"]}
+		titleInfo.rightTitleList = {"Subgroup Items:"}
 	else
-		titleInfo.leftTitleList = {L["Ungrouped Items:"]}
+		titleInfo.leftTitleList = {"Ungrouped Items:"}
 		titleInfo.left = {{ungrouped=true}}
-		titleInfo.rightTitleList = {L["Group Items:"]}
+		titleInfo.rightTitleList = {"Group Items:"}
 	end
 
 	local bagItems = {}
@@ -478,73 +477,73 @@ function private:DrawGroupImportExportPage(container, groupPath)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Import Items"],
+					title = "Import Items",
 					children = {
 						{
 							type = "Label",
 							relativeWidth = 1,
-							text = L["Paste the list of items into the box below and hit enter or click on the 'Okay' button.\n\nYou can also paste an itemLink into the box below to add a specific item to this group."],
+							text = "Paste the list of items into the box below and hit enter or click on the 'Okay' button.\n\nYou can also paste an itemLink into the box below to add a specific item to this group.",
 						},
 						{
 							type = "EditBox",
-							label = L["Import String"],
+							label = "Import String",
 							relativeWidth = 1,
 							callback = function(self, _, value)
 								TSM:AnalyticsEvent("GROUP_IMPORT_ITEMS", TSM.db.profile.moveImportedItems)
 								TSMAPI.Threading:Start(private.ImportGroupThread, 0.7, nil, {self, value, groupPath})
 							end,
-							tooltip = L["Paste the exported items into this box and hit enter or press the 'Okay' button. The recommended format for the list of items is a comma separated list of itemIDs for general items. For battle pets, the entire battlepet string should be used. For randomly enchanted items, the format is <itemID>:<randomEnchant> (ex: 38472:-29)."],
+							tooltip = "Paste the exported items into this box and hit enter or press the 'Okay' button. The recommended format for the list of items is a comma separated list of itemIDs for general items. For battle pets, the entire battlepet string should be used. For randomly enchanted items, the format is <itemID>:<randomEnchant> (ex: 38472:-29).",
 						},
 						{
 							type = "CheckBox",
-							label = L["Move Already Grouped Items"],
+							label = "Move Already Grouped Items",
 							relativeWidth = 0.5,
 							settingInfo = {TSM.db.profile, "moveImportedItems"},
 							callback = function() container:Reload() end,
-							tooltip = L["If checked, any items you import that are already in a group will be moved out of their current group and into this group. Otherwise, they will simply be ignored."],
+							tooltip = "If checked, any items you import that are already in a group will be moved out of their current group and into this group. Otherwise, they will simply be ignored.",
 						},
 						{
 							type = "CheckBox",
 							disabled = not strfind(groupPath, TSM.GROUP_SEP) or not TSM.db.profile.moveImportedItems,
-							label = L["Only Import Items from Parent Group"],
+							label = "Only Import Items from Parent Group",
 							relativeWidth = 0.5,
 							settingInfo = {TSM.db.profile, "importParentOnly"},
-							tooltip = L["If checked, only items which are in the parent group of this group will be imported."],
+							tooltip = "If checked, only items which are in the parent group of this group will be imported.",
 						},
 					},
 				},
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Export Items in Group"],
+					title = "Export Items in Group",
 					children = {
 						{
 							type = "Label",
 							relativeWidth = 1,
-							text = L["Click the button below to open the export frame for this group."],
+							text = "Click the button below to open the export frame for this group.",
 						},
 						{
 							type = "Button",
-							text = L["Export Group Items"],
+							text = "Export Group Items",
 							relativeWidth = 1,
 							callback = function()
 								private:ShowGroupExportFrame(private.ExportGroup(groupPath, TSM.db.profile.exportSubGroups, TSM.db.profile.exportOperations))
 							end,
-							tooltip = L["Click this button to show a frame for easily exporting the list of items which are in this group."],
+							tooltip = "Click this button to show a frame for easily exporting the list of items which are in this group.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Include Subgroup Structure"],
+							label = "Include Subgroup Structure",
 							relativeWidth = 0.5,
 							settingInfo = {TSM.db.profile, "exportSubGroups"},
-							tooltip = L["If checked, the structure of the subgroups will be included in the export. Otherwise, the items in this group (and all subgroups) will be exported as a flat list."],
+							tooltip = "If checked, the structure of the subgroups will be included in the export. Otherwise, the items in this group (and all subgroups) will be exported as a flat list.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Include Operations"],
+							label = "Include Operations",
 							relativeWidth = 0.5,
 							settingInfo = {TSM.db.profile, "exportOperations"},
-							tooltip = L["If checked, all operations will be exported, including all of their settings."],
+							tooltip = "If checked, all operations will be exported, including all of their settings.",
 						},
 					},
 				},
@@ -569,63 +568,63 @@ function private:DrawGroupImportExportPage(container, groupPath)
 		local syncInlineGroup = {
 			type = "InlineGroup",
 			layout = "flow",
-			title = L["Send to Other Account"],
+			title = "Send to Other Account",
 			children = {
 				{
 					type = "Label",
 					relativeWidth = 1,
-					text = L["Select an online character on one of your other accounts to send this group to using the dropdown below and then click on the button."],
+					text = "Select an online character on one of your other accounts to send this group to using the dropdown below and then click on the button.",
 				},
 				{
 					type = "Dropdown",
-					label = L["Target Character:"],
+					label = "Target Character:",
 					list = syncTargetList,
 					value = syncTargetValue,
 					relativeWidth = 0.5,
 					callback = function(_, _, value) syncTargetValue = value end,
-					tooltip = L["This dropdown will list all characters on your other accounts which have active syncing connections and are currently online."],
+					tooltip = "This dropdown will list all characters on your other accounts which have active syncing connections and are currently online.",
 				},
 				{
 					type = "Button",
-					text = L["Send Group"],
+					text = "Send Group",
 					relativeWidth = 0.5,
 					callback = function(self)
 						local exportStr = private.ExportGroup(groupPath, includeSubgroup)
 						if #exportStr > 5000 then
-							return TSM:Print(L["This group is too large to send automatically. Please use manual import / export instead."])
+							return TSM:Print("This group is too large to send automatically. Please use manual import / export instead.")
 						end
 						local targetPlayer = syncTargetList[syncTargetValue]
 						local function handler(numItems)
 							if type(numItems) ~= "number" then
-								return TSM:Printf(L["Failed to send group to %s."], targetPlayer)
+								return TSM:Printf("Failed to send group to %s.", targetPlayer)
 							end
-							TSM:Printf(L["Successfully sent %d items to %s."], numItems, targetPlayer)
+							TSM:Printf("Successfully sent %d items to %s.", numItems, targetPlayer)
 						end
 						self:SetCallback("OnRelease", function() TSMAPI.Sync:CancelRPC("CreateGroupWithItems", handler) end)
 						self:SetDisabled(true)
-						self:SetText(L["Sent Group - Result is in Chat"])
+						self:SetText("Sent Group - Result is in Chat")
 						local _, groupName = TSM.Groups:SplitGroupPath(groupPath)
 						if not TSMAPI.Sync:CallRPC("CreateGroupWithItems", targetPlayer, handler, groupName, private.ExportGroup(groupPath, includeSubgroup), moveImportedItems) then
-							TSM:Printf(L["Failed to send group to %s."], targetPlayer)
+							TSM:Printf("Failed to send group to %s.", targetPlayer)
 						end
 					end,
-					tooltip = L["Click this button to send this group to the selected character. TSM will print out the operation in chat."],
+					tooltip = "Click this button to send this group to the selected character. TSM will print out the operation in chat.",
 				},
 				{
 					type = "CheckBox",
-					label = L["Include Subgroup Structure"],
+					label = "Include Subgroup Structure",
 					relativeWidth = 0.5,
 					value = includeSubgroup,
 					callback = function(_, _, value) includeSubgroup = value end,
-					tooltip = L["If checked, the structure of the subgroups will be included in the export. Otherwise, the items in this group (and all subgroups) will be exported as a flat list."],
+					tooltip = "If checked, the structure of the subgroups will be included in the export. Otherwise, the items in this group (and all subgroups) will be exported as a flat list.",
 				},
 				{
 					type = "CheckBox",
-					label = L["Move Already Grouped Items on Other Account"],
+					label = "Move Already Grouped Items on Other Account",
 					relativeWidth = 1,
 					value = moveImportedItems,
 					callback = function(_, _, value) moveImportedItems = value end,
-					tooltip = L["If checked, any items you import that are already in a group will be moved out of their current group and into this group. Otherwise, they will simply be ignored."],
+					tooltip = "If checked, any items you import that are already in a group will be moved out of their current group and into this group. Otherwise, they will simply be ignored.",
 				},
 			},
 		}
@@ -639,9 +638,9 @@ function private:DrawGroupManagementPage(container, groupPath)
 	local deleteTooltip = nil
 	local hasParent = TSM.Groups:SplitGroupPath(groupPath) and true or false
 	if hasParent and TSM.db.profile.keepInParent then
-		deleteTooltip = L["All items in this group and its subgroups will be moved to the parent group and this group and all of its subgroups will be deleted."]
+		deleteTooltip = "All items in this group and its subgroups will be moved to the parent group and this group and all of its subgroups will be deleted."
 	else
-		deleteTooltip = L["All items in this group and its subgroups will be removed and this group and all of its subgroups will be deleted."]
+		deleteTooltip = "All items in this group and its subgroups will be removed and this group and all of its subgroups will be deleted."
 	end
 
 	local page = {
@@ -652,11 +651,11 @@ function private:DrawGroupManagementPage(container, groupPath)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Group Management"],
+					title = "Group Management",
 					children = {
 						{
 							type = "EditBox",
-							label = L["Rename Group"],
+							label = "Rename Group",
 							relativeWidth = 1,
 							value = select(2, TSM.Groups:SplitGroupPath(groupPath)),
 							callback = function(_,_,value)
@@ -664,7 +663,7 @@ function private:DrawGroupManagementPage(container, groupPath)
 									if value == "" then return end
 									if value == select(2, TSM.Groups:SplitGroupPath(groupPath)) then return end -- same name
 									if strfind(value, TSM.GROUP_SEP) then
-										return TSM:Printf(L["Group names cannot contain %s characters."], TSM.GROUP_SEP)
+										return TSM:Printf("Group names cannot contain %s characters.", TSM.GROUP_SEP)
 									end
 									local newPath
 									local parent = TSM.Groups:SplitGroupPath(groupPath)
@@ -674,21 +673,21 @@ function private:DrawGroupManagementPage(container, groupPath)
 										newPath = value
 									end
 									if TSM.db.profile.groups[newPath] then
-										return TSM:Printf(L["Error renaming group. Group with name '%s' already exists."], value)
+										return TSM:Printf("Error renaming group. Group with name '%s' already exists.", value)
 									end
 									TSM:AnalyticsEvent("GROUP_RENAME")
 									TSM.Groups:Move(groupPath, newPath)
 									GroupOptions:UpdateTree()
 									private:SelectGroup(newPath)
 								end,
-							tooltip = L["Give the group a new name. A descriptive name will help you find this group later."],
+							tooltip = "Give the group a new name. A descriptive name will help you find this group later.",
 						},
 						{
 							type = "HeadingLine",
 						},
 						{
 							type = "Button",
-							text = L["Delete Group"],
+							text = "Delete Group",
 							relativeWidth = 0.5,
 							callback = function()
 								StaticPopupDialogs["TSM_DELETE_GROUP"] = StaticPopupDialogs["TSM_DELETE_GROUP"] or {
@@ -708,7 +707,7 @@ function private:DrawGroupManagementPage(container, groupPath)
 										end
 									end,
 								}
-								StaticPopupDialogs["TSM_DELETE_GROUP"].text = deleteTooltip.."\n\n"..L["Are you sure you want to delete this group?"]
+								StaticPopupDialogs["TSM_DELETE_GROUP"].text = deleteTooltip.."\n\n".."Are you sure you want to delete this group?"
 								StaticPopupDialogs["TSM_DELETE_GROUP"].tsmInfo = groupPath
 								TSMAPI.Util:ShowStaticPopupDialog("TSM_DELETE_GROUP")
 							end,
@@ -716,7 +715,7 @@ function private:DrawGroupManagementPage(container, groupPath)
 						},
 						{
 							type = "CheckBox",
-							label = L["Keep Items in Parent Group"],
+							label = "Keep Items in Parent Group",
 							relativeWidth = 0.5,
 							settingInfo = {TSM.db.profile, "keepInParent"},
 							disabled = not hasParent,
@@ -727,21 +726,21 @@ function private:DrawGroupManagementPage(container, groupPath)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Create New Subgroup"],
+					title = "Create New Subgroup",
 					children = {
 						{
 							type = "EditBox",
-							label = L["New Subgroup Name"],
+							label = "New Subgroup Name",
 							relativeWidth = 1,
 							callback = function(self,_,value)
 									value = (value or ""):trim()
 									if value == "" then return end
 									if strfind(value, TSM.GROUP_SEP) then
-										return TSM:Printf(L["Group names cannot contain %s characters."], TSM.GROUP_SEP)
+										return TSM:Printf("Group names cannot contain %s characters.", TSM.GROUP_SEP)
 									end
 									local newPath = groupPath..TSM.GROUP_SEP..value
 									if TSM.db.profile.groups[newPath] then
-										return TSM:Printf(L["Error creating subgroup. Subgroup with name '%s' already exists."], value)
+										return TSM:Printf("Error creating subgroup. Subgroup with name '%s' already exists.", value)
 									end
 									TSM:AnalyticsEvent("GROUP_CREATE_SUBGROUP")
 									TSM.Groups:Create(newPath)
@@ -753,11 +752,11 @@ function private:DrawGroupManagementPage(container, groupPath)
 										self:SetFocus()
 									end
 								end,
-							tooltip = L["Subgroups can contain a subset of the items in their parent group and can be useful in further refining how modules handle the items in this group."].."\n\n"..L["Give the group a new name. A descriptive name will help you find this group later."],
+							tooltip = "Subgroups can contain a subset of the items in their parent group and can be useful in further refining how modules handle the items in this group.".."\n\n".."Give the group a new name. A descriptive name will help you find this group later.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Switch to New Group After Creation"],
+							label = "Switch to New Group After Creation",
 							relativeWidth = 1,
 							settingInfo = {TSM.db.profile, "gotoNewGroup"},
 						},
@@ -766,33 +765,33 @@ function private:DrawGroupManagementPage(container, groupPath)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Move Group"],
+					title = "Move Group",
 					children = {
 						{
 							type = "Label",
 							relativeWidth = 1,
-							text = L["Use the group box below to move this group and all subgroups of this group. Moving a group will cause all items in the group (and its subgroups) to be removed from its current parent group and added to the new parent group."],
+							text = "Use the group box below to move this group and all subgroups of this group. Moving a group will cause all items in the group (and its subgroups) to be removed from its current parent group and added to the new parent group.",
 						},
 						{
 							type = "HeadingLine",
 						},
 						{
 							type = "GroupBox",
-							label = L["New Parent Group"],
+							label = "New Parent Group",
 							relativeWidth = 0.5,
 							callback = function(self, _, value)
 								self:SetText()
 								if value and value ~= groupPath then
 									if strfind(value, "^"..groupPath) then
-										return TSM:Printf(L["Error moving group. You cannot move this group to one of its subgroups."])
+										return TSM:Printf("Error moving group. You cannot move this group to one of its subgroups.")
 									end
 									local _, groupName = TSM.Groups:SplitGroupPath(groupPath)
 									local newPath = value..TSM.GROUP_SEP..groupName
 									if TSM.db.profile.groups[newPath] then
-										return TSM:Printf(L["Error moving group. Group '%s' already exists."], TSMAPI.Groups:FormatPath(newPath, true))
+										return TSM:Printf("Error moving group. Group '%s' already exists.", TSMAPI.Groups:FormatPath(newPath, true))
 									end
 
-									TSM:Printf(L["Moved %s to %s."], TSMAPI.Groups:FormatPath(groupPath, true), TSMAPI.Groups:FormatPath(value, true))
+									TSM:Printf("Moved %s to %s.", TSMAPI.Groups:FormatPath(groupPath, true), TSMAPI.Groups:FormatPath(value, true))
 									TSM:AnalyticsEvent("GROUP_NEW_PARENT")
 									TSM.Groups:Move(groupPath, newPath)
 									GroupOptions:UpdateTree()
@@ -802,23 +801,23 @@ function private:DrawGroupManagementPage(container, groupPath)
 						},
 						{
 							type = "Button",
-							text = L["Move to Top Level"],
+							text = "Move to Top Level",
 							relativeWidth = 0.5,
 							disabled = groupPath == select(2, TSM.Groups:SplitGroupPath(groupPath)),
 							callback = function()
 								local _, groupName = TSM.Groups:SplitGroupPath(groupPath)
 								local newPath = groupName
 								if TSM.db.profile.groups[newPath] then
-									return TSM:Printf(L["Error moving group. Group '%s' already exists."], TSMAPI.Groups:FormatPath(newPath, true))
+									return TSM:Printf("Error moving group. Group '%s' already exists.", TSMAPI.Groups:FormatPath(newPath, true))
 								end
 
-								TSM:Printf(L["Moved %s to %s."], TSMAPI.Groups:FormatPath(groupPath, true), TSMAPI.Groups:FormatPath(newPath, true))
+								TSM:Printf("Moved %s to %s.", TSMAPI.Groups:FormatPath(groupPath, true), TSMAPI.Groups:FormatPath(newPath, true))
 								TSM:AnalyticsEvent("GROUP_NEW_PARENT")
 								TSM.Groups:Move(groupPath, newPath)
 								GroupOptions:UpdateTree()
 								private:SelectGroup(newPath)
 							end,
-							tooltip = L["When clicked, makes this group a top-level group with no parent."],
+							tooltip = "When clicked, makes this group a top-level group with no parent.",
 						},
 					},
 				},
@@ -846,8 +845,8 @@ function private.ImportGroupAndOperationsThread(self, value, groupPath)
 					-- an operation with this name already exists
 					if not StaticPopupDialogs["TSMGroupImportPopup"] then
 						StaticPopupDialogs["TSMGroupImportPopup"] = {
-							button1 = L["Replace"],
-							button2 = L["Skip"],
+							button1 = "Replace",
+							button2 = "Skip",
 							button3 = CANCEL,
 							timeout = 0,
 							OnAccept = function() self:SendMsgToSelf("REPLACE") end, -- button1
@@ -856,7 +855,7 @@ function private.ImportGroupAndOperationsThread(self, value, groupPath)
 						}
 					end
 					-- Blizzard's code passes the text to format() so we need to escape '%' characters
-					StaticPopupDialogs["TSMGroupImportPopup"].text = gsub(format(L["A(n) %s operation named '%s' already exists! Would you like to replace the existing operation, skip importing this operation, or cancel the entire import?"], module, name), "%%", "%%%%")
+					StaticPopupDialogs["TSMGroupImportPopup"].text = gsub(format("A(n) %s operation named '%s' already exists! Would you like to replace the existing operation, skip importing this operation, or cancel the entire import?", module, name), "%%", "%%%%")
 					TSMAPI.Util:ShowStaticPopupDialog("TSMGroupImportPopup")
 					local event = unpack(self:ReceiveMsg())
 					if event == "REPLACE" then
@@ -881,7 +880,7 @@ function private.ImportGroupAndOperationsThread(self, value, groupPath)
 				end
 			end
 		else
-			TSM:Printf(L["Skipping %s operations as the module is not loaded."], module)
+			TSM:Printf("Skipping %s operations as the module is not loaded.", module)
 		end
 		newOperations[module] = newModuleOperations
 	end
@@ -923,11 +922,11 @@ function private.ImportGroupThread(self, args)
 	end
 	editbox:SetDisabled(false)
 	if not num then
-		TSM:Print(L["Invalid import string."])
+		TSM:Print("Invalid import string.")
 		return editbox:SetFocus()
 	end
 	editbox:SetText("")
-	TSM:Printf(L["Successfully imported %d items to %s."], num, TSMAPI.Groups:FormatPath(groupPath, true))
+	TSM:Printf("Successfully imported %d items to %s.", num, TSMAPI.Groups:FormatPath(groupPath, true))
 	GroupOptions:UpdateTree()
 	private:SelectGroup(groupPath)
 end
@@ -1085,12 +1084,12 @@ TSM.exportedForTesting.ExportGroup = private.ExportGroup
 function private:ShowGroupExportFrame(text)
 	local f = AceGUI:Create("TSMWindow")
 	f:SetCallback("OnClose", function(self) AceGUI:Release(self) end)
-	f:SetTitle("TradeSkillMaster - "..L["Export Group Items"])
+	f:SetTitle("TradeSkillMaster - ".."Export Group Items")
 	f:SetLayout("Fill")
 	f:SetHeight(300)
 
 	local eb = AceGUI:Create("TSMMultiLineEditBox")
-	eb:SetLabel(L["Group Item Data"])
+	eb:SetLabel("Group Item Data")
 	eb:SetMaxLetters(0)
 	eb:SetText(text)
 	f:AddChild(eb)

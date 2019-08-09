@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local MailTab = TSM:NewModule("MailTab", "AceEvent-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Mailing") -- loads the localization table
 local private = {frame=nil, tabs={}, didHook=nil}
 
 
@@ -90,7 +89,7 @@ function private:CreateMailTab()
 			{
 				type = "Button",
 				key = "groupsBtn",
-				text = L["TSM Groups"],
+				text = "TSM Groups",
 				textHeight = 15,
 				size = {95, 20},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}},
@@ -99,7 +98,7 @@ function private:CreateMailTab()
 			{
 				type = "Button",
 				key = "quickSendBtn",
-				text = L["Quick Send"],
+				text = "Quick Send",
 				textHeight = 15,
 				size = {85, 20},
 				points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}},

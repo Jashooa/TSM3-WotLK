@@ -8,14 +8,13 @@
 
 local TSM = select(2, ...)
 local Groups = TSM:NewModule("Groups", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Mailing") -- loads the localization table
 local private = {dryRun=nil, frame=nil}
 
 
 function Groups:OnEnable()
 	Groups:RegisterEvent("MAIL_CLOSED", function()
 		if private.frame then
-			private.frame.button:SetText(L["Mail Selected Groups"])
+			private.frame.button:SetText("Mail Selected Groups")
 			private.frame.button:Enable()
 		end
 	end)
@@ -41,9 +40,9 @@ function Groups:CreateTab(parent)
 			{
 				type = "Button",
 				key = "button",
-				text = L["Mail Selected Groups"],
+				text = "Mail Selected Groups",
 				textHeight = 15,
-				tooltip = L["|cff99ffffShift-Click|r to automatically re-send after the amount of time specified in the TSM_Mailing options.\n|cff99ffffCtrl-Click|r to perform a dry-run where Mailing doesn't send anything, but prints out what it would send (useful for testing your operations)."],
+				tooltip = "|cff99ffffShift-Click|r to automatically re-send after the amount of time specified in the TSM_Mailing options.\n|cff99ffffCtrl-Click|r to perform a dry-run where Mailing doesn't send anything, but prints out what it would send (useful for testing your operations).",
 				size = {0, 25},
 				points = {{"BOTTOMLEFT", 5, 5}, {"BOTTOMRIGHT", -5, 5}},
 				scripts = {"OnClick"},
@@ -76,7 +75,7 @@ function Groups:ValidateOperation(operation, operationName)
 	if operation.target == "" then
 		-- operation is invalid (no target)
 		if not badOperations[operationName] then
-			TSM:Printf(L["Skipping operation '%s' because there is no target."], operationName)
+			TSM:Printf("Skipping operation '%s' because there is no target.", operationName)
 			badOperations[operationName] = true
 		end
 		return
@@ -168,18 +167,18 @@ end
 function private:SendNextTarget()
 	local target, items = next(private.targets)
 	if not target then
-		private.frame.button:SetText(L["Mail Selected Groups"])
+		private.frame.button:SetText("Mail Selected Groups")
 		private.frame.button:Enable()
 		private.isSending = nil
 		private.dryRun = nil
-		TSM:Print(L["Done sending mail."])
+		TSM:Print("Done sending mail.")
 		return
 	end
 
 	TSM:LOG_INFO("Sending items to %s", tostring(target))
 	private.isSending = true
 	private.targets[target] = nil
-	private.frame.button:SetText(L["Sending..."])
+	private.frame.button:SetText("Sending...")
 	private.frame.button:Disable()
 	if not TSM.AutoMail:SendItems(items, target, private.SendNextTarget, nil, private.dryRun) then
 		private:SendNextTarget()

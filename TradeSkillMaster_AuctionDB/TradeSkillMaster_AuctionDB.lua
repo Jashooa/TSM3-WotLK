@@ -10,7 +10,6 @@
 local TSM = select(2, ...)
 TSM = LibStub("AceAddon-3.0"):NewAddon(TSM, "TSM_AuctionDB", "AceEvent-3.0", "AceConsole-3.0")
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_AuctionDB") -- loads the localization table
 local private = {}
 
 TSM.MAX_AVG_DAY = 1
@@ -18,7 +17,7 @@ TSM.HISTORICAL_DAYS = 60
 local SECONDS_PER_DAY = 60 * 60 * 24
 
 StaticPopupDialogs["TSM_AUCTIONDB_NO_DATA_POPUP"] = {
-	text = L["|cffff0000WARNING:|r TSM_AuctionDB doesn't currently have any pricing data for your realm. Either download the TSM Desktop Application from |cff99ffffhttp://tradeskillmaster.com|r to automatically update TSM_AuctionDB's data, or run a manual scan in-game."],
+	text = "|cffff0000WARNING:|r TSM_AuctionDB doesn't currently have any pricing data for your realm. Either download the TSM Desktop Application from |cff99ffffhttp://tradeskillmaster.com|r to automatically update TSM_AuctionDB's data, or run a manual scan in-game.",
 	button1 = OKAY,
 	timeout = 0,
 	hideOnEscape = false,
@@ -61,9 +60,9 @@ end
 -- registers this module with TSM by first setting all fields and then calling TSMAPI:NewModule().
 function TSM:RegisterModule()
 	TSM.priceSources = {
-		{ key = "DBMarket", label = L["AuctionDB - Market Value"], callback = "GetRealmItemData", arg = "marketValue", takeItemString = true },
-        { key = "DBMinBuyout", label = L["AuctionDB - Minimum Buyout"], callback = "GetRealmItemData", arg = "minBuyout", takeItemString = true },
-        { key = "DBHistorical", label = L["AuctionDB - Historical Price"], callback = "GetRealmItemData", arg = "historical", takeItemString = true },
+		{ key = "DBMarket", label = "AuctionDB - Market Value", callback = "GetRealmItemData", arg = "marketValue", takeItemString = true },
+        { key = "DBMinBuyout", label = "AuctionDB - Minimum Buyout", callback = "GetRealmItemData", arg = "minBuyout", takeItemString = true },
+        { key = "DBHistorical", label = "AuctionDB - Historical Price", callback = "GetRealmItemData", arg = "historical", takeItemString = true },
 	}
 	TSM.moduleOptions = {callback="Config:Load"}
 	if TSM.db.global.showAHTab then
@@ -93,9 +92,9 @@ function TSM:OnTSMDBShutdown()
 end
 
 local TOOLTIP_STRINGS = {
-	minBuyout = {L["Min Buyout:"], L["Min Buyout x%s:"]},
-    marketValue = {L["Market Value:"], L["Market Value x%s:"]},
-    historical = {L["Historical Price:"], L["Historical Price x%s:"]},
+	minBuyout = {"Min Buyout:", "Min Buyout x%s:"},
+    marketValue = {"Market Value:", "Market Value x%s:"},
+    historical = {"Historical Price:", "Historical Price x%s:"},
 }
 local function TooltipMoneyFormat(value, quantity, moneyCoins)
 	return TSMAPI:MoneyToString(value*quantity, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil)
@@ -134,12 +133,12 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 	-- add the header if we've added at least one line
 	if #lines > numStartingLines then
 		local lastScan = TSM:GetRealmItemData(itemString, "lastScan")
-		local rightStr = "|cffffffff"..L["Not Scanned"].."|r"
+		local rightStr = "|cffffffff".."Not Scanned".."|r"
 		if lastScan then
 			local timeColor = (time() - lastScan) > 60*60*3 and "|cffff0000" or "|cff00ff00"
 			local timeDiff = SecondsToTime(time() - lastScan)
 			local numAuctions = TSM:GetRealmItemData(itemString, "numAuctions") or 0
-			rightStr = format("%s (%s)", format("|cffffffff"..L["%d auctions"].."|r", numAuctions), format(timeColor..L["%s ago"].."|r", timeDiff))
+			rightStr = format("%s (%s)", format("|cffffffff".."%d auctions".."|r", numAuctions), format(timeColor.."%s ago".."|r", timeDiff))
 		end
 		tinsert(lines, numStartingLines+1, {left="|cffffff00TSM AuctionDB:|r", right=rightStr})
 	end

@@ -7,7 +7,6 @@
 -- ------------------------------------------------------------------------------ --
 
 -- loads the localization table --
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Warehousing")
 
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
@@ -55,7 +54,7 @@ function data:unIndexMoveGroupTree(grpInfo, src, dest)
 			local opSettings = TSM.operations[opName]
 			if not opSettings then
 				-- operation doesn't exist anymore in Warehousing
-				TSM:Printf(L["'%s' has a Warehousing operation of '%s' which no longer exists."], groupName, opName)
+				TSM:Printf("'%s' has a Warehousing operation of '%s' which no longer exists.", groupName, opName)
 			else
 				-- it's a valid operation
 				for itemString in pairs(info.items) do
@@ -124,7 +123,7 @@ function data:unIndexRestockGroupTree(grpInfo, src)
 			local opSettings = TSM.operations[opName]
 			if not opSettings then
 				-- operation doesn't exist anymore in warehousing
-				TSM:Printf(L["'%s' has a Warehousing operation of '%s' which no longer exists."], groupName, opName)
+				TSM:Printf("'%s' has a Warehousing operation of '%s' which no longer exists.", groupName, opName)
 			else
 				-- it's a valid operation
 				for itemString in pairs(info.items) do

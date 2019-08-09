@@ -8,12 +8,11 @@
 
 local TSM = select(2, ...)
 local AuctionTabSaved = TSM:NewModule("AuctionTabSaved")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Shopping") -- loads the localization table
 local private = {frame=nil, popupInfo={}}
 
 
 StaticPopupDialogs["TSM_SHOPPING_SAVED_RENAME_POPUP"] = {
-	text = L["Type in the new name for this saved search and hit the 'Save' button."],
+	text = "Type in the new name for this saved search and hit the 'Save' button.",
 	button1 = SAVE,
 	OnShow = function(self)
 		local renameInfo = private.popupInfo.renameInfo
@@ -34,7 +33,7 @@ StaticPopupDialogs["TSM_SHOPPING_SAVED_RENAME_POPUP"] = {
 	preferredIndex = 3,
 }
 StaticPopupDialogs["TSM_SHOPPING_SAVED_EXPORT_POPUP"] = {
-	text = L["Press Ctrl-C to copy this saved search."],
+	text = "Press Ctrl-C to copy this saved search.",
 	button1 = OKAY,
 	OnShow = function(self)
 		self.editBox:SetText(private.popupInfo.export)
@@ -49,8 +48,8 @@ StaticPopupDialogs["TSM_SHOPPING_SAVED_EXPORT_POPUP"] = {
 	preferredIndex = 3,
 }
 StaticPopupDialogs["TSM_SHOPPING_SAVED_IMPORT_POPUP"] = {
-	text = L["Paste the search you'd like to import into the box below."],
-	button1 = L["Import"],
+	text = "Paste the search you'd like to import into the box below.",
+	button1 = "Import",
 	button2 = CANCEL,
 	OnShow = function(self)
 		self.editBox:SetText("")
@@ -75,7 +74,7 @@ StaticPopupDialogs["TSM_SHOPPING_SAVED_IMPORT_POPUP"] = {
 			if not found then
 				tinsert(TSM.db.global.savedSearches, {searchMode="normal", filter=text, name=text, lastSearch=time(), isFavorite=true})
 			end
-			TSM:Printf(L["Added '%s' to your favorite searches."], text)
+			TSM:Printf("Added '%s' to your favorite searches.", text)
 			private.UpdateSTData()
 		end
 	end,
@@ -98,9 +97,9 @@ function private.UpdateSTData()
 	for i, data in ipairs(TSM.db.global.savedSearches) do
 		local name = data.name
 		if data.searchMode == "normal" then
-			name = L["|cff99ffff[Normal]|r "]..name
+			name = "|cff99ffff[Normal]|r "..name
 		elseif data.searchMode == "crafting" then
-			name = L["|cff99ffff[Crafting]|r "]..name
+			name = "|cff99ffff[Crafting]|r "..name
 		end
 		local row = {
 			cols = {{value=name}},
@@ -129,7 +128,7 @@ function private:StartGroupScan(groupTree)
 			local opSettings = TSM.operations[opName]
 			if not opSettings then
 				-- operation doesn't exist anymore in Auctioning
-				TSM:Printf(L["'%s' has a Shopping operation of '%s' which no longer exists. Shopping will ignore this group until this is fixed."], groupName, opName)
+				TSM:Printf("'%s' has a Shopping operation of '%s' which no longer exists. Shopping will ignore this group until this is fixed.", groupName, opName)
 			else
 				-- it's a valid operation
 				for itemString in pairs(data.items) do
@@ -158,7 +157,7 @@ function private:StartGroupScan(groupTree)
 					if isValid then
 						itemOperations[itemString] = opSettings
 					elseif err then
-						TSM:Printf(L["Invalid custom price source for %s. %s"], TSMAPI.Item:GetLink(itemString), err)
+						TSM:Printf("Invalid custom price source for %s. %s", TSMAPI.Item:GetLink(itemString), err)
 					end
 				end
 			end
@@ -171,11 +170,11 @@ function private:StartGroupScan(groupTree)
 	end
 
 	if #itemList == 0 then
-		TSM:Print(L["Nothing to search for!"])
+		TSM:Print("Nothing to search for!")
 		return
 	end
 
-	local searchInfo = {searchMode="normal", item=itemList, extraInfo={searchType="group", itemOperations=itemOperations, maxQuantity=maxQuantity}, searchBoxText="~"..L["group search"].."~"}
+	local searchInfo = {searchMode="normal", item=itemList, extraInfo={searchType="group", itemOperations=itemOperations, maxQuantity=maxQuantity}, searchBoxText="~".."group search".."~"}
 	TSM.AuctionTab:StartSearch(searchInfo)
 end
 
@@ -222,7 +221,7 @@ function private.RunSavedSearch(index, isFavoriteST)
 			if TSM.db.global.savedSearches[i].isFavorite then
 				-- setup the next search
 				searchInfo.extraInfo.continue = {
-					tooltip = L["Shift-Click to run the next favorite search."],
+					tooltip = "Shift-Click to run the next favorite search.",
 					callback = function()
 						private.RunSavedSearch(i, true)
 					end,
@@ -244,7 +243,7 @@ function AuctionTabSaved:GetFrameInfo()
 						private.popupInfo.export = data.search
 						TSMAPI.Util:ShowStaticPopupDialog("TSM_SHOPPING_SAVED_EXPORT_POPUP")
 					else
-						TSM:Print(L["Only exporting normal mode searches is allows."])
+						TSM:Print("Only exporting normal mode searches is allows.")
 					end
 				elseif IsControlKeyDown() then
 					private.popupInfo.renameInfo = data.searchInfo
@@ -256,16 +255,16 @@ function AuctionTabSaved:GetFrameInfo()
 				if st == private.frame.saved.recentST then
 					if IsShiftKeyDown() then
 						tremove(TSM.db.global.savedSearches, data.index)
-						TSM:Printf(L["Removed '%s' from your recent searches."], data.searchInfo.name)
+						TSM:Printf("Removed '%s' from your recent searches.", data.searchInfo.name)
 						private.UpdateSTData()
 					else
 						data.searchInfo.isFavorite = true
-						TSM:Printf(L["Added '%s' to your favorite searches."], data.searchInfo.name)
+						TSM:Printf("Added '%s' to your favorite searches.", data.searchInfo.name)
 						private.UpdateSTData()
 					end
 				elseif st == private.frame.saved.favoriteST then
 					data.searchInfo.isFavorite = nil
-					TSM:Printf(L["Removed '%s' from your favorite searches."], data.searchInfo.name)
+					TSM:Printf("Removed '%s' from your favorite searches.", data.searchInfo.name)
 				end
 				private.UpdateSTData()
 			end
@@ -277,16 +276,16 @@ function AuctionTabSaved:GetFrameInfo()
 			GameTooltip:AddLine("")
 			local color = TSMAPI.Design:GetInlineColor("link")
 			if st == private.frame.saved.recentST then
-				GameTooltip:AddLine(color..L["Left-Click to run this search."], 1, 1, 1, true)
-				GameTooltip:AddLine(color..L["Shift-Left-Click to export this search."], 1, 1, 1, true)
-				GameTooltip:AddLine(color..L["Ctrl-Left-Click to rename this search."], 1, 1, 1, true)
-				GameTooltip:AddLine(color..L["Right-Click to favorite this recent search."], 1, 1, 1, true)
-				GameTooltip:AddLine(color..L["Shift-Right-Click to remove this recent search."], 1, 1, 1, true)
+				GameTooltip:AddLine(color.."Left-Click to run this search.", 1, 1, 1, true)
+				GameTooltip:AddLine(color.."Shift-Left-Click to export this search.", 1, 1, 1, true)
+				GameTooltip:AddLine(color.."Ctrl-Left-Click to rename this search.", 1, 1, 1, true)
+				GameTooltip:AddLine(color.."Right-Click to favorite this recent search.", 1, 1, 1, true)
+				GameTooltip:AddLine(color.."Shift-Right-Click to remove this recent search.", 1, 1, 1, true)
 			elseif st == private.frame.saved.favoriteST then
-				GameTooltip:AddLine(color..L["Left-Click to run this search."], 1, 1, 1, true)
-				GameTooltip:AddLine(color..L["Shift-Left-Click to export this search."], 1, 1, 1, true)
-				GameTooltip:AddLine(color..L["Ctrl-Left-Click to rename this search."], 1, 1, 1, true)
-				GameTooltip:AddLine(color..L["Right-Click to remove from favorite searches."], 1, 1, 1, true)
+				GameTooltip:AddLine(color.."Left-Click to run this search.", 1, 1, 1, true)
+				GameTooltip:AddLine(color.."Shift-Left-Click to export this search.", 1, 1, 1, true)
+				GameTooltip:AddLine(color.."Ctrl-Left-Click to rename this search.", 1, 1, 1, true)
+				GameTooltip:AddLine(color.."Right-Click to remove from favorite searches.", 1, 1, 1, true)
 			end
 			GameTooltip:Show()
 		end,
@@ -312,7 +311,7 @@ function AuctionTabSaved:GetFrameInfo()
 					{
 						type = "ScrollingTableFrame",
 						key = "recentST",
-						stCols = {{name=L["Recent Searches"], width=1}},
+						stCols = {{name="Recent Searches", width=1}},
 						stDisableSelection = true,
 						points = {{"TOPLEFT"}, {"BOTTOMRIGHT", BFC.PARENT, "RIGHT", 0, 2}},
 						scripts = {"OnClick", "OnEnter", "OnLeave"},
@@ -320,7 +319,7 @@ function AuctionTabSaved:GetFrameInfo()
 					{
 						type = "ScrollingTableFrame",
 						key = "favoriteST",
-						stCols = {{name=L["Favorite Searches"], width=1}},
+						stCols = {{name="Favorite Searches", width=1}},
 						stDisableSelection = true,
 						points = {{"TOPLEFT", BFC.PARENT, "LEFT", 0, -2}, {"BOTTOMRIGHT", 0, 26}},
 						scripts = {"OnClick", "OnEnter", "OnLeave"},
@@ -328,7 +327,7 @@ function AuctionTabSaved:GetFrameInfo()
 					{
 						type = "Button",
 						key = "importBtn",
-						text = L["Import Favorite Search"],
+						text = "Import Favorite Search",
 						textHeight = 18,
 						size = {0, 22},
 						points = {{"BOTTOMLEFT", 2, 2}, {"BOTTOMRIGHT", -2, 2}},
@@ -354,7 +353,7 @@ function AuctionTabSaved:GetFrameInfo()
 					},
 					{
 						type = "Text",
-						text = L["Select the groups which you would like to include in the search."],
+						text = "Select the groups which you would like to include in the search.",
 						justify = {"CENTER", "MIDDLE"},
 						size = {0, 35},
 						points = {{"TOPLEFT"}, {"TOPRIGHT"}},
@@ -362,7 +361,7 @@ function AuctionTabSaved:GetFrameInfo()
 					{
 						type = "Button",
 						key = "startBtn",
-						text = L["Start Search"],
+						text = "Start Search",
 						textHeight = 18,
 						size = {0, 20},
 						points = {{"BOTTOMLEFT", 2, 2}, {"BOTTOMRIGHT", -2, 2}},

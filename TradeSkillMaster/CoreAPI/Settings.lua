@@ -9,7 +9,6 @@
 -- This file contains various settings APIs
 local TSM = select(2, ...)
 local Settings = TSM:NewModule("Settings", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {context={}, proxies={}, profileWarning=nil, protectedAccessAllowed={}}
 local VALID_TYPES = {boolean=true, string=true, table=true, number=true}
 local KEY_SEP = "@"
@@ -94,9 +93,9 @@ function TSMAPI.Settings:Init(svTableName, settingsInfo, upgradeCallback)
 		if not private.profileWarning then
 			for character, profileName in pairs(oldDB.profileKeys) do
 				if profileName ~= DEFAULT_PROFILE_NAME then
-					TSM:Print(L["|cffff0000IMPORTANT:|r Your TSM profile has been reset to the 'Default' profile as part of a recent update. None of your settings have been lost, but on characters where you wish to use another profile, you'll need to manually change it back."])
+					TSM:Print("|cffff0000IMPORTANT:|r Your TSM profile has been reset to the 'Default' profile as part of a recent update. None of your settings have been lost, but on characters where you wish to use another profile, you'll need to manually change it back.")
 					StaticPopupDialogs["TSMResetToDefaultProfile"] = {
-						text = L["|cffff0000IMPORTANT:|r Your TSM profile has been reset to the 'Default' profile as part of a recent update. None of your settings have been lost, but on characters where you wish to use another profile, you'll need to manually change it back."],
+						text = "|cffff0000IMPORTANT:|r Your TSM profile has been reset to the 'Default' profile as part of a recent update. None of your settings have been lost, but on characters where you wish to use another profile, you'll need to manually change it back.",
 						button1 = OKAY,
 						timeout = 0,
 					}

@@ -9,7 +9,6 @@
 local TSM = select(2, ...)
 local TradeSkill = TSM:GetModule("TradeSkill")
 local Groups = TradeSkill:NewModule("Groups")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
 local private = {}
 
 
@@ -34,7 +33,7 @@ function Groups:GetFrameInfo()
 			{
 				type = "Button",
 				key = "createBtn",
-				text = L["Create Profession Groups"],
+				text = "Create Profession Groups",
 				textHeight = 13,
 				size = {160, 24},
 				points = {{"BOTTOMLEFT", 5, 5}},
@@ -43,7 +42,7 @@ function Groups:GetFrameInfo()
 			{
 				type = "Button",
 				key = "restockBtn",
-				text = L["Restock Selected Groups"],
+				text = "Restock Selected Groups",
 				textHeight = 20,
 				size = {0, 24},
 				points = {{"BOTTOMLEFT", "createBtn", "BOTTOMRIGHT", 5, 0}, {"BOTTOMRIGHT", -5, 5}},

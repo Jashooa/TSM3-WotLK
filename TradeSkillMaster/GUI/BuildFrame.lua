@@ -7,7 +7,6 @@
 -- ------------------------------------------------------------------------------ --
 
 local TSM = select(2, ...)
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {frameInfo={}, CONSTANTS={PARENT={},PREV={}}}
 
 

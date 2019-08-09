@@ -18,7 +18,6 @@ TSM.CANCELLED_KEYS = { "itemString", "stackSize", "quantity", "player", "time" }
 TSM.GOLD_LOG_KEYS = { "startMinute", "endMinute", "copper" }
 TSM.AUCTION_KEYS = { "itemString", "bid", "buyout", "duration", "stackSize", "numStacks", "player", "time" }
 local MAX_CSV_RECORDS = 55000
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Accounting") -- loads the localization table
 local LibParse = LibStub("LibParse")
 local baseItemLookup = { update = 0 }
 
@@ -79,7 +78,7 @@ function TSM:OnInitialize()
 	TSM:RegisterModule()
 
 	for key, timestamp in pairs(TSM.db.realm.trimmed) do
-		TSM:Printf(L["|cffff0000IMPORTANT:|r When TSM_Accounting last saved data for this realm, it was too big for WoW to handle, so old data was automatically trimmed in order to avoid corruption of the saved variables. The last %s of %s data has been preserved."], SecondsToTime(time() - timestamp), key)
+		TSM:Printf("|cffff0000IMPORTANT:|r When TSM_Accounting last saved data for this realm, it was too big for WoW to handle, so old data was automatically trimmed in order to avoid corruption of the saved variables. The last %s of %s data has been preserved.", SecondsToTime(time() - timestamp), key)
 	end
 	TSM.db.realm.trimmed = {}
 
@@ -136,12 +135,12 @@ function TSM:RegisterModule()
 	}
 	TSM.moduleOptions = { callback = "Options:Load" }
 	TSM.priceSources = {
-		{ key = "avgSell", label = L["Avg Sell Price"], callback = "GetAvgSellPrice", takeItemString = true },
-		{ key = "avgBuy", label = L["Avg Buy Price"], callback = "GetAvgBuyPrice", takeItemString = true },
-		{ key = "maxSell", label = L["Max Sell Price"], callback = "GetMaxSellPrice", takeItemString = true },
-		{ key = "maxBuy", label = L["Max Buy Price"], callback = "GetMaxBuyPrice", takeItemString = true },
-		{ key = "minSell", label = L["Min Sell Price"], callback = "GetMinSellPrice", takeItemString = true },
-		{ key = "minBuy", label = L["Min Buy Price"], callback = "GetMinBuyPrice", takeItemString = true },
+		{ key = "avgSell", label = "Avg Sell Price", callback = "GetAvgSellPrice", takeItemString = true },
+		{ key = "avgBuy", label = "Avg Buy Price", callback = "GetAvgBuyPrice", takeItemString = true },
+		{ key = "maxSell", label = "Max Sell Price", callback = "GetMaxSellPrice", takeItemString = true },
+		{ key = "maxBuy", label = "Max Buy Price", callback = "GetMaxBuyPrice", takeItemString = true },
+		{ key = "minSell", label = "Min Sell Price", callback = "GetMinSellPrice", takeItemString = true },
+		{ key = "minBuy", label = "Min Buy Price", callback = "GetMinBuyPrice", takeItemString = true },
 	}
 	TSM.moduleAPIs = {
 		{ key = "getAuctionStatsSinceLastSale", callback = "GetAuctionStatsSinceLastSale" },
@@ -186,7 +185,7 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 		end
 
 		if IsShiftKeyDown() then
-			tinsert(lines, { left = "  " .. L["Sold (Total Price):"], right = format("%s (%s)", "|cffffffff" .. totalSaleNum .. "|r", (TSMAPI:MoneyToString(totalSalePrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
+			tinsert(lines, { left = "  " .. "Sold (Total Price):", right = format("%s (%s)", "|cffffffff" .. totalSaleNum .. "|r", (TSMAPI:MoneyToString(totalSalePrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
 		else
 			local minPrice = TSM:GetMinSellPrice(itemString)
 			local maxPrice = nil
@@ -200,26 +199,26 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 					maxPrice = nil
 				end
 			end
-			tinsert(lines, { left = "  " .. L["Sold (Min/Avg/Max Price):"], right = format("%s (%s / %s / %s)", "|cffffffff" .. totalSaleNum .. "|r", (TSMAPI:MoneyToString(minPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(avgSalePrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(maxPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
+			tinsert(lines, { left = "  " .. "Sold (Min/Avg/Max Price):", right = format("%s (%s / %s / %s)", "|cffffffff" .. totalSaleNum .. "|r", (TSMAPI:MoneyToString(minPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(avgSalePrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(maxPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
 		end
 		if lastSold > 0 then
 			local timeDiff = SecondsToTime(time() - lastSold)
-			tinsert(lines, { left = "  " .. L["Last Sold:"], right = "|cffffffff" .. format(L["%s ago"], timeDiff) })
+			tinsert(lines, { left = "  " .. "Last Sold:", right = "|cffffffff" .. format("%s ago", timeDiff) })
 		end
 	end
 
 	local cancelledNum, expiredNum, totalFailed = TSM:GetAuctionStats(itemString, lastSold)
 	if expiredNum > 0 and cancelledNum > 0 and options.expiredAuctions and options.cancelledAuctions then
-		tinsert(lines, { left = "  " .. L["Failed Since Last Sale (Expired/Cancelled):"], right = format("|cffffffff%s|r (|cffffffff%s|r/|cffffffff%s|r)", expiredNum + cancelledNum, expiredNum, cancelledNum) })
+		tinsert(lines, { left = "  " .. "Failed Since Last Sale (Expired/Cancelled):", right = format("|cffffffff%s|r (|cffffffff%s|r/|cffffffff%s|r)", expiredNum + cancelledNum, expiredNum, cancelledNum) })
 	elseif expiredNum > 0 and options.expiredAuctions then
-		tinsert(lines, { left = "  " .. L["Expired Since Last Sale:"], right = "|cffffffff" .. expiredNum .. "|r" })
+		tinsert(lines, { left = "  " .. "Expired Since Last Sale:", right = "|cffffffff" .. expiredNum .. "|r" })
 	elseif cancelledNum > 0 and options.cancelledAuctions then
-		tinsert(lines, { left = "  " .. L["Cancelled Since Last Sale:"], right = "|cffffffff" .. cancelledNum .. "|r" })
+		tinsert(lines, { left = "  " .. "Cancelled Since Last Sale:", right = "|cffffffff" .. cancelledNum .. "|r" })
 	end
 
 	if options.saleRate and totalSaleNum > 0 and totalFailed > 0 then
 		local saleRate = TSMAPI.Util:Round(totalSaleNum / (totalSaleNum + totalFailed or 0), 0.01)
-		tinsert(lines, { left = "  " .. L["Sale Rate:"], right = "|cffffffff" .. saleRate .. "|r" })
+		tinsert(lines, { left = "  " .. "Sale Rate:", right = "|cffffffff" .. saleRate .. "|r" })
 	end
 
 	local lastPurchased, totalBuyPrice, totalBuyNum = nil, 0, 0
@@ -246,15 +245,15 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 	end
 	if options.purchase and lastPurchased then
 		if IsShiftKeyDown() then
-			tinsert(lines, { left = "  " .. L["Purchased (Total Price):"], right = format("|cffffffff%s|r (%s)", totalBuyNum, (TSMAPI:MoneyToString(totalBuyPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
+			tinsert(lines, { left = "  " .. "Purchased (Total Price):", right = format("|cffffffff%s|r (%s)", totalBuyNum, (TSMAPI:MoneyToString(totalBuyPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
 		else
 			local minPrice = TSM:GetMinBuyPrice(itemString)
 			local avgPrice = TSM:GetAvgBuyPrice(itemString)
 			local maxPrice = TSM:GetMaxBuyPrice(itemString)
-			tinsert(lines, { left = "  " .. L["Purchased (Min/Avg/Max Price):"], right = format("|cffffffff%s|r (%s / %s / %s)", totalBuyNum, (TSMAPI:MoneyToString(minPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(avgPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(maxPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
+			tinsert(lines, { left = "  " .. "Purchased (Min/Avg/Max Price):", right = format("|cffffffff%s|r (%s / %s / %s)", totalBuyNum, (TSMAPI:MoneyToString(minPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(avgPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r"), (TSMAPI:MoneyToString(maxPrice, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff?|r")) })
 		end
 		local timeDiff = SecondsToTime(time() - lastPurchased)
-		tinsert(lines, { left = "  " .. L["Last Purchased:"], right = "|cffffffff" .. format(L["%s ago"] .. "|r", timeDiff) })
+		tinsert(lines, { left = "  " .. "Last Purchased:", right = "|cffffffff" .. format("%s ago" .. "|r", timeDiff) })
 	end
 
 	-- add heading

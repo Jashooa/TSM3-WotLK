@@ -9,7 +9,6 @@
 -- Much of this code is copied from .../AceGUI-3.0/widgets/AceGUIWidget-EditBox.lua
 -- This EditBox widget is modified to fit TSM's theme / needs
 local TSM = select(2, ...)
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local Type, Version = "TSMEditBox", 2
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
@@ -66,8 +65,8 @@ local function Control_OnEnter(frame)
 		if #value > 0 then
 			GameTooltip:SetOwner(frame, "ANCHOR_NONE")
 			GameTooltip:SetPoint("BOTTOM", frame, "TOP")
-			GameTooltip:SetText(L["This EditBox is Disabled"], 1, 0, 0)
-			GameTooltip:AddLine(L["|cff99ffffValue:|r "]..value, 1, 1, 1)
+			GameTooltip:SetText("This EditBox is Disabled", 1, 0, 0)
+			GameTooltip:AddLine("|cff99ffffValue:|r "..value, 1, 1, 1)
 			GameTooltip:Show()
 		end
 	else

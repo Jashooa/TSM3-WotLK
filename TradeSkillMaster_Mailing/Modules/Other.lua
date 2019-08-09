@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local Other = TSM:NewModule("Other", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Mailing") -- loads the localization table
 local private = { frame = nil }
 
 
@@ -29,7 +28,7 @@ function Other:CreateTab()
 				children = {
 					{
 						type = "Text",
-						text = L["Mail Disenchantables"],
+						text = "Mail Disenchantables",
 						textSize = "normal",
 						justify = { "CENTER", "TOP" },
 						size = { 0, 20 },
@@ -37,7 +36,7 @@ function Other:CreateTab()
 					},
 					{
 						type = "Text",
-						text = L["Target Player:"],
+						text = "Target Player:",
 						textSize = "small",
 						justify = { "LEFT", "MIDDLE" },
 						size = { 0, 20 },
@@ -47,7 +46,7 @@ function Other:CreateTab()
 						type = "InputBox",
 						key = "targetBox",
 						text = TSM.db.factionrealm.deMailTarget,
-						tooltip = L["Enter name of the character disenchantable items should be sent to."] .. "\n\n" .. TSM.SPELLING_WARNING,
+						tooltip = "Enter name of the character disenchantable items should be sent to." .. "\n\n" .. TSM.SPELLING_WARNING,
 						size = { 0, 20 },
 						points = { { "TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0 }, { "TOPRIGHT", -5, -30 } },
 						scripts = { "OnEnterPressed" },
@@ -57,7 +56,7 @@ function Other:CreateTab()
 						key = "btn",
 						text = "",
 						textHeight = 15,
-						tooltip = L["Click this button to send all disenchantable items in your bags to the specified character. You can set the maximum quality to be sent in the options."],
+						tooltip = "Click this button to send all disenchantable items in your bags to the specified character. You can set the maximum quality to be sent in the options.",
 						size = { 0, 20 },
 						points = { { "TOPLEFT", 5, -55 }, { "TOPRIGHT", -5, -55 } },
 						scripts = { "OnClick" },
@@ -72,7 +71,7 @@ function Other:CreateTab()
 				children = {
 					{
 						type = "Text",
-						text = L["Send Excess Gold to Banker"],
+						text = "Send Excess Gold to Banker",
 						textSize = "normal",
 						justify = { "CENTER", "TOP" },
 						size = { 0, 20 },
@@ -80,7 +79,7 @@ function Other:CreateTab()
 					},
 					{
 						type = "Text",
-						text = L["Target Player:"],
+						text = "Target Player:",
 						textSize = "small",
 						justify = { "LEFT", "MIDDLE" },
 						size = { 0, 20 },
@@ -90,14 +89,14 @@ function Other:CreateTab()
 						type = "InputBox",
 						key = "targetBox",
 						text = TSM.db.char.goldMailTarget,
-						tooltip = L["Enter the name of the player you want to send excess gold to."] .. "\n\n" .. TSM.SPELLING_WARNING,
+						tooltip = "Enter the name of the player you want to send excess gold to." .. "\n\n" .. TSM.SPELLING_WARNING,
 						size = { 80, 20 },
 						points = { { "TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0 } },
 						scripts = { "OnEnterPressed" },
 					},
 					{
 						type = "Text",
-						text = L["Limit (In Gold):"],
+						text = "Limit (In Gold):",
 						textSize = "small",
 						justify = { "LEFT", "MIDDLE" },
 						size = { 0, 20 },
@@ -108,7 +107,7 @@ function Other:CreateTab()
 						key = "goldBox",
 						numeric = true,
 						text = TSM.db.char.goldKeepAmount,
-						tooltip = L["This is maximum amount of gold you want to keep on the current player. Any amount over this limit will be send to the specified character."],
+						tooltip = "This is maximum amount of gold you want to keep on the current player. Any amount over this limit will be send to the specified character.",
 						size = { 80, 20 },
 						points = { { "TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0 }, { "TOPRIGHT", -5, -30 } },
 						scripts = { "OnEnterPressed" },
@@ -118,7 +117,7 @@ function Other:CreateTab()
 						key = "btn",
 						text = "",
 						textHeight = 15,
-						tooltip = L["Click this button to send excess gold to the specified character (Maximum of 200k per mail)."],
+						tooltip = "Click this button to send excess gold to the specified character (Maximum of 200k per mail).",
 						size = { 0, 20 },
 						points = { { "TOPLEFT", 5, -55 }, { "TOPRIGHT", -5, -55 } },
 						scripts = { "OnClick" },
@@ -157,12 +156,12 @@ function Other:CreateTab()
 						end
 						if hasItems then
 							local function callback()
-								TSM:Printf(L["Sent all disenchantable items to %s."], target)
+								TSM:Printf("Sent all disenchantable items to %s.", target)
 								private:UpdateDisenchantButton()
 							end
 
 							self:Disable()
-							self:SetText(L["Sending..."])
+							self:SetText("Sending...")
 							TSM.AutoMail:SendItems(items, target, callback)
 						end
 					end,
@@ -185,19 +184,19 @@ function Other:CreateTab()
 				btn = {
 					OnClick = function()
 						if not TSM.db.char.goldKeepAmount then
-							TSM:Print(L["Not sending any gold as you either did not enter a limit or did not press enter to store the limit."])
+							TSM:Print("Not sending any gold as you either did not enter a limit or did not press enter to store the limit.")
 							return
 						end
 						local extra = (GetMoney() - 30) - (TSM.db.char.goldKeepAmount * COPPER_PER_GOLD)
 						if extra <= 0 then
-							TSM:Print(L["Not sending any gold as you have less than the specified limit."])
+							TSM:Print("Not sending any gold as you have less than the specified limit.")
 							return
 						else
 							extra = min(extra, 200000 * COPPER_PER_GOLD)
 						end
 						SetSendMailMoney(extra)
-						SendMail(TSM.db.char.goldMailTarget, L["TSM_Mailing Excess Gold"], "")
-						TSM:Printf(L["Sent %s to %s."], TSMAPI:MoneyToString(extra), TSM.db.char.goldMailTarget)
+						SendMail(TSM.db.char.goldMailTarget, "TSM_Mailing Excess Gold", "")
+						TSM:Printf("Sent %s to %s.", TSMAPI:MoneyToString(extra), TSM.db.char.goldMailTarget)
 					end,
 				},
 			},
@@ -210,10 +209,10 @@ function private:UpdateDisenchantButton()
 	local btn = private.frame.deBox.btn
 	if TSM.db.factionrealm.deMailTarget ~= "" then
 		btn:Enable()
-		btn:SetText(format(L["Send Disenchantable Items to %s"], TSM.db.factionrealm.deMailTarget))
+		btn:SetText(format("Send Disenchantable Items to %s", TSM.db.factionrealm.deMailTarget))
 	else
 		btn:Disable()
-		btn:SetText(L["No Target Player"])
+		btn:SetText("No Target Player")
 	end
 end
 
@@ -221,12 +220,12 @@ function private:UpdateSendGoldButton()
 	local btn = private.frame.sendGoldBox.btn
 	if TSM.db.char.goldMailTarget == "" then
 		btn:Disable()
-		btn:SetText(L["Not Target Specified"])
+		btn:SetText("Not Target Specified")
 	elseif TSMAPI.Player:IsPlayer(TSM.db.char.goldMailTarget) then
 		btn:Disable()
-		btn:SetText(L["Target is Current Player"])
+		btn:SetText("Target is Current Player")
 	else
 		btn:Enable()
-		btn:SetText(format(L["Send Excess Gold to %s"], TSM.db.char.goldMailTarget))
+		btn:SetText(format("Send Excess Gold to %s", TSM.db.char.goldMailTarget))
 	end
 end

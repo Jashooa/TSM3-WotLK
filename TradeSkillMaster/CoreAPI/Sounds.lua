@@ -9,26 +9,25 @@
 -- This file contains sound-related APIs
 
 local TSM = select(2, ...)
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local SOUNDS = {
-	[TSM.NO_SOUND_KEY] = "|cff99ffff"..L["No Sound"].."|r",
-	["AuctionWindowOpen"] = L["Auction Window Open"],
-	["AuctionWindowClose"] = L["Auction Window Close"],
-	["alarmclockwarning3"] = L["Alarm Clock"],
-	["UI_AutoQuestComplete"] = L["Auto Quest Complete"],
-	["HumanExploration"] = L["Exploration"],
-	["TSM_CASH_REGISTER"] = L["Cash Register"],
-	["Fishing Reel in"] = L["Fishing Reel In"],
-	["LevelUp"] = L["Level Up"],
-	["MapPing"] = L["Map Ping"],
-	["MONEYFRAMEOPEN"] = L["Money Frame Open"],
-	["IgPlayerInviteAccept"] = L["Player Invite Accept"],
-	["QUESTADDED"] = L["Quest Added"],
-	["QUESTCOMPLETED"] = L["Quest Completed"],
-	["UI_QuestObjectivesComplete"] = L["Quest Objectives Complete"],
-	["RaidWarning"] = L["Raid Warning"],
-	["ReadyCheck"] = L["Ready Check"],
-	["UnwrapGift"] = L["Unwrap Gift"],
+	[TSM.NO_SOUND_KEY] = "|cff99ffff".."No Sound".."|r",
+	["AuctionWindowOpen"] = "Auction Window Open",
+	["AuctionWindowClose"] = "Auction Window Close",
+	["alarmclockwarning3"] = "Alarm Clock",
+	["UI_AutoQuestComplete"] = "Auto Quest Complete",
+	["HumanExploration"] = "Exploration",
+	["TSM_CASH_REGISTER"] = "Cash Register",
+	["Fishing Reel in"] = "Fishing Reel In",
+	["LevelUp"] = "Level Up",
+	["MapPing"] = "Map Ping",
+	["MONEYFRAMEOPEN"] = "Money Frame Open",
+	["IgPlayerInviteAccept"] = "Player Invite Accept",
+	["QUESTADDED"] = "Quest Added",
+	["QUESTCOMPLETED"] = "Quest Completed",
+	["UI_QuestObjectivesComplete"] = "Quest Objectives Complete",
+	["RaidWarning"] = "Raid Warning",
+	["ReadyCheck"] = "Ready Check",
+	["UnwrapGift"] = "Unwrap Gift",
 }
 
 

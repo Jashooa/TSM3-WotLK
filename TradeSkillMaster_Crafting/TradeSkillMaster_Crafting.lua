@@ -9,7 +9,6 @@
 -- register this file with Ace Libraries
 local TSM = select(2, ...)
 TSM = LibStub("AceAddon-3.0"):NewAddon(TSM, "TSM_Crafting", "AceEvent-3.0", "AceConsole-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
 local WEAPON, ARMOR = GetAuctionItemClasses()
 
 TSM.MINING_SPELLID = 2575
@@ -138,14 +137,14 @@ end
 function TSM:OnEnable()
 	local isValid, err = TSMAPI:ValidateCustomPrice(TSM.db.global.defaultCraftPriceMethod, "crafting")
 	if not isValid then
-		TSM:Printf(L["Your default craft value method was invalid so it has been returned to the default. Details: %s"], err)
+		TSM:Printf("Your default craft value method was invalid so it has been returned to the default. Details: %s", err)
 		TSM.db.global.defaultCraftPriceMethod = TSM.defaultCraftPriceMethod
 	end
 	for name, operation in pairs(TSM.operations) do
 		if operation.craftPriceMethod then
 			local isValid, err = TSMAPI:ValidateCustomPrice(operation.craftPriceMethod, "crafting")
 			if not isValid then
-				TSM:Printf(L["Your craft value method for '%s' was invalid so it has been returned to the default. Details: %s"], name, err)
+				TSM:Printf("Your craft value method for '%s' was invalid so it has been returned to the default. Details: %s", name, err)
 				operation.craftPriceMethod = operationDefaults.craftPriceMethod
 			end
 		end
@@ -158,12 +157,12 @@ function TSM:RegisterModule()
 	TSM.operations = { maxOperations = 1, callbackOptions = "Options:GetOperationOptionsInfo", callbackInfo = "GetOperationInfo", defaults = operationDefaults }
 	TSM.moduleOptions = { callback = "Options:Load" }
 	TSM.priceSources = {
-		{ key = "Crafting", label = L["Crafting Cost"], callback = "GetCraftingCost", takeItemString = true },
-		{ key = "matPrice", label = L["Crafting Material Cost"], callback = "GetCraftingMatCost", takeItemString = true },
+		{ key = "Crafting", label = "Crafting Cost", callback = "GetCraftingCost", takeItemString = true },
+		{ key = "matPrice", label = "Crafting Material Cost", callback = "GetCraftingMatCost", takeItemString = true },
 	}
 	TSM.slashCommands = {
-		{ key = "profession", label = L["Opens the Crafting window to the first profession."], callback = TSM.TradeSkill.OpenFirstProfession },
-		{ key = "restock_help", label = L["Tells you why a specific item is not being restocked and added to the queue."], callback = "RestockHelp" },
+		{ key = "profession", label = "Opens the Crafting window to the first profession.", callback = TSM.TradeSkill.OpenFirstProfession },
+		{ key = "restock_help", label = "Tells you why a specific item is not being restocked and added to the queue.", callback = "RestockHelp" },
 	}
 	TSM.tooltip = { callbackLoad = "LoadTooltip", callbackOptions = "Options:LoadTooltipOptions", defaults = tooltipDefaults }
 
@@ -175,9 +174,9 @@ function TSM:GetOperationInfo(name)
 	local operation = TSM.operations[name]
 	if not operation then return end
 	if operation.minProfit then
-		return format(L["Restocking to a max of %d (min of %d) with a min profit."], operation.maxRestock, operation.minRestock)
+		return format("Restocking to a max of %d (min of %d) with a min profit.", operation.maxRestock, operation.minRestock)
 	else
-		return format(L["Restocking to a max of %d (min of %d) with no min profit."], operation.maxRestock, operation.minRestock)
+		return format("Restocking to a max of %d (min of %d) with no min profit.", operation.maxRestock, operation.minRestock)
 	end
 end
 
@@ -192,7 +191,7 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 			local costText = (TSMAPI:MoneyToString(cost, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff---|r")
 			local profitColor = (profit or 0) < 0 and "|cffff0000" or "|cff00ff00"
 			local profitText = (TSMAPI:MoneyToString(profit, profitColor, "OPT_PAD", moneyCoins and "OPT_ICON" or nil) or "|cffffffff---|r")
-			tinsert(lines, { left = "  " .. L["Crafting Cost"], right = format(L["%s (%s profit)"], costText, profitText) })
+			tinsert(lines, { left = "  " .. "Crafting Cost", right = format("%s (%s profit)", costText, profitText) })
 
 			local craftInfo = TSM.db.factionrealm.crafts[spellID]
 			if options.detailedMats and craftInfo then
@@ -217,7 +216,7 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 		local matInfo = TSM.db.factionrealm.mats[itemString]
 		local cost = matInfo and TSMAPI:GetCustomPriceValue(matInfo.customValue or TSM.db.global.defaultMatCostMethod, itemString) or nil
 		if cost then
-			tinsert(lines, { left = "  " .. L["Mat Cost"], right = TSMAPI:MoneyToString(cost, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) })
+			tinsert(lines, { left = "  " .. "Mat Cost", right = TSMAPI:MoneyToString(cost, "|cffffffff", "OPT_PAD", moneyCoins and "OPT_ICON" or nil) })
 		end
 	end
 
@@ -260,42 +259,42 @@ end
 function TSM:RestockHelp(link)
 	local itemString = TSMAPI.Item:ToItemString(link)
 	if not itemString then
-		return print(L["No item specified. Usage: /tsm restock_help [ITEM_LINK]"])
+		return print("No item specified. Usage: /tsm restock_help [ITEM_LINK]")
 	end
 
-	TSM:Printf(L["Restock help for %s:"], link)
+	TSM:Printf("Restock help for %s:", link)
 
 	-- check if the item is in a group
 	local groupPath = TSMAPI.Groups:GetPath(itemString)
 	if not groupPath then
-		return print(L["This item is not in a TSM group."])
+		return print("This item is not in a TSM group.")
 	end
 
 	-- check that there's a crafting operation applied
 	local opName = TSMAPI.Operations:GetFirstByItem(itemString, "Crafting")
 	local opSettings = opName and TSM.operations[opName]
 	if not opSettings then
-		return print(format(L["There is no TSM_Crafting operation applied to this item's TSM group (%s)."], TSMAPI.Groups:FormatPath(groupPath)))
+		return print(format("There is no TSM_Crafting operation applied to this item's TSM group (%s).", TSMAPI.Groups:FormatPath(groupPath)))
 	end
 
 	-- check if it's an invalid operation
 	if opSettings.minRestock > opSettings.maxRestock then
-		return print(format(L["The operation applied to this item is invalid! Min restock of %d is higher than max restock of %d."], opSettings.minRestock, opSettings.maxRestock))
+		return print(format("The operation applied to this item is invalid! Min restock of %d is higher than max restock of %d.", opSettings.minRestock, opSettings.maxRestock))
 	end
 
 	-- check that this item is craftable
 	TSM:UpdateCraftReverseLookup()
 	local spellID = TSM.craftReverseLookup[itemString] and TSM.craftReverseLookup[itemString][1]
 	if not spellID or not TSM.db.factionrealm.crafts[spellID] then
-		return print(L["You don't know how to craft this item."])
+		return print("You don't know how to craft this item.")
 	end
 
 	-- check the restock quantity
 	local numHave = TSMAPI.Inventory:GetTotalQuantity(itemString)
 	if numHave >= opSettings.maxRestock then
-		return print(format(L["You already have at least your max restock quantity of this item. You have %d and the max restock quantity is %d"], numHave, opSettings.maxRestock))
+		return print(format("You already have at least your max restock quantity of this item. You have %d and the max restock quantity is %d", numHave, opSettings.maxRestock))
 	elseif (opSettings.maxRestock - numHave) < opSettings.minRestock then
-		return print(format(L["The number which would be queued (%d) is less than the min restock quantity (%d)."], (opSettings.maxRestock - numHave), opSettings.minRestock))
+		return print(format("The number which would be queued (%d) is less than the min restock quantity (%d).", (opSettings.maxRestock - numHave), opSettings.minRestock))
 	end
 
 	-- check the prices on the item and the min profit
@@ -305,30 +304,30 @@ function TSM:RestockHelp(link)
 		-- check that there's a crafted value
 		if not craftedValue then
 			local craftPriceMethod = opSettings and opSettings.craftPriceMethod or TSM.db.global.defaultCraftPriceMethod
-			return print(format(L["The 'Craft Value Method' (%s) did not return a value for this item. If it is based on some price database (AuctionDB, TSM_WoWuction, TUJ, etc), then ensure that you have scanned for or downloaded the data as appropriate."], craftPriceMethod))
+			return print(format("The 'Craft Value Method' (%s) did not return a value for this item. If it is based on some price database (AuctionDB, TSM_WoWuction, TUJ, etc), then ensure that you have scanned for or downloaded the data as appropriate.", craftPriceMethod))
 		end
 
 		-- check that there's a crafted cost
 		if not cost then
-			return print(L["This item does not have a crafting cost. Check that all of its mats have mat prices. If the mat prices are based on some price database (AuctionDB, TSM_WoWuction, TUJ, etc), then ensure that you have scanned for or downloaded the data as appropriate."])
+			return print("This item does not have a crafting cost. Check that all of its mats have mat prices. If the mat prices are based on some price database (AuctionDB, TSM_WoWuction, TUJ, etc), then ensure that you have scanned for or downloaded the data as appropriate.")
 		end
 
 		-- check that there's a profit
 		if not profit then
-			return print(L["There is a crafting cost and crafted item value, but TSM_Crafting wasn't able to calculate a profit. This shouldn't happen!"])
+			return print("There is a crafting cost and crafted item value, but TSM_Crafting wasn't able to calculate a profit. This shouldn't happen!")
 		end
 
 		local minProfit = TSMAPI:GetCustomPriceValue(opSettings.minProfit, itemString)
 		if not minProfit then
-			return print(format(L["The min profit (%s) did not evalulate to a valid value for this item."], opSettings.minProfit))
+			return print(format("The min profit (%s) did not evalulate to a valid value for this item.", opSettings.minProfit))
 		end
 
 		if profit < minProfit then
-			return print(format(L["The profit of this item (%s) is below the min profit (%s)."], TSMAPI:MoneyToString(profit), TSMAPI:MoneyToString(minProfit)))
+			return print(format("The profit of this item (%s) is below the min profit (%s).", TSMAPI:MoneyToString(profit), TSMAPI:MoneyToString(minProfit)))
 		end
 	end
 
-	print(L["This item will be added to the queue when you restock its group. If this isn't happening, make a post on the TSM forums with a screenshot of the item's tooltip, operation settings, and your general TSM_Crafting options."])
+	print("This item will be added to the queue when you restock its group. If this isn't happening, make a post on the TSM forums with a screenshot of the item's tooltip, operation settings, and your general TSM_Crafting options.")
 end
 
 function TSM:GetSpellId(linkOrIndex)

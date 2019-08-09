@@ -11,7 +11,6 @@
 local TSM = select(2, ...)
 local Type, Version = "TSMMainFrame", 2
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
 local ICON_TEXT_COLOR = {165/255, 168/255, 188/255, .7}
@@ -191,7 +190,7 @@ local methods = {
 		btn:SetScript("OnLeave", Icon_OnLeave)
 		btn:SetScript("OnClick", function(btn)
 				if InCombatLockdown() then
-					TSM:Print(L["You cannot change tabs within the main TSM window while in combat."])
+					TSM:Print("You cannot change tabs within the main TSM window while in combat.")
 					return
 				end
 				if #self.children > 0 then

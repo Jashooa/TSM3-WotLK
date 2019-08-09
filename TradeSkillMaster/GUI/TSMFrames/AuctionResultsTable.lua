@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local private = {}
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local RT_COUNT = 1
 local HEAD_HEIGHT = 27
 local HEAD_SPACE = 2
@@ -105,12 +104,12 @@ local methods = {
 			if rt.expanded[row.data.expandKey] then
 				GameTooltip:SetOwner(self, "ANCHOR_NONE")
 				GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT")
-				GameTooltip:AddLine(L["Double-click to collapse this item and show only the cheapest auction."], 1, 1, 1, true)
+				GameTooltip:AddLine("Double-click to collapse this item and show only the cheapest auction.", 1, 1, 1, true)
 				GameTooltip:Show()
 			elseif row.data.expandable then
 				GameTooltip:SetOwner(self, "ANCHOR_NONE")
 				GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT")
-				GameTooltip:AddLine(L["Double-click to expand this item and show all the auctions."], 1, 1, 1, true)
+				GameTooltip:AddLine("Double-click to expand this item and show all the auctions.", 1, 1, 1, true)
 				GameTooltip:Show()
 			end
 		end
@@ -605,10 +604,10 @@ local methods = {
 
 function TSM:CreateAuctionResultsTable(parent)
 	local colInfo = {
-		{name=L["Item"], width=0.35},
-		{name=L["ilvl"], width=0.035, align="CENTER"},
-		{name=L["Auctions"], width=0.06, align="CENTER"},
-		{name=L["Stack Size"], width=0.055, align="CENTER"},
+		{name="Item", width=0.35},
+		{name="ilvl", width=0.035, align="CENTER"},
+		{name="Auctions", width=0.06, align="CENTER"},
+		{name="Stack Size", width=0.055, align="CENTER"},
 		{name=CLOSES_IN, width=0.04, align="CENTER"},
 		{name=AUCTION_CREATOR, width=0.13, align="CENTER"},
 		{name={"??", "??"}, width=0.125, align="RIGHT", isPrice=true},

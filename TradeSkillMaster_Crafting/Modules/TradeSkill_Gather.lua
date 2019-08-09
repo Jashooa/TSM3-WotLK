@@ -9,7 +9,6 @@
 local TSM = select(2, ...)
 local TradeSkill = TSM:GetModule("TradeSkill")
 local Gather = TradeSkill:NewModule("Gather", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Crafting") -- loads the localization table
 local private = { gatherSelection = {} }
 
 
@@ -129,7 +128,7 @@ function Gather:GetFrameInfo()
 		children = {
 			{
 				type = "Text",
-				text = "TSM_Crafting - " .. L["Gathering"],
+				text = "TSM_Crafting - " .. "Gathering",
 				size = { 0, 20 },
 				points = { { "TOPLEFT" }, { "TOPRIGHT" } },
 			},
@@ -140,7 +139,7 @@ function Gather:GetFrameInfo()
 			{
 				type = "Text",
 				key = "instructions",
-				text = L["First select a crafter"],
+				text = "First select a crafter",
 				size = { 0, 20 },
 				justify = { "CENTER", "CENTER" },
 				points = { { "TOPLEFT", 5, -28 }, { "TOPRIGHT", -5, -28 } },
@@ -152,14 +151,14 @@ function Gather:GetFrameInfo()
 			{
 				type = "Dropdown",
 				key = "playerDropdown",
-				label = L["Crafter"],
+				label = "Crafter",
 				points = { { "TOPLEFT", 5, -55 }, { "TOPRIGHT", -5, -55 } },
 				scripts = { "OnValueChanged" },
 			},
 			{
 				type = "Dropdown",
 				key = "professionDropdown",
-				label = L["Professions"],
+				label = "Professions",
 				multiselect = true,
 				points = { { "TOPLEFT", 5, -100 }, { "TOPRIGHT", -5, -100 } },
 				scripts = { "OnValueChanged" },
@@ -170,7 +169,7 @@ function Gather:GetFrameInfo()
 			},
 			{
 				type = "Text",
-				text = L["Override global options for the session"],
+				text = "Override global options for the session",
 				size = { 0, 20 },
 				justify = { "CENTER", "CENTER" },
 				points = { { "TOPLEFT", BFC.PREV, "BOTTOMLEFT" }, { "TOPRIGHT", BFC.PREV, "BOTTOMRIGHT" } },
@@ -178,9 +177,9 @@ function Gather:GetFrameInfo()
 			{
 				type = "CheckBox",
 				key = "disableCheckBox",
-				label = L["Disable Crafting AH Search"],
+				label = "Disable Crafting AH Search",
 				value = TSM.db.factionrealm.disableCheckBox,
-				tooltip = L["Toggle to switch between Crafting and Normal searches at the Auction House."],
+				tooltip = "Toggle to switch between Crafting and Normal searches at the Auction House.",
 				size = { 190, 25 },
 				points = { { "TOPLEFT", BFC.PREV, "BOTTOMLEFT" } },
 				--scripts = { "OnValueChanged" },
@@ -189,8 +188,8 @@ function Gather:GetFrameInfo()
 				type = "CheckBox",
 				key = "ignoreDECheckBox",
 				value = TSM.db.factionrealm.ignoreDECheckBox,
-				label = L["Disable DE Search"],
-				tooltip = L["If enabled the crafting search at the Auction House will ignore Disenchantable Items."],
+				label = "Disable DE Search",
+				tooltip = "If enabled the crafting search at the Auction House will ignore Disenchantable Items.",
 				size = { 155, 25 },
 				points = { { "TOPLEFT", BFC.PREV, "BOTTOMLEFT" } },
 				--scripts = { "OnValueChanged" },
@@ -199,8 +198,8 @@ function Gather:GetFrameInfo()
 				type = "CheckBox",
 				key = "evenStacksCheckBox",
 				value = TSM.db.factionrealm.evenStacks,
-				label = L["Even Stacks Only"],
-				tooltip = L["If enabled the crafting search will only search for multiples of 5."],
+				label = "Even Stacks Only",
+				tooltip = "If enabled the crafting search will only search for multiples of 5.",
 				size = { 190, 25 },
 				points = { { "TOPLEFT", BFC.PREV, "BOTTOMLEFT" } },
 				--scripts = { "OnValueChanged" },
@@ -209,8 +208,8 @@ function Gather:GetFrameInfo()
 				type = "CheckBox",
 				key = "ignoreAlts",
 				value = TSM.db.factionrealm.ignoreAlts,
-				label = L["Ignore Alts"],
-				tooltip = L["Toggle to ignore gathering from Alts."],
+				label = "Ignore Alts",
+				tooltip = "Toggle to ignore gathering from Alts.",
 				size = { 190, 25 },
 				points = { { "TOPLEFT", BFC.PREV, "BOTTOMLEFT" } },
 				--scripts = { "OnValueChanged" },
@@ -219,8 +218,8 @@ function Gather:GetFrameInfo()
 				type = "CheckBox",
 				key = "ignoreIntermediate",
 				value = TSM.db.factionrealm.ignoreIntermediate,
-				label = L["Ignore Intermediate Crafting"],
-				tooltip = L["Toggle to ignore intermediate crafting."],
+				label = "Ignore Intermediate Crafting",
+				tooltip = "Toggle to ignore intermediate crafting.",
 				size = { 210, 25 },
 				points = { { "TOPLEFT", BFC.PREV, "BOTTOMLEFT" } },
 				--scripts = { "OnValueChanged" },
@@ -229,8 +228,8 @@ function Gather:GetFrameInfo()
 				type = "CheckBox",
 				key = "inkTrade",
 				value = TSM.db.factionrealm.inkTrade,
-				label = L["Trade Inks at the vendor"],
-				tooltip = L["Toggle to suggest trading inks at the vendor."],
+				label = "Trade Inks at the vendor",
+				tooltip = "Toggle to suggest trading inks at the vendor.",
 				size = { 190, 25 },
 				points = { { "TOPLEFT", BFC.PREV, "BOTTOMLEFT" } },
 				--scripts = { "OnValueChanged" },
@@ -239,15 +238,15 @@ function Gather:GetFrameInfo()
 				type = "CheckBox",
 				key = "buyAH",
 				value = TSM.db.factionrealm.buyAH,
-				label = L["Always Buy from AH"],
-				tooltip = L["If enabled, buying from AH will always be suggested even if you have enough via other sources. If disabled only short items will be searched for at the AH"],
+				label = "Always Buy from AH",
+				tooltip = "If enabled, buying from AH will always be suggested even if you have enough via other sources. If disabled only short items will be searched for at the AH",
 				size = { 190, 25 },
 				points = { { "TOPLEFT", BFC.PREV, "BOTTOMLEFT" } },
 			},
 			{
 				type = "Button",
 				key = "gatherSelectionButton",
-				text = L["Start Gathering"],
+				text = "Start Gathering",
 				textHeight = 24,
 				size = { 0, 40 },
 				points = { { "BOTTOMLEFT", 5, 5 }, { "BOTTOMRIGHT", -5, 5 } },
@@ -345,14 +344,14 @@ function Gather:CreateMainFrame()
 		children = {
 			{
 				type = "Text",
-				text = "TSM_Crafting - " .. L["Gathering"],
+				text = "TSM_Crafting - " .. "Gathering",
 				textFont = { TSMAPI.Design:GetContentFont(), 16 },
 				points = { { "TOP", BFC.PARENT, 0, -5 } },
 			},
 			{
 				type = "Button",
 				key = "modeToggleBtn",
-				text = L["Intermediate Crafting"],
+				text = "Intermediate Crafting",
 				textHeight = 14,
 				size = { 105, 30 },
 				points = { { "TOPLEFT", 5, -35 }, { "RIGHT", BFC.PARENT, "CENTER", -5, 0 } },
@@ -371,7 +370,7 @@ function Gather:CreateMainFrame()
 						type = "ScrollingTableFrame",
 						key = "matST",
 						headFontSize = 16,
-						stCols = { { name = L["Sources"], width = 1 } },
+						stCols = { { name = "Sources", width = 1 } },
 						stDisableSelection = true,
 						points = { { "TOPLEFT", BFC.PARENT, "TOPLEFT" }, { "BOTTOMLEFT", BFC.PARENT, "BOTTOMLEFT", -3, 33 }, { "RIGHT", BFC.PARENT, "CENTER", -3, 33 } },
 					},
@@ -384,7 +383,7 @@ function Gather:CreateMainFrame()
 						type = "ScrollingTableFrame",
 						key = "sourceST",
 						headFontSize = 16,
-						stCols = { { name = L["Current Source"], width = 1 } },
+						stCols = { { name = "Current Source", width = 1 } },
 						stDisableSelection = true,
 						points = { { "TOPLEFT", "matST", "TOPRIGHT", 6, 0 }, { "BOTTOMLEFT", "matST", "BOTTOMRIGHT", 6, 0 }, { "TOPRIGHT", -5, -5 } },
 						scripts = { "OnClick", "OnEnter", "OnLeave" },
@@ -403,7 +402,7 @@ function Gather:CreateMainFrame()
 							{
 								type = "Button",
 								key = "gatherItemsBtn",
-								text = L["Gather Items"],
+								text = "Gather Items",
 								disabled = true,
 								textHeight = 18,
 								size = { 105, 30 },
@@ -413,7 +412,7 @@ function Gather:CreateMainFrame()
 							{
 								type = "Button",
 								key = "gatherStopBtn",
-								text = L["Stop Gathering"],
+								text = "Stop Gathering",
 								textHeight = 18,
 								size = { 105, 30 },
 								points = { { "LEFT", BFC.PARENT, "CENTER", 2, 0 }, { "RIGHT", -2, 0 } },
@@ -448,7 +447,7 @@ function Gather:CreateMainFrame()
 						type = "ScrollingTableFrame",
 						key = "interSelST",
 						headFontSize = 16,
-						stCols = { { name = L["Selection"], width = 1 } },
+						stCols = { { name = "Selection", width = 1 } },
 						stDisableSelection = true,
 						points = { { "TOPLEFT", BFC.PARENT, "TOPLEFT" }, { "BOTTOMLEFT", BFC.PARENT, "BOTTOMLEFT", -3, 33 }, { "RIGHT", BFC.PARENT, "CENTER", -3, 33 } },
 						scripts = { "OnClick" },
@@ -462,7 +461,7 @@ function Gather:CreateMainFrame()
 						type = "ScrollingTableFrame",
 						key = "interCraftST",
 						headFontSize = 16,
-						stCols = { { name = L["Craftable"], width = 1 } },
+						stCols = { { name = "Craftable", width = 1 } },
 						stDisableSelection = true,
 						points = { { "TOPLEFT", "interSelST", "TOPRIGHT", 6, 0 }, { "BOTTOMLEFT", "interSelST", "BOTTOMRIGHT", 6, 0 }, { "TOPRIGHT", -5, -5 } },
 						--scripts = { "OnClick", "OnEnter", "OnLeave" },
@@ -481,7 +480,7 @@ function Gather:CreateMainFrame()
 							{
 								type = "Button",
 								key = "craftNextBtn",
-								text = L["Craft Next"],
+								text = "Craft Next",
 								disabled = true,
 								textHeight = 18,
 								size = { 105, 30 },
@@ -499,11 +498,11 @@ function Gather:CreateMainFrame()
 					if private.gatheringFrame.mainFrame:IsShown() then
 						private.gatheringFrame.mainFrame:Hide()
 						private.gatheringFrame.interFrame:Show()
-						private.gatheringFrame.modeToggleBtn:SetText(L["Gathering"])
+						private.gatheringFrame.modeToggleBtn:SetText("Gathering")
 					else
 						private.gatheringFrame.interFrame:Hide()
 						private.gatheringFrame.mainFrame:Show()
-						private.gatheringFrame.modeToggleBtn:SetText(L["Intermediate Crafting"])
+						private.gatheringFrame.modeToggleBtn:SetText("Intermediate Crafting")
 					end
 				end,
 			},
@@ -521,7 +520,7 @@ function Gather:CreateMainFrame()
 									TSM.Gather:ShoppingSearch(data.itemString, math.huge, disableCrafting, ignoreDE, evenStacks)
 								end
 							else
-								TSM:Printf(L["Please switch to the Shopping Tab at the AH to perform the gathering search."])
+								TSM:Printf("Please switch to the Shopping Tab at the AH to perform the gathering search.")
 							end
 						end
 					end,
@@ -529,9 +528,9 @@ function Gather:CreateMainFrame()
 						if data.isTitle or data.sourceName ~= "auction" then return end
 						GameTooltip:SetOwner(self, "ANCHOR_NONE")
 						GameTooltip:SetPoint("LEFT", self, "BOTTOM")
-						GameTooltip:AddLine(L["Perform a manual AH search for this item"])
-						GameTooltip:AddLine(L["Left click will set max quantity as quantity required"])
-						GameTooltip:AddLine(L["Right click will search with no max quantity"])
+						GameTooltip:AddLine("Perform a manual AH search for this item")
+						GameTooltip:AddLine("Left click will set max quantity as quantity required")
+						GameTooltip:AddLine("Right click will search with no max quantity")
 						GameTooltip:Show()
 					end,
 					OnLeave = function()
@@ -615,7 +614,7 @@ function private:UpdateGatherSelectionWindow()
 	private.selectionFrame.gather.playerDropdown:SetValue(private.gatherSelection.player)
 	if not private.gatherSelection.player then
 		-- wait for user to choose a player
-		private.selectionFrame.gather.instructions:SetText(L["First select a crafter"])
+		private.selectionFrame.gather.instructions:SetText("First select a crafter")
 		private.selectionFrame.gather.playerDropdown:SetValue()
 		private.selectionFrame.gather.professionDropdown:SetDisabled(true)
 		private.selectionFrame.gather.professionDropdown:SetValue({})
@@ -623,7 +622,7 @@ function private:UpdateGatherSelectionWindow()
 		return
 	end
 
-	private.selectionFrame.gather.instructions:SetText(L["Select profession(s) and click start"])
+	private.selectionFrame.gather.instructions:SetText("Select profession(s) and click start")
 	-- create table of professions
 	local professions = {}
 	for profession in pairs(queuedCrafts) do
@@ -674,7 +673,7 @@ function Gather:StartGathering(player, professions)
 	end
 
 	if not next(neededMats) then
-		TSM:Print(L["Nothing To Gather"])
+		TSM:Print("Nothing To Gather")
 		TradeSkill.Gather:ResetGathering(true)
 	else
 		TSM.db.factionrealm.gathering.crafter = player
@@ -748,7 +747,7 @@ function Gather:Update(firstRun)
 
 	if not next(shortItems) then
 		if TSM.db.factionrealm.gathering.gatheredMats == true then
-			TSM:Print(L["Finished Gathering"])
+			TSM:Print("Finished Gathering")
 		end
 		Gather:ResetGathering(true)
 		return
@@ -794,20 +793,20 @@ function Gather:Update(firstRun)
 							end
 							quantity = total
 							if sourceName == "crafting" then
-								rowText = format("%s|r", leader .. L["Intermediate Craft"])
+								rowText = format("%s|r", leader .. "Intermediate Craft")
 								tinsert(stData, { cols = { { value = rowText } }, isSubTitle = true, itemString = itemString, name = itemName, sourceName = sourceName, quantity = quantity })
 								rowInserted = true
 							else
 								if sourceName == "auction" then
-									rowText = format("%s|r", leader .. L["Buy From AH"])
+									rowText = format("%s|r", leader .. "Buy From AH")
 								elseif sourceName == "vendorBuy" then
-									rowText = format("%s|r", leader .. L["Buy From Vendor"])
+									rowText = format("%s|r", leader .. "Buy From Vendor")
 								elseif sourceName == "vendorTrade" then
-									rowText = format("%s|r", leader .. L["Vendor Trade"])
+									rowText = format("%s|r", leader .. "Vendor Trade")
 								elseif sourceName == "transform" then
-									rowText = format("%s|r", leader .. L["Transform"])
+									rowText = format("%s|r", leader .. "Transform")
 								else
-									rowText = format("%s|r", leader .. L["Retrieve From "] .. sourceName .. " (" .. min(shortItems[item], quantity) .. ")")
+									rowText = format("%s|r", leader .. "Retrieve From " .. sourceName .. " (" .. min(shortItems[item], quantity) .. ")")
 								end
 								tinsert(stData, { cols = { { value = rowText } }, isTitle = false, itemString = itemString, name = itemName, sourceName = sourceName, quantity = quantity })
 								rowInserted = true
@@ -817,7 +816,7 @@ function Gather:Update(firstRun)
 				end
 			end
 			if not rowInserted then
-				local noneText = format("%s|r", "|cffff0000     " .. L["None Found"])
+				local noneText = format("%s|r", "|cffff0000     " .. "None Found")
 				tinsert(stData, { cols = { { value = noneText } }, isTitle = false, itemString = itemString, name = itemName, sourceName = "none", quantity = quantity })
 			end
 		end
@@ -904,20 +903,20 @@ function Gather:Update(firstRun)
 					availableMats[charName][location] = availableMats[charName][location] or {}
 					local locationText
 					if location == "bank" then
-						locationText = L["Visit Bank"]
+						locationText = "Visit Bank"
 					elseif location == "gVault" then
-						locationText = L["Visit Guild Vault"]
+						locationText = "Visit Guild Vault"
 					elseif location == "mail" then
-						locationText = L["Visit Mailbox"]
+						locationText = "Visit Mailbox"
 					else
-						locationText = L["Mail To "] .. crafter
+						locationText = "Mail To " .. crafter
 					end
 					local rowAdded = false
 					for item, quantity in pairs(items) do
 						local rowQty = min(quantity, (location ~= "bags" and (shortItems[item] or quantity) - TSMAPI.Inventory:GetBagQuantity(item, charName)) or quantity)
 						if rowQty > 0 then
 							if not headerAdded then
-								headerText = format(" %s|r", color .. L["Mail From "] .. charName)
+								headerText = format(" %s|r", color .. "Mail From " .. charName)
 								tinsert(stData2, { cols = { { value = headerText } }, isTitle = true, name = charName })
 								headerAdded = true
 							end
@@ -944,17 +943,17 @@ function Gather:Update(firstRun)
 		elseif data.source == "crafter" then
 			color = ""
 			availableMats[crafter] = availableMats[crafter] or {}
-			headerText = format(" %s|r", L["From "] .. crafter)
+			headerText = format(" %s|r", "From " .. crafter)
 			tinsert(stData2, { cols = { { value = headerText } }, isTitle = true, name = crafter })
 			for location, items in pairs(data.tasks) do
 				availableMats[crafter][location] = availableMats[crafter][location] or {}
 				local locationText
 				if location == "bank" then
-					locationText = L["Visit Bank"]
+					locationText = "Visit Bank"
 				elseif location == "gVault" then
-					locationText = L["Visit Guild Vault"]
+					locationText = "Visit Guild Vault"
 				elseif location == "mail" then
-					locationText = L["Visit Mailbox"]
+					locationText = "Visit Mailbox"
 				end
 				if private.currentSource == crafter and private.currentTask == location then
 					color = "|cff00ff00"
@@ -975,9 +974,9 @@ function Gather:Update(firstRun)
 			availableMats["vendor"] = availableMats["vendor"] or {}
 			availableMats["vendor"]["buy"] = availableMats["vendor"]["buy"] or {}
 			if data.source == "vendor" then
-				headerText = format(" %s|r", color .. L["Vendor"])
+				headerText = format(" %s|r", color .. "Vendor")
 			else
-				headerText = format(" %s|r", color .. L["Vendor Trade"])
+				headerText = format(" %s|r", color .. "Vendor Trade")
 			end
 			tinsert(stData2, { cols = { { value = headerText } }, isTitle = true, sourceName = data.source })
 			for item, quantity in pairs(data.tasks) do
@@ -987,7 +986,7 @@ function Gather:Update(firstRun)
 				tinsert(stData2, { cols = { { value = rowText } }, itemString = item, quantity = quantity, sourceName = data.source })
 			end
 		elseif data.source == "crafting" then
-			headerText = format(" %s|r", color .. L["Intermediate Craft"])
+			headerText = format(" %s|r", color .. "Intermediate Craft")
 			tinsert(stData2, { cols = { { value = headerText } }, isTitle = true, sourceName = data.source })
 			availableMats["crafting"] = availableMats["crafting"] or {}
 			for spellID, items in pairs(data.tasks) do
@@ -995,7 +994,7 @@ function Gather:Update(firstRun)
 				local spellData = TSM.db.factionrealm.crafts[spellID]
 				for item, quantity in pairs(items) do
 					availableMats["crafting"][spellData.profession] = availableMats["crafting"][spellData.profession] or {}
-					local spellName = spellData.name .. (spellData.hasCD and L[" (CD)"] or "")
+					local spellName = spellData.name .. (spellData.hasCD and " (CD)" or "")
 					local spellQuantity = ceil(quantity / spellData.numResult)
 					availableMats["crafting"][spellData.profession][spellID] = spellQuantity
 					rowText = format("%s x %s|r", color .. leader .. spellName, color .. spellQuantity)
@@ -1005,17 +1004,17 @@ function Gather:Update(firstRun)
 		elseif data.source == "convert" then
 			color = ""
 			availableMats[data.source] = availableMats[data.source] or {}
-			headerText = format(" %s|r", color .. L["Conversions"])
+			headerText = format(" %s|r", color .. "Conversions")
 			tinsert(stData2, { cols = { { value = headerText } }, isTitle = true, name = data.source })
 			for method, items in pairs(data.tasks) do
 				availableMats[data.source][method] = availableMats[data.source][method] or {}
 				local methodText
 				if method == "transform" then
-					methodText = L["Transform"]
+					methodText = "Transform"
 				elseif method == "prospect" then
-					methodText = L["Prospect"]
+					methodText = "Prospect"
 				else
-					methodText = L["Convert"]
+					methodText = "Convert"
 				end
 				rowText = format(" %s|r", color .. leader .. methodText)
 				tinsert(stData2, { cols = { { value = rowText } }, location = method, sourceName = data.source })
@@ -1035,7 +1034,7 @@ function Gather:Update(firstRun)
 				local auctionQty = (shortItems[item] or 0) - private:GetAuctionQty(availableMats, item)
 				if auctionQty > 0 then
 					if not headerAdded then
-						headerText = format("%s|r", color .. L["Auction House"])
+						headerText = format("%s|r", color .. "Auction House")
 						tinsert(stData2, { cols = { { value = headerText } }, isTitle = true, sourceName = data.source })
 						headerAdded = true
 					end
@@ -1146,19 +1145,19 @@ function Gather:Update(firstRun)
 		end
 	end
 
-	private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:SetText(L["Gather Items"])
+	private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:SetText("Gather Items")
 	if next(TSM.db.factionrealm.gathering.availableMats) then
 		private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:Enable()
 		if private.currentSource == "vendor" then
-			private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:SetText(L["Buy Vendor Items"])
+			private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:SetText("Buy Vendor Items")
 		elseif private.currentSource ~= crafter and private.currentTask == "mail" then
-			private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:SetText(L["Mail Items"])
+			private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:SetText("Mail Items")
 		elseif private.currentTask == "buy" then
-			private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:SetText(L["Buy Items"])
+			private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:SetText("Buy Items")
 		elseif private.currentSource == "crafting" then
 			private.gatheringFrame.interFrame.interBtnFrame.craftNextBtn:Enable()
 		elseif private.currentSource == "bags" and private.currentTask == "transform" then
-			private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:SetText(L["Transform Next"])
+			private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:SetText("Transform Next")
 		end
 	else
 		private.gatheringFrame.mainFrame.buttonsFrame.gatherItemsBtn:Disable()

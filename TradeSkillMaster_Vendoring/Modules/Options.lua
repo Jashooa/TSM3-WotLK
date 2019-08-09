@@ -9,7 +9,6 @@
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
 local Options = TSM:NewModule("Options", "AceEvent-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Vendoring") -- loads the localization table
 local AceGUI = LibStub("AceGUI-3.0")
 local private = {ignoreSTCreated=nil }
 
@@ -24,7 +23,7 @@ function Options:Load(container)
 	tg:SetLayout("Fill")
 	tg:SetFullHeight(true)
 	tg:SetFullWidth(true)
-	tg:SetTabs({{value=1, text=L["General"]}, {value=2, text=L["Ignore List"]}})
+	tg:SetTabs({{value=1, text="General"}, {value=2, text="Ignore List"}})
     tg:SetCallback("OnGroupSelected", function(self, _, value)
 		self:ReleaseChildren()
 		if value == 1 then
@@ -46,41 +45,41 @@ function private:DrawGeneralSettings(container)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["General Settings"],
+					title = "General Settings",
 					relativeWidth = 1,
 					children = {
 						{
 							type = "CheckBox",
-							label = L["Make Vendoring Default Merchant Tab"],
+							label = "Make Vendoring Default Merchant Tab",
 							settingInfo = {TSM.db.global, "defaultMerchantTab"},
-							tooltip = L["If checked, the Vendoring tab of merchant windows will be the default tab."],
+							tooltip = "If checked, the Vendoring tab of merchant windows will be the default tab.",
 						},
 						{
 							type = "Dropdown",
-							label = L["Default Vendoring Page"],
+							label = "Default Vendoring Page",
 							relativeWidth = 0.5,
-							list = {L["Buy"], L["Buyback"], L["TSM Groups"], L["Quick Sell"]},
+							list = {"Buy", "Buyback", "TSM Groups", "Quick Sell"},
 							settingInfo = {TSM.db.global, "defaultPage"},
-							tooltip = L["Specifies the default page that will show when you select the TSM_Vendoring tab."],
+							tooltip = "Specifies the default page that will show when you select the TSM_Vendoring tab.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Automatically Sell Vendor trash"],
+							label = "Automatically Sell Vendor trash",
 							settingInfo = {TSM.db.global, "autoSellTrash"},
-							tooltip = L["If checked, vendoring will automatically sell any grey items in your inventory when you visit a merchant."],
+							tooltip = "If checked, vendoring will automatically sell any grey items in your inventory when you visit a merchant.",
 						},
 					}
 				},
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Quick Sell Settings"],
+					title = "Quick Sell Settings",
 					relativeWidth = 1,
 					children = {
 						{
 							type = "Slider",
-							label = L["Batch Size"],
-							tooltip = L["Number of items to sell at a time when QuickSelling"],
+							label = "Batch Size",
+							tooltip = "Number of items to sell at a time when QuickSelling",
 							isPercent = false,
 							min = 1,
 							max = 100,
@@ -93,49 +92,49 @@ function private:DrawGeneralSettings(container)
 						},
 						{
 							type = "EditBox",
-							label = L["Market Value"],
+							label = "Market Value",
 							settingInfo = { TSM.db.global, "qsMarketValue" },
 							relativeWidth = 0.5,
 							acceptCustom = true,
-							tooltip = L["Formula for an item's market value"],
+							tooltip = "Formula for an item's market value",
 						},
 						{
 							type = "EditBox",
-							label = L["Max Market Value"],
+							label = "Max Market Value",
 							settingInfo = { TSM.db.global, "qsMaxMarketValue" },
 							relativeWidth = 0.5,
 							acceptCustom = true,
-							tooltip = L["Do not sell an item if its market value meets or exceeds this amount"],
+							tooltip = "Do not sell an item if its market value meets or exceeds this amount",
 						},
 						{
 							type = "EditBox",
-							label = L["Destroy Value"],
+							label = "Destroy Value",
 							settingInfo = { TSM.db.global, "qsDestroyValue" },
 							relativeWidth = 0.5,
 							acceptCustom = true,
-							tooltip = L["Formula for an item's destroy value"],
+							tooltip = "Formula for an item's destroy value",
 						},
 						{
 							type = "EditBox",
-							label = L["Max Destroy Value"],
+							label = "Max Destroy Value",
 							settingInfo = { TSM.db.global, "qsMaxDestroyValue" },
 							relativeWidth = 0.5,
 							acceptCustom = true,
-							tooltip = L["Do not sell an item if its destroy value meets or exceeds this amount"],
+							tooltip = "Do not sell an item if its destroy value meets or exceeds this amount",
 						}
 					},
 				},
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Chat Message Options"],
+					title = "Chat Message Options",
 					relativeWidth = 1,
 					children = {
 						{
 							type = "CheckBox",
-							label = L["Display Total Money Received"],
+							label = "Display Total Money Received",
 							settingInfo = {TSM.db.global, "displayMoneyCollected"},
-							tooltip = L["If checked, the total amount of gold received will be shown at the end of automatically selling."],
+							tooltip = "If checked, the total amount of gold received will be shown at the end of automatically selling.",
 						},
 					},
 				},
@@ -150,7 +149,7 @@ function private:DrawIgnoreSettings(container)
 
 	local stCols = {
 		{
-			name = L["Ignored Item"],
+			name = "Ignored Item",
 			width = 1,
 		}
 	}
@@ -160,7 +159,7 @@ function private:DrawIgnoreSettings(container)
 			if not data.itemString then return end
 			GameTooltip:SetOwner(self, "ANCHOR_NONE")
 			GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPLEFT")
-			GameTooltip:AddLine(L["Click on this row to remove this item from the permanent ignore list."], 1, 1, 1, true)
+			GameTooltip:AddLine("Click on this row to remove this item from the permanent ignore list.", 1, 1, 1, true)
 			GameTooltip:Show()
 		end,
 		OnLeave = function()
@@ -170,7 +169,7 @@ function private:DrawIgnoreSettings(container)
 		OnClick = function(_, data, _, button)
 			if not data.itemString then return end
 			TSM.db.global.ignore[data.itemString] = nil
-			TSM:Printf(L["Removed %s from the permanent ignore list."], data.link)
+			TSM:Printf("Removed %s from the permanent ignore list.", data.link)
 			Options:UpdateIgnoreST()
 		end
 	}
@@ -224,24 +223,24 @@ end
 -- ============================================================================
 
 function Options:GetOperationOptionsInfo()
-	local description = L["Vendoring operations contain settings for easy vendoring of items."]
+	local description = "Vendoring operations contain settings for easy vendoring of items."
 	local tabInfo = {
-		{text = L["General"], callback = private.DrawOperationGeneral},
+		{text = "General", callback = private.DrawOperationGeneral},
 	}
 	local relationshipInfo = {
 		{
-			label = L["Vendoring Settings"],
-			{key="sellAfterExpired", label=L["Sell after expired auctions"]},
-			{key="enableBuy", label=L["Enable Buying"]},
-			{key="enableSell", label=L["Enable Selling"]},
-			{key="keepQty", label=L["Keep Quantity"]},
-			{key="restockQty", label=L["Restock Quantity"]},
-			{key="restockSources", label = L["Sources to Include in Restock"] },
-			{key="vsMarketValue", label=L["Market Value"]},
-			{key="vsMaxMarketValue", label=L["Max Market Value"]},
-			{key="vsDestroyValue", label=L["Destroy Value"]},
-			{key="vsMaxDestroyValue", label=L["Max Destroy Value"]},
-			{key="sellSoulbound", label=L["Sell soulbound items"]},
+			label = "Vendoring Settings",
+			{key="sellAfterExpired", label="Sell after expired auctions"},
+			{key="enableBuy", label="Enable Buying"},
+			{key="enableSell", label="Enable Selling"},
+			{key="keepQty", label="Keep Quantity"},
+			{key="restockQty", label="Restock Quantity"},
+			{key="restockSources", label = "Sources to Include in Restock" },
+			{key="vsMarketValue", label="Market Value"},
+			{key="vsMaxMarketValue", label="Max Market Value"},
+			{key="vsDestroyValue", label="Destroy Value"},
+			{key="vsMaxDestroyValue", label="Max Destroy Value"},
+			{key="sellSoulbound", label="Sell soulbound items"},
 		},
 	}
 	return description, tabInfo, relationshipInfo
@@ -259,13 +258,13 @@ function private.DrawOperationGeneral(container, operationName)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Buy Settings"],
+					title = "Buy Settings",
 					children = {
 						{
 							type = "CheckBox",
-							label = L["Enable Buying"],
+							label = "Enable Buying",
 							settingInfo = {operationSettings, "enableBuy"},
-							tooltip = L["If checked, this operation will be considered when clicking 'Buy Groups'"],
+							tooltip = "If checked, this operation will be considered when clicking 'Buy Groups'",
 							disabled = operationSettings.relationships.enableBuy,
 							callback = function() container:Reload() end,
 						},
@@ -275,8 +274,8 @@ function private.DrawOperationGeneral(container, operationName)
 						{
 							type = "Slider",
 							settingInfo = {operationSettings, "restockQty"},
-							label = L["Restock Quantity"],
-							tooltip = L["When buying, restock to this amount"],
+							label = "Restock Quantity",
+							tooltip = "When buying, restock to this amount",
 							isPercent = false,
 							min = 0,
 							max = 5000,
@@ -286,11 +285,11 @@ function private.DrawOperationGeneral(container, operationName)
 						},
 						{
 							type = "Dropdown",
-							label = L["Sources to Include in Restock"],
-							tooltip = L["Vendoring will take into account items from these sources when calculating how much to restock"],
+							label = "Sources to Include in Restock",
+							tooltip = "Vendoring will take into account items from these sources when calculating how much to restock",
 							disabled = operationSettings.relationships.restockSources or not operationSettings.enableBuy,
 							relativeWidth = 0.5,
-							list = {bank=BANK, guild=GUILD, alts=L["Alts"], alts_ah=L["Alts AH"],  ah=L["AH"], mail=L["Mail"]},
+							list = {bank=BANK, guild=GUILD, alts="Alts", alts_ah="Alts AH",  ah="AH", mail="Mail"},
 							value = operationSettings.restockSources,
 							multiselect = true,
 							callback = function(_, _, key, value)
@@ -306,13 +305,13 @@ function private.DrawOperationGeneral(container, operationName)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Sell Settings"],
+					title = "Sell Settings",
 					children = {
 						{
 							type = "CheckBox",
-							label = L["Enable Selling"],
+							label = "Enable Selling",
 							settingInfo = {operationSettings, "enableSell"},
-							tooltip = L["If checked, this operation will be considered when clicking 'Sell Groups'"],
+							tooltip = "If checked, this operation will be considered when clicking 'Sell Groups'",
 							disabled = operationSettings.relationships.enableSell,
 							callback = function() container:Reload() end,
 						},
@@ -322,8 +321,8 @@ function private.DrawOperationGeneral(container, operationName)
 						{
 							type = "Slider",
 							settingInfo = {operationSettings, "keepQty"},
-							label = L["Keep Quantity"],
-							tooltip = L["Quantity to keep in your bags"],
+							label = "Keep Quantity",
+							tooltip = "Quantity to keep in your bags",
 							isPercent = false,
 							min = 0,
 							max = 5000,
@@ -334,8 +333,8 @@ function private.DrawOperationGeneral(container, operationName)
 						{
 							type = "Slider",
 							settingInfo = {operationSettings, "sellAfterExpired"},
-							label = L["Min Expires"],
-							tooltip = L["Only sell an item after it has expired this many times"],
+							label = "Min Expires",
+							tooltip = "Only sell an item after it has expired this many times",
 							isPercent = false,
 							min = 0,
 							max = 5000,
@@ -345,45 +344,45 @@ function private.DrawOperationGeneral(container, operationName)
 						},
 						{
 							type = "EditBox",
-							label = L["Market Value"],
+							label = "Market Value",
 							settingInfo = { operationSettings, "vsMarketValue" },
 							relativeWidth = 0.5,
 							acceptCustom = true,
-							tooltip = L["Formula for an item's market value"],
+							tooltip = "Formula for an item's market value",
 							disabled = operationSettings.relationships.vsMarketValue or not operationSettings.enableSell
 						},
 						{
 							type = "EditBox",
-							label = L["Max Market Value ('0c' to disable)"],
+							label = "Max Market Value ('0c' to disable)",
 							settingInfo = { operationSettings, "vsMaxMarketValue" },
 							relativeWidth = 0.5,
 							acceptCustom = true,
-							tooltip = L["Do not sell an item if its market value meets or exceeds this amount"],
+							tooltip = "Do not sell an item if its market value meets or exceeds this amount",
 							disabled = operationSettings.relationships.vsMaxMarketValue or not operationSettings.enableSell
 						},
 						{
 							type = "EditBox",
-							label = L["Destroy Value"],
+							label = "Destroy Value",
 							settingInfo = { operationSettings, "vsDestroyValue" },
 							relativeWidth = 0.5,
 							acceptCustom = true,
-							tooltip = L["Formula for an item's destroy value"],
+							tooltip = "Formula for an item's destroy value",
 							disabled = operationSettings.relationships.vsDestroyValue or not operationSettings.enableSell
 						},
 						{
 							type = "EditBox",
-							label = L["Max Destroy Value ('0c' to disable)"],
+							label = "Max Destroy Value ('0c' to disable)",
 							settingInfo = { operationSettings, "vsMaxDestroyValue" },
 							relativeWidth = 0.5,
 							acceptCustom = true,
-							tooltip = L["Do not sell an item if its destroy value meets or exceeds this amount"],
+							tooltip = "Do not sell an item if its destroy value meets or exceeds this amount",
 							disabled = operationSettings.relationships.vsMaxDestroyValue or not operationSettings.enableSell
 						},
 						{
 							type = "CheckBox",
-							label = L["Sell soulbound items"],
+							label = "Sell soulbound items",
 							settingInfo = {operationSettings, "sellSoulbound"},
-							tooltip = L["If checked, soulbound items will be sold"],
+							tooltip = "If checked, soulbound items will be sold",
 							disabled = operationSettings.relationships.sellSoulbound or not operationSettings.enableSell
 						},
 					},

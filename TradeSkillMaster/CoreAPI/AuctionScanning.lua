@@ -8,7 +8,6 @@
 
 -- This file contains code for scanning the auction house
 local TSM = select(2, ...)
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {callbackHandler=nil, scanThreadId=nil, database=nil, currentModule=nil, pageTemp=nil, optimize=nil}
 -- some constants
 local SCAN_THREAD_PRIORITY = 0.8
@@ -176,7 +175,7 @@ end
 
 function private:ShowScanBusyPopup(module)
 	StaticPopupDialogs["TSMScanBusyPopup"] = StaticPopupDialogs["TSMScanBusyPopup"] or {
-		text = L["|cffffff00TSM Scan Blocked|r\n\nAnother module is currently scanning. Stop the other module's scan before retrying this scan."],
+		text = "|cffffff00TSM Scan Blocked|r\n\nAnother module is currently scanning. Stop the other module's scan before retrying this scan.",
 		button1 = OKAY,
 		timeout = 0,
 	}

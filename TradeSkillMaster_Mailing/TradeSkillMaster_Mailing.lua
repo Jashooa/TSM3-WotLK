@@ -10,9 +10,8 @@
 local TSM = select(2, ...)
 TSM = LibStub("AceAddon-3.0"):NewAddon(TSM, "TSM_Mailing", "AceEvent-3.0", "AceConsole-3.0")
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Mailing") -- loads the localization table
 
-TSM.SPELLING_WARNING = "|cffff0000"..L["BE SURE TO SPELL THE NAME CORRECTLY!"].."|r"
+TSM.SPELLING_WARNING = "|cffff0000".."BE SURE TO SPELL THE NAME CORRECTLY!".."|r"
 local private = {lootIndex=1, recheckTime=1, allowTimerStart=true}
 
 local settingsInfo = {
@@ -96,8 +95,8 @@ function TSM:GetOperationInfo(operationName)
 	if operation.target == "" then return end
 
 	if operation.maxQtyEnabled then
-		return format(L["Mailing up to %d to %s."], operation.maxQty, operation.target)
+		return format("Mailing up to %d to %s.", operation.maxQty, operation.target)
 	else
-		return format(L["Mailing all to %s."], operation.target)
+		return format("Mailing all to %s.", operation.target)
 	end
 end

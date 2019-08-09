@@ -9,7 +9,6 @@
 -- load the parent file (TSM) into a local variable and register this file as a module
 local TSM = select(2, ...)
 local GUI = TSM:NewModule("GUI", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Destroying")
 local private = { data = {}, ignore = {}, threadId = nil, hidden = nil }
 
 local GEM_CHIPS = {
@@ -92,7 +91,7 @@ function private:CreateDestroyingFrame()
 			},
 			{
 				type = "Text",
-				text = format(L["%sLeft-Click|r to ignore an item for this session.\n%sShift-Left-Click|r to ignore an item permanently. You can remove items from permanent ignore in the Destroying options."], color, color),
+				text = format("%sLeft-Click|r to ignore an item for this session.\n%sShift-Left-Click|r to ignore an item permanently. You can remove items from permanent ignore in the Destroying options.", color, color),
 				textFont = { TSMAPI.Design:GetContentFont("small") },
 				justify = { "LEFT", "TOP" },
 				points = { { "TOPLEFT", 3, -26 }, { "TOPRIGHT", -3, -26 } },
@@ -101,7 +100,7 @@ function private:CreateDestroyingFrame()
 				type = "ScrollingTableFrame",
 				key = "st",
 				stDisableSelection = true,
-				stCols = { { name = L["Item"], width = 0.75 }, { name = L["Stack Size"], width = 0.25, align = "CENTER" } },
+				stCols = { { name = "Item", width = 0.75 }, { name = "Stack Size", width = 0.25, align = "CENTER" } },
 				points = { { "TOPLEFT", 3, -75 }, { "BOTTOMRIGHT", -3, 50 } },
 				scripts = { "OnClick", "OnEnter", "OnLeave" },
 			},
@@ -109,7 +108,7 @@ function private:CreateDestroyingFrame()
 				type = "Button",
 				key = "combineBtn",
 				isSecure = true,
-				text = L["Combine Partial Stacks"],
+				text = "Combine Partial Stacks",
 				textHeight = 14,
 				size = { 0, 20 },
 				points = { { "BOTTOMLEFT", 3, 26 }, { "BOTTOMRIGHT", -3, 26 } },
@@ -120,7 +119,7 @@ function private:CreateDestroyingFrame()
 				name = "TSMDestroyButton",
 				key = "destroyBtn",
 				isSecure = true,
-				text = L["Destroy Next"],
+				text = "Destroy Next",
 				textHeight = 14,
 				size = { 0, 20 },
 				points = { { "BOTTOMLEFT", 3, 3 }, { "BOTTOMRIGHT", -3, 3 } },
@@ -131,7 +130,7 @@ function private:CreateDestroyingFrame()
 			closeBtn = {
 				OnClick = function()
 					if InCombatLockdown() then return end
-					TSM:Print(L["Hiding frame for the remainder of this session. Typing '/tsm destroy' will open the frame again."])
+					TSM:Print("Hiding frame for the remainder of this session. Typing '/tsm destroy' will open the frame again.")
 					private.hidden = true
 					private.StopDestroying()
 					private.frame:Hide()
@@ -143,11 +142,11 @@ function private:CreateDestroyingFrame()
 					if button == "LeftButton" then
 						if IsShiftKeyDown() then
 							TSM.db.global.ignore[data.itemString] = true
-							TSM:Printf(L["Ignoring all %s permanently. You can undo this in the Destroying options."], data.link)
+							TSM:Printf("Ignoring all %s permanently. You can undo this in the Destroying options.", data.link)
 							TSM.Options:UpdateIgnoreST()
 						else
 							private.ignore[data.itemString] = true
-							TSM:Printf(L["Ignoring all %s this session (until your UI is reloaded)."], data.link)
+							TSM:Printf("Ignoring all %s this session (until your UI is reloaded).", data.link)
 						end
 						private:UpdateSTData()
 					end
@@ -174,7 +173,7 @@ function private:CreateDestroyingFrame()
 						self:SetAttribute("macrotext1", "")
 						return
 					elseif IsAltKeyDown() or IsControlKeyDown() or IsShiftKeyDown() then
-						TSM:Print(L["Make sure not to press any modifier keys when clicking the 'Destroy Next' button!"])
+						TSM:Print("Make sure not to press any modifier keys when clicking the 'Destroy Next' button!")
 						self:SetAttribute("macrotext1", "")
 						return
 					end

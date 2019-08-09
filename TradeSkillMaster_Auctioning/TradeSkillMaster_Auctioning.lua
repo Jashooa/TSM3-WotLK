@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 TSM = LibStub("AceAddon-3.0"):NewAddon(TSM, "TSM_Auctioning", "AceEvent-3.0", "AceConsole-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Auctioning") -- loads the localization table
 TSM.operationLookup = {}
 TSM.operationNameLookup = {}
 
@@ -148,27 +147,27 @@ function TSM:GetOperationInfo(operationName)
 
 	-- get the post string
 	if operation.postCap == 0 then
-		tinsert(parts, L["No posting."])
+		tinsert(parts, "No posting.")
 	else
-		tinsert(parts, format(L["Posting %d stack(s) of %d for %d hours."], operation.postCap, operation.stackSize, operation.duration))
+		tinsert(parts, format("Posting %d stack(s) of %d for %d hours.", operation.postCap, operation.stackSize, operation.duration))
 	end
 
 	-- get the cancel string
 	if operation.cancelUndercut and operation.cancelRepost then
-		tinsert(parts, format(L["Canceling undercut auctions and to repost higher."]))
+		tinsert(parts, format("Canceling undercut auctions and to repost higher."))
 	elseif operation.cancelUndercut then
-		tinsert(parts, format(L["Canceling undercut auctions."]))
+		tinsert(parts, format("Canceling undercut auctions."))
 	elseif operation.cancelRepost then
-		tinsert(parts, format(L["Canceling to repost higher."]))
+		tinsert(parts, format("Canceling to repost higher."))
 	else
-		tinsert(parts, L["Not canceling."])
+		tinsert(parts, "Not canceling.")
 	end
 
 	-- get the reset string
 	if operation.resetEnabled then
-		tinsert(parts, L["Resetting enabled."])
+		tinsert(parts, "Resetting enabled.")
 	else
-		tinsert(parts, L["Not resetting."])
+		tinsert(parts, "Not resetting.")
 	end
 	return table.concat(parts, " ")
 end
@@ -188,7 +187,7 @@ function TSM:LoadTooltip(itemString, quantity, options, moneyCoins, lines)
 		local minPrice = (TSMAPI:MoneyToString(prices.minPrice, "|cffffffff", moneyCoins and "OPT_ICON" or nil) or "|cffffffff---|r")
 		local normPrice = (TSMAPI:MoneyToString(prices.normalPrice, "|cffffffff", moneyCoins and "OPT_ICON" or nil) or "|cffffffff---|r")
 		local maxPrice = (TSMAPI:MoneyToString(prices.maxPrice, "|cffffffff", moneyCoins and "OPT_ICON" or nil) or "|cffffffff---|r")
-		tinsert(lines, {left="  "..L["Min/Normal/Max Prices:"], right=format("%s / %s / %s", minPrice, normPrice, maxPrice)})
+		tinsert(lines, {left="  ".."Min/Normal/Max Prices:", right=format("%s / %s / %s", minPrice, normPrice, maxPrice)})
 	end
 
 	if #lines > numStartingLines then

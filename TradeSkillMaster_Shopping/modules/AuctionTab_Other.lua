@@ -8,7 +8,6 @@
 
 local TSM = select(2, ...)
 local AuctionTabOther = TSM:NewModule("AuctionTabOther")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster_Shopping") -- loads the localization table
 local private = {frame=nil}
 
 
@@ -89,7 +88,7 @@ function private.StartSearchThread(self, mode)
 	local lastScanTime = TSMAPI:ModuleAPI("AuctionDB", "lastCompleteScanTime")
 	local lastScanData = TSMAPI:ModuleAPI("AuctionDB", "lastCompleteScan")
 	if not lastScanData or lastScanTime < time() - 60 * 60 * 12 or not next(lastScanData) then
-		TSM:Print(L["No recent AuctionDB scan data found."])
+		TSM:Print("No recent AuctionDB scan data found.")
 		return
 	end
 
@@ -111,7 +110,7 @@ function private.StartSearchThread(self, mode)
 			end
 			self:Yield()
 		end
-		searchBoxText = "~"..L["vendor search"].."~"
+		searchBoxText = "~".."vendor search".."~"
 	elseif mode == "disenchant" then
 		for itemString, data in pairs(lastScanData) do
 			local iLvl = TSMAPI.Item:GetItemLevel(itemString) or -1
@@ -123,11 +122,11 @@ function private.StartSearchThread(self, mode)
 			end
 			self:Yield()
 		end
-		searchBoxText = "~"..L["disenchant search"].."~"
+		searchBoxText = "~".."disenchant search".."~"
 	end
 
 	if #itemList == 0 then
-		TSM:Print(L["Nothing to search for!"])
+		TSM:Print("Nothing to search for!")
 		return
 	end
 
@@ -159,10 +158,10 @@ end
 
 function private:StartSniperSearch()
 	local continueInfo = {
-		tooltip = L["Shift-Click to run sniper again."],
+		tooltip = "Shift-Click to run sniper again.",
 		callback = private.StartSniperSearch,
 	}
-	TSM.AuctionTab:StartSearch({searchMode="normal", extraInfo={searchType="sniper", continue=continueInfo}, searchBoxText="~"..L["sniper"].."~"})
+	TSM.AuctionTab:StartSearch({searchMode="normal", extraInfo={searchType="sniper", continue=continueInfo}, searchBoxText="~".."sniper".."~"})
 end
 
 
@@ -186,7 +185,7 @@ function AuctionTabOther:GetFrameInfo()
 				children = {
 					{
 						type = "Text",
-						text = L["Custom Filter"],
+						text = "Custom Filter",
 						textHeight = 20,
 						size = {0, 20},
 						points = {{"TOPLEFT", 5, -5}, {"TOPRIGHT", -5, -5}},
@@ -198,7 +197,7 @@ function AuctionTabOther:GetFrameInfo()
 					-- row 1 - filter
 					{
 						type = "Text",
-						text = L["Search Filter:"],
+						text = "Search Filter:",
 						size = {0, 20},
 						points = {{"TOPLEFT", 5, -35}},
 					},
@@ -216,7 +215,7 @@ function AuctionTabOther:GetFrameInfo()
 					{
 						type = "Text",
 						key = "levelText",
-						text = L["Required Level Range:"],
+						text = "Required Level Range:",
 						size = {0, 20},
 						points = {{"TOPLEFT", 5, -70}},
 					},
@@ -247,7 +246,7 @@ function AuctionTabOther:GetFrameInfo()
 					-- row 3 - item level
 					{
 						type = "Text",
-						text = L["Item Level Range:"],
+						text = "Item Level Range:",
 						size = {0, 20},
 						points = {{"TOPLEFT", 5, -105}},
 					},
@@ -279,7 +278,7 @@ function AuctionTabOther:GetFrameInfo()
 					{
 						type = "Dropdown",
 						key = "classDropdown",
-						label = L["Item Class"],
+						label = "Item Class",
 						list = itemClasses,
 						points = {{"TOPLEFT", 5, -132}, {"TOPRIGHT", BFC.PARENT, "TOP", 0, -132}},
 						scripts = {"OnValueChanged"},
@@ -287,7 +286,7 @@ function AuctionTabOther:GetFrameInfo()
 					{
 						type = "Dropdown",
 						key = "subClassDropdown",
-						label = L["Item SubClass"],
+						label = "Item SubClass",
 						list = {},
 						points = {{"TOPLEFT", BFC.PARENT, "TOP", 5, -132}, {"TOPRIGHT", 0, -132}},
 					},
@@ -299,7 +298,7 @@ function AuctionTabOther:GetFrameInfo()
 					{
 						type = "Dropdown",
 						key = "rarityDropdown",
-						label = L["Minimum Rarity"],
+						label = "Minimum Rarity",
 						list = rarityList,
 						points = {{"TOPLEFT", 5, -182}, {"TOPRIGHT", -5, -182}},
 					},
@@ -311,7 +310,7 @@ function AuctionTabOther:GetFrameInfo()
 					-- row 6 - max quantity
 					{
 						type = "Text",
-						text = L["Maximum Quantity to Buy:"],
+						text = "Maximum Quantity to Buy:",
 						size = {0, 20},
 						points = {{"TOPLEFT", 5, -240}},
 					},
@@ -331,7 +330,7 @@ function AuctionTabOther:GetFrameInfo()
 						type = "CheckBox",
 						key = "usableCheckBox",
 						label = USABLE_ITEMS,
-						tooltip = L["If set, only items which are usable by your character will be included in the results."],
+						tooltip = "If set, only items which are usable by your character will be included in the results.",
 						size = {200, 30},
 						points = {{"TOPLEFT", 5, -272}},
 					},
@@ -339,7 +338,7 @@ function AuctionTabOther:GetFrameInfo()
 						type = "CheckBox",
 						key = "exactCheckBox",
 						label = AH_EXACT_MATCH,
-						tooltip = L["If set, only items which exactly match the search filter you have set will be included in the results."],
+						tooltip = "If set, only items which exactly match the search filter you have set will be included in the results.",
 						size = {200, 30},
 						points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}},
 					},
@@ -351,7 +350,7 @@ function AuctionTabOther:GetFrameInfo()
 					{
 						type = "Button",
 						key = "clearBtn",
-						text = L["Reset Filters"],
+						text = "Reset Filters",
 						textHeight = 20,
 						size = {0, 25},
 						points = {{"BOTTOMLEFT", 5, 5}, {"BOTTOMRIGHT", BFC.PARENT, "BOTTOM", -2, 5}},
@@ -360,7 +359,7 @@ function AuctionTabOther:GetFrameInfo()
 					{
 						type = "Button",
 						key = "startBtn",
-						text = L["Start Search"],
+						text = "Start Search",
 						textHeight = 20,
 						size = {0, 25},
 						points = {{"BOTTOMLEFT", BFC.PARENT, "BOTTOM", 2, 5}, {"BOTTOMRIGHT", -5, 5}},
@@ -380,7 +379,7 @@ function AuctionTabOther:GetFrameInfo()
 				children = {
 					{
 						type = "Text",
-						text = L["Other Searches"],
+						text = "Other Searches",
 						textHeight = 18,
 						justify = {"CENTER", "MIDDLE"},
 						size = {0, 20},
@@ -393,8 +392,8 @@ function AuctionTabOther:GetFrameInfo()
 					{
 						type = "Button",
 						key = "startVendorBtn",
-						text = L["Start Vendor Search"],
-						tooltip = L["The vendor search looks for items on the AH below their vendor sell price."],
+						text = "Start Vendor Search",
+						tooltip = "The vendor search looks for items on the AH below their vendor sell price.",
 						textHeight = 18,
 						size = {0, 25},
 						points = {{"TOPLEFT", 5, -35}, {"TOPRIGHT", -5, -35}},
@@ -407,8 +406,8 @@ function AuctionTabOther:GetFrameInfo()
 					{
 						type = "Button",
 						key = "startDisenchantBtn",
-						text = L["Start Disenchant Search"],
-						tooltip = L["The disenchant search looks for items on the AH below their disenchant value. You can set the maximum percentage of disenchant value to search for in the Shopping General options"],
+						text = "Start Disenchant Search",
+						tooltip = "The disenchant search looks for items on the AH below their disenchant value. You can set the maximum percentage of disenchant value to search for in the Shopping General options",
 						textHeight = 18,
 						size = {0, 25},
 						points = {{"TOPLEFT", 5, -70}, {"TOPRIGHT", -5, -70}},
@@ -421,8 +420,8 @@ function AuctionTabOther:GetFrameInfo()
 					{
 						type = "Button",
 						key = "sniperStartBtn",
-						text = L["Start Sniper"],
-						tooltip = L["The Sniper feature will look in real-time for items that have recently been posted to the AH which are worth snatching! You can configure the parameters of Sniper in the Shopping options."],
+						text = "Start Sniper",
+						tooltip = "The Sniper feature will look in real-time for items that have recently been posted to the AH which are worth snatching! You can configure the parameters of Sniper in the Shopping options.",
 						textHeight = 18,
 						size = {0, 25},
 						points = {{"TOPLEFT", 5, -105}, {"TOPRIGHT", -5, -105}},

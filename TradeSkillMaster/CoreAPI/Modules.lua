@@ -10,7 +10,6 @@
 
 local TSM = select(2, ...)
 local Modules = TSM:NewModule("Modules", "AceConsole-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local private = {}
 local moduleObjects = TSM.moduleObjects
 local moduleNames = TSM.moduleNames
@@ -97,7 +96,7 @@ function TSMAPI:NewModule(obj)
 		for _, info in ipairs(obj.icons) do
 			if info.slashCommand then
 				obj.slashCommands = obj.slashCommands or {}
-				tinsert(obj.slashCommands, {key=info.slashCommand, label=format(L["Opens the TSM window to the '%s' page"], info.desc), callback=function() TSM.MainFrame:Show() TSM.MainFrame:SelectIcon(obj.name, info.desc) end})
+				tinsert(obj.slashCommands, {key=info.slashCommand, label=format("Opens the TSM window to the '%s' page", info.desc), callback=function() TSM.MainFrame:Show() TSM.MainFrame:SelectIcon(obj.name, info.desc) end})
 			end
 			TSM.MainFrame:RegisterMainFrameIcon(info.desc, info.icon, info.callback, obj.name, info.side)
 		end
@@ -186,11 +185,11 @@ function Modules:OnEnable()
 	TSMAPI.Delay:AfterTime(3, function()
 		if #moduleNames == 1 then
 			StaticPopupDialogs["TSMInfoPopup"] = {
-				text = L["|cffffff00Important Note:|r You do not currently have any modules installed / enabled for TradeSkillMaster! |cff77ccffYou must download modules for TradeSkillMaster to have some useful functionality!|r\n\nPlease visit http://www.curse.com/addons/wow/tradeskill-master and check the project description for links to download modules."],
-				button1 = L["I'll Go There Now!"],
+				text = "|cffffff00Important Note:|r You do not currently have any modules installed / enabled for TradeSkillMaster! |cff77ccffYou must download modules for TradeSkillMaster to have some useful functionality!|r\n\nPlease visit http://www.curse.com/addons/wow/tradeskill-master and check the project description for links to download modules.",
+				button1 = "I'll Go There Now!",
 				timeout = 0,
 				whileDead = true,
-				OnAccept = function() TSM:Print(L["Just incase you didn't read this the first time:"]) TSM:Print(L["|cffffff00Important Note:|r You do not currently have any modules installed / enabled for TradeSkillMaster! |cff77ccffYou must download modules for TradeSkillMaster to have some useful functionality!|r\n\nPlease visit http://www.curse.com/addons/wow/tradeskill-master and check the project description for links to download modules."]) end,
+				OnAccept = function() TSM:Print("Just incase you didn't read this the first time:") TSM:Print("|cffffff00Important Note:|r You do not currently have any modules installed / enabled for TradeSkillMaster! |cff77ccffYou must download modules for TradeSkillMaster to have some useful functionality!|r\n\nPlease visit http://www.curse.com/addons/wow/tradeskill-master and check the project description for links to download modules.") end,
 			}
 			TSMAPI.Util:ShowStaticPopupDialog("TSMInfoPopup")
 		end
@@ -296,7 +295,7 @@ function Modules:ChatCommand(input)
 
 	if cmd == "" then
 		TSM.MainFrame:Show()
-		TSM.MainFrame:SelectIcon("TradeSkillMaster", L["TSM Features"])
+		TSM.MainFrame:SelectIcon("TradeSkillMaster", "TSM Features")
 	else
 		local foundCmd
 		for _, obj in pairs(moduleObjects) do
@@ -312,9 +311,9 @@ function Modules:ChatCommand(input)
 		-- If not a registered command, print out slash command help
 		if not foundCmd then
 			local chatFrame = TSMAPI:GetChatFrame()
-			TSM:Print(L["Slash Commands:"])
-			chatFrame:AddMessage("|cffffaa00" .. L["/tsm|r - opens the main TSM window."])
-			chatFrame:AddMessage("|cffffaa00" .. L["/tsm help|r - Shows this help listing"])
+			TSM:Print("Slash Commands:")
+			chatFrame:AddMessage("|cffffaa00" .. "/tsm|r - opens the main TSM window.")
+			chatFrame:AddMessage("|cffffaa00" .. "/tsm help|r - Shows this help listing")
 			for _, name in ipairs(moduleNames) do
 				for _, info in ipairs(moduleObjects[name].slashCommands or {}) do
 					if not info.hidden then

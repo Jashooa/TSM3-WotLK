@@ -10,16 +10,15 @@
 
 local TSM = select(2, ...)
 local Options = TSM:NewModule("Options")
-local L = LibStub("AceLocale-3.0"):GetLocale("TradeSkillMaster") -- loads the localization table
 local AceGUI = LibStub("AceGUI-3.0") -- load the AceGUI libraries
 local private = {operationInfo=TSM.moduleOperationInfo, treeGroup=nil, moduleOptions={}}
 local presetThemes = {
-	light = { L["Light (by Ravanys - The Consortium)"], "inlineColors{link{49,56,133,1}link2{153,255,255,1}category{36,106,36,1}category2{85,180,8,1}}textColors{iconRegion{enabled{105,105,105,1}}title{enabled{49,56,85,1}}label{enabled{45,44,40,1}disabled{150,148,140,1}}text{enabled{245,244,240,1}disabled{95,98,90,1}}link{enabled{49,56,133,1}}}fontSizes{normal{15}medium{13}small{12}}edgeSize{1.5}frameColors{frameBG{backdrop{219,219,219,1}border{30,30,30,1}}content{backdrop{60,60,60,1}border{40,40,40,1}}frame{backdrop{228,228,228,1}border{199,199,199,1}}}" },
-	goblineer = { L["Goblineer (by Sterling - The Consortium)"], "inlineColors{link{153,255,255,1}link2{153,255,255,1}category{36,106,36,1}category2{85,180,8,1}}textColors{iconRegion{enabled{249,255,247,1}}title{enabled{132,219,9,1}}label{enabled{216,225,211,1}disabled{150,148,140,1}}text{enabled{255,254,250,1}disabled{147,151,139,1}}link{enabled{49,56,133,1}}}fontSizes{normal{15}medium{13}small{12}}edgeSize{1.5}frameColors{frameBG{backdrop{24,24,24,0.93}border{50,50,50,1}}content{backdrop{45,45,45,1}border{0,0,0,0}}frame{backdrop{24,24,24,1}border{100,100,100,0.3}}}" },
-	jaded = { L["Jaded (by Ravanys - The Consortium)"], "frameColors{frameBG{backdrop{0,0,0,0.6}border{0,0,0,0.4}}content{backdrop{62,62,62,1}border{72,72,72,1}}frame{backdrop{32,32,32,1}border{2,2,2,0.48}}}textColors{text{enabled{99,219,136,1}disabled{95,98,90,1}}iconRegion{enabled{43,255,156,1}}title{enabled{75,255,150,1}}label{enabled{99,219,136,1}disabled{177,176,168,1}}}edgeSize{1}fontSizes{normal{15}medium{13}small{12}}" },
-	tsmdeck = { L["TSMDeck (by Jim Younkin - Power Word: Gold)"], "inlineColors{link2{153,255,255,1}category2{85,180,8,1}link{89,139,255,1}category{80,222,22,1}}textColors{iconRegion{enabled{117,117,122,1}}title{enabled{247,248,255,1}}label{enabled{238,249,237,1}disabled{110,110,110,1}}text{enabled{245,240,251,1}disabled{115,115,115,1}}link{enabled{49,56,133,1}}}fontSizes{normal{14}medium{13}small{12}}edgeSize{1}frameColors{frameBG{backdrop{29,29,29,1}border{20,20,20,1}}content{backdrop{27,27,27,1}border{67,67,65,1}}frame{backdrop{39,39,40,1}border{20,20,20,1}}}" },
-	tsmclassic = { L["TSM Classic (by Jim Younkin - Power Word: Gold)"], "inlineColors{link{89,139,255,1}link2{153,255,255,1}category{80,222,22,1}category2{85,180,8,1}}textColors{text{enabled{245,240,251,1}disabled{115,115,115,1}}iconRegion{enabled{216,216,224,1}}title{enabled{247,248,255,1}}label{enabled{238,249,237,1}disabled{110,110,110,1}}}fontSizes{normal{14}medium{13}small{12}}edgeSize{1}frameColors{frameBG{backdrop{8,8,8,1}border{4,2,147,1}}content{backdrop{18,18,18,1}border{102,108,105,1}}frame{backdrop{2,2,2,1}border{4,2,147,1}}}" },
-	functional = { L["The Functional Gold Maker (by Xsinthis - The Golden Crusade)"], "inlineColors{category{3,175,222,1}link2{153,255,255,1}tooltip{130,130,250}link{89,139,255,1}category2{6,24,180,1}}textColors{iconRegion{enabled{216,216,224,1}}title{enabled{247,248,255,1}}label{enabled{238,249,237,1}disabled{110,110,110,1}}text{enabled{245,240,251,1}disabled{115,115,115,1}}link{enabled{49,56,133,1}}}fontSizes{normal{14}small{12}}edgeSize{0.5}frameColors{frameBG{backdrop{28,28,28,1}border{74,5,0,1}}content{backdrop{18,18,18,0.64000001549721}border{84,7,3,1}}frame{backdrop{2,2,2,0.48000001907349}border{72,9,4,1}}}" },
+	light = { "Light (by Ravanys - The Consortium)", "inlineColors{link{49,56,133,1}link2{153,255,255,1}category{36,106,36,1}category2{85,180,8,1}}textColors{iconRegion{enabled{105,105,105,1}}title{enabled{49,56,85,1}}label{enabled{45,44,40,1}disabled{150,148,140,1}}text{enabled{245,244,240,1}disabled{95,98,90,1}}link{enabled{49,56,133,1}}}fontSizes{normal{15}medium{13}small{12}}edgeSize{1.5}frameColors{frameBG{backdrop{219,219,219,1}border{30,30,30,1}}content{backdrop{60,60,60,1}border{40,40,40,1}}frame{backdrop{228,228,228,1}border{199,199,199,1}}}" },
+	goblineer = { "Goblineer (by Sterling - The Consortium)", "inlineColors{link{153,255,255,1}link2{153,255,255,1}category{36,106,36,1}category2{85,180,8,1}}textColors{iconRegion{enabled{249,255,247,1}}title{enabled{132,219,9,1}}label{enabled{216,225,211,1}disabled{150,148,140,1}}text{enabled{255,254,250,1}disabled{147,151,139,1}}link{enabled{49,56,133,1}}}fontSizes{normal{15}medium{13}small{12}}edgeSize{1.5}frameColors{frameBG{backdrop{24,24,24,0.93}border{50,50,50,1}}content{backdrop{45,45,45,1}border{0,0,0,0}}frame{backdrop{24,24,24,1}border{100,100,100,0.3}}}" },
+	jaded = { "Jaded (by Ravanys - The Consortium)", "frameColors{frameBG{backdrop{0,0,0,0.6}border{0,0,0,0.4}}content{backdrop{62,62,62,1}border{72,72,72,1}}frame{backdrop{32,32,32,1}border{2,2,2,0.48}}}textColors{text{enabled{99,219,136,1}disabled{95,98,90,1}}iconRegion{enabled{43,255,156,1}}title{enabled{75,255,150,1}}label{enabled{99,219,136,1}disabled{177,176,168,1}}}edgeSize{1}fontSizes{normal{15}medium{13}small{12}}" },
+	tsmdeck = { "TSMDeck (by Jim Younkin - Power Word: Gold)", "inlineColors{link2{153,255,255,1}category2{85,180,8,1}link{89,139,255,1}category{80,222,22,1}}textColors{iconRegion{enabled{117,117,122,1}}title{enabled{247,248,255,1}}label{enabled{238,249,237,1}disabled{110,110,110,1}}text{enabled{245,240,251,1}disabled{115,115,115,1}}link{enabled{49,56,133,1}}}fontSizes{normal{14}medium{13}small{12}}edgeSize{1}frameColors{frameBG{backdrop{29,29,29,1}border{20,20,20,1}}content{backdrop{27,27,27,1}border{67,67,65,1}}frame{backdrop{39,39,40,1}border{20,20,20,1}}}" },
+	tsmclassic = { "TSM Classic (by Jim Younkin - Power Word: Gold)", "inlineColors{link{89,139,255,1}link2{153,255,255,1}category{80,222,22,1}category2{85,180,8,1}}textColors{text{enabled{245,240,251,1}disabled{115,115,115,1}}iconRegion{enabled{216,216,224,1}}title{enabled{247,248,255,1}}label{enabled{238,249,237,1}disabled{110,110,110,1}}}fontSizes{normal{14}medium{13}small{12}}edgeSize{1}frameColors{frameBG{backdrop{8,8,8,1}border{4,2,147,1}}content{backdrop{18,18,18,1}border{102,108,105,1}}frame{backdrop{2,2,2,1}border{4,2,147,1}}}" },
+	functional = { "The Functional Gold Maker (by Xsinthis - The Golden Crusade)", "inlineColors{category{3,175,222,1}link2{153,255,255,1}tooltip{130,130,250}link{89,139,255,1}category2{6,24,180,1}}textColors{iconRegion{enabled{216,216,224,1}}title{enabled{247,248,255,1}}label{enabled{238,249,237,1}disabled{110,110,110,1}}text{enabled{245,240,251,1}disabled{115,115,115,1}}link{enabled{49,56,133,1}}}fontSizes{normal{14}small{12}}edgeSize{0.5}frameColors{frameBG{backdrop{28,28,28,1}border{74,5,0,1}}content{backdrop{18,18,18,0.64000001549721}border{84,7,3,1}}frame{backdrop{2,2,2,0.48000001907349}border{72,9,4,1}}}" },
 }
 local defaultTheme = presetThemes.goblineer
 
@@ -54,7 +53,7 @@ function Options:Load(parent)
 	local treeInfo = {
 		{
 			value = "module",
-			text = L["Module Options"],
+			text = "Module Options",
 			children = moduleChildren,
 		},
 		TSM.Tooltips:GetTreeInfo("tooltip"),
@@ -110,7 +109,7 @@ function private:LoadOptions(parent)
 	tg:SetLayout("Fill")
 	tg:SetFullHeight(true)
 	tg:SetFullWidth(true)
-	tg:SetTabs({{value=1, text=L["General"]}, {value=2, text=L["Appearance"]}, {value=3, text=L["Profiles"]}, {value=4, text=L["Account Syncing"]}, {value=5, text=L["Misc. Features"]}})
+	tg:SetTabs({{value=1, text="General"}, {value=2, text="Appearance"}, {value=3, text="Profiles"}, {value=4, text="Account Syncing"}, {value=5, text="Misc. Features"}})
 	tg:SetCallback("OnGroupSelected", function(self, _, value)
 		self:ReleaseChildren()
 		if value == 1 then
@@ -180,11 +179,11 @@ function private:LoadOptionsPage(container)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["General Settings"],
+					title = "General Settings",
 					children = {
 						{
 							type = "CheckBox",
-							label = L["Hide Minimap Icon"],
+							label = "Hide Minimap Icon",
 							settingInfo = { TSM.db.profile.minimapIcon, "hide" },
 							relativeWidth = 0.5,
 							callback = function(_, _, value)
@@ -197,12 +196,12 @@ function private:LoadOptionsPage(container)
 						},
 						{
 							type = "CheckBox",
-							label = L["Store Operations Globally"],
+							label = "Store Operations Globally",
 							value = TSM.db.global.globalOperations,
 							relativeWidth = 0.5,
 							callback = function(_, _, value)
 								StaticPopupDialogs["TSM_GLOBAL_OPERATIONS"] = StaticPopupDialogs["TSM_GLOBAL_OPERATIONS"] or {
-									text = L["If you have multiple profile set up with operations, enabling this will cause all but the current profile's operations to be irreversibly lost. Are you sure you want to continue?"],
+									text = "If you have multiple profile set up with operations, enabling this will cause all but the current profile's operations to be irreversibly lost. Are you sure you want to continue?",
 									button1 = YES,
 									button2 = CANCEL,
 									timeout = 0,
@@ -237,38 +236,38 @@ function private:LoadOptionsPage(container)
 								container:Reload()
 								TSMAPI.Util:ShowStaticPopupDialog("TSM_GLOBAL_OPERATIONS")
 							end,
-							tooltip = L["If checked, operations will be stored globally rather than by profile. TSM groups are always stored by profile. Note that if you have multiple profiles setup already with separate operation information, changing this will cause all but the current profile's operations to be lost."],
+							tooltip = "If checked, operations will be stored globally rather than by profile. TSM groups are always stored by profile. Note that if you have multiple profiles setup already with separate operation information, changing this will cause all but the current profile's operations to be lost.",
 						},
 						{
 							type = "Dropdown",
-							label = L["Chat Tab"],
+							label = "Chat Tab",
 							list = chatFrameList,
 							value = chatFrameValue,
 							callback = function(_, _, value)
 								TSM.db.global.chatFrame = chatFrameList[value]
 							end,
 							relativeWidth = 0.5,
-							tooltip = L["This option sets which tab TSM and its modules will use for printing chat messages."],
+							tooltip = "This option sets which tab TSM and its modules will use for printing chat messages.",
 						},
 						{
 							type = "HeadingLine",
 						},
 						{
 							type = "Dropdown",
-							label = L["Forget Characters"],
+							label = "Forget Characters",
 							list = characterList,
 							relativeWidth = 0.5,
 							callback = function(_, _, value)
 								local name = characterList[value]
 								TSM.Inventory:RemoveCharacterData(name)
-								TSM:Printf(L["%s removed."], name)
+								TSM:Printf("%s removed.", name)
 								container:Reload()
 							end,
-							tooltip = L["If you delete, rename, or transfer a character off the current faction/realm, you should remove it from TSM's list of characters using this dropdown."],
+							tooltip = "If you delete, rename, or transfer a character off the current faction/realm, you should remove it from TSM's list of characters using this dropdown.",
 						},
 						{
 							type = "Dropdown",
-							label = L["Ignore Guilds"],
+							label = "Ignore Guilds",
 							list = guildList,
 							value = guildValues,
 							relativeWidth = 0.5,
@@ -277,27 +276,27 @@ function private:LoadOptionsPage(container)
 								local guild = guildList[key]
 								TSM.db.factionrealm.ignoreGuilds[guild] = value
 							end,
-							tooltip = L["Any guilds which are selected will be ignored for inventory tracking purposes."],
+							tooltip = "Any guilds which are selected will be ignored for inventory tracking purposes.",
 						},
 					},
 				},
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["BankUI Settings"],
+					title = "BankUI Settings",
 					children = {
 						{
 							type = "Dropdown",
-							label = L["Default BankUI Tab"],
+							label = "Default BankUI Tab",
 							list = TSM:getBankTabs(),
 							settingInfo = { TSM.db.global, "bankUITab" },
 							relativeWidth = 0.5,
-							tooltip = L["The default tab shown in the 'BankUI' frame."],
+							tooltip = "The default tab shown in the 'BankUI' frame.",
 						},
 						{
 							type = "Slider",
 							value = TSM.db.global.moveDelay,
-							label = L["BankUI Move Delay"],
+							label = "BankUI Move Delay",
 							min = 0,
 							max = 2,
 							step = 0.1,
@@ -308,35 +307,35 @@ function private:LoadOptionsPage(container)
 								self:SetValue(value)
 								TSM.db.global.moveDelay = value
 							end,
-							tooltip = L["This slider controls how long the BankUI code will sleep betwen individual moves, default of 0 should be fine but increase it if you run into problems."],
+							tooltip = "This slider controls how long the BankUI code will sleep betwen individual moves, default of 0 should be fine but increase it if you run into problems.",
 						},
 						{
 							type = "HeadingLine",
 						},
 						{
 							type = "CheckBox",
-							label = L["Clean Bags Automatically"],
+							label = "Clean Bags Automatically",
 							settingInfo = { TSM.db.profile, "cleanBags" },
 							relativeWidth = 0.5,
-							tooltip = L["If checked, after moving items using BankUI your bags will be automatically sorted / re-stacked."],
+							tooltip = "If checked, after moving items using BankUI your bags will be automatically sorted / re-stacked.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Clean Bank Automatically"],
+							label = "Clean Bank Automatically",
 							settingInfo = { TSM.db.profile, "cleanBank" },
 							relativeWidth = 0.5,
-							tooltip = L["If checked, after moving items using BankUI at the bank your bank bags will be automatically sorted / re-stacked."],
+							tooltip = "If checked, after moving items using BankUI at the bank your bank bags will be automatically sorted / re-stacked.",
 						},
 					}
 				},
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Auction House Tab Settings"],
+					title = "Auction House Tab Settings",
 					children = {
 						{
 							type = "Dropdown",
-							label = auctionTabs and L["Default Tab"] or L["Default Tab (Open Auction House to Enable)"],
+							label = auctionTabs and "Default Tab" or "Default Tab (Open Auction House to Enable)",
 							list = auctionTabs or {},
 							order = auctionTabOrder,
 							disabled = not auctionTabs,
@@ -345,20 +344,20 @@ function private:LoadOptionsPage(container)
 						},
 						{
 							type = "CheckBox",
-							label = L["Open All Bags with Auction House"],
+							label = "Open All Bags with Auction House",
 							settingInfo = { TSM.db.profile, "openAllBags" },
 							relativeWidth = 0.5,
-							tooltip = L["If checked, your bags will be automatically opened when you open the auction house."],
+							tooltip = "If checked, your bags will be automatically opened when you open the auction house.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Protect AH Frame (Requires Reload)"],
+							label = "Protect AH Frame (Requires Reload)",
 							settingInfo = { TSM.db.profile, "protectAH" },
-							tooltip = L["If checked, TSM will provent WoW from closing the auction house frame when other UI frames are opened."],
+							tooltip = "If checked, TSM will provent WoW from closing the auction house frame when other UI frames are opened.",
 						},
 						{
 							type = "CheckBox",
-							label = L["Make Auction Frame Movable"],
+							label = "Make Auction Frame Movable",
 							settingInfo = { TSM.db.profile, "auctionFrameMovable" },
 							callback = function(_, _, value)
 								if AuctionFrame then
@@ -368,17 +367,17 @@ function private:LoadOptionsPage(container)
 						},
 						{
 							type = "Slider",
-							label = L["Auction Rows (Requires Reload)"],
+							label = "Auction Rows (Requires Reload)",
 							settingInfo = { TSM.db.profile, "auctionResultRows" },
 							relativeWidth = 0.5,
 							min = 8,
 							max = 25,
 							step = 1,
-							tooltip = L["Changes how many rows are shown in the auction results tables."],
+							tooltip = "Changes how many rows are shown in the auction results tables.",
 						},
 						{
 							type = "Slider",
-							label = L["Auction Frame Scale"],
+							label = "Auction Frame Scale",
 							settingInfo = { TSM.db.profile, "auctionFrameScale" },
 							isPercent = true,
 							relativeWidth = 0.5,
@@ -386,7 +385,7 @@ function private:LoadOptionsPage(container)
 							max = 2,
 							step = 0.05,
 							callback = function(_, _, value) if AuctionFrame then AuctionFrame:SetScale(value) end end,
-							tooltip = L["Changes the size of the auction frame. The size of the detached TSM auction frame will always be the same as the main auction frame."],
+							tooltip = "Changes the size of the auction frame. The size of the detached TSM auction frame will always be the same as the main auction frame.",
 						},
 					},
 				},
@@ -422,16 +421,16 @@ function private:LoadAppearancePage(parent)
 				{
 					type = "InlineGroup",
 					layout = "flow",
-					title = L["Appearance Settings"],
+					title = "Appearance Settings",
 					children = {
 						{
 							type = "Label",
-							text = L["Use the options below to change and tweak the appearance of TSM."],
+							text = "Use the options below to change and tweak the appearance of TSM.",
 							relativeWidth = 1,
 						},
 						{
 							type = "Dropdown",
-							label = L["Import Preset TSM Theme"],
+							label = "Import Preset TSM Theme",
 							list = presetThemeList,
 							relativeWidth = 1,
 							callback = function(_, _, key)
@@ -439,57 +438,57 @@ function private:LoadAppearancePage(parent)
 									private:DecodeAppearanceData(presetThemes[key][2])
 								end
 							end,
-							tooltip = L["Select a theme from this dropdown to import one of the preset TSM themes."],
+							tooltip = "Select a theme from this dropdown to import one of the preset TSM themes.",
 						},
 						{
 							type = "Dropdown",
-							label = L["Load Saved Theme"],
+							label = "Load Saved Theme",
 							list = savedThemeList,
 							relativeWidth = 1,
 							callback = function(_, _, index)
 								private:DecodeAppearanceData(TSM.db.profile.savedThemes[index].theme)
 							end,
-							tooltip = L["Select a theme from this dropdown to import one of your saved TSM themes."],
+							tooltip = "Select a theme from this dropdown to import one of your saved TSM themes.",
 						},
 						{
 							type = "EditBox",
-							label = L["Theme Name"],
+							label = "Theme Name",
 							relativeWidth = 0.5,
 							callback = function(_, _, value) themeName = value:trim() end,
 						},
 						{
 							type = "Button",
-							text = L["Save Theme"],
+							text = "Save Theme",
 							relativeWidth = 0.5,
 							callback = function(_, _, value)
 								if themeName == "" then
-									return TSM:Print(L["Theme name is empty."])
+									return TSM:Print("Theme name is empty.")
 								end
-								TSM:Printf(L["Saved theme: %s."], themeName)
+								TSM:Printf("Saved theme: %s.", themeName)
 								tinsert(TSM.db.profile.savedThemes, { name = themeName, theme = private:EncodeAppearanceData() })
 								parent:Reload()
 							end,
 						},
 						{
 							type = "Button",
-							text = L["Restore Default Colors"],
+							text = "Restore Default Colors",
 							relativeWidth = 1,
 							callback = function() Options:LoadDefaultDesign() parent:Reload() end,
-							tooltip = L["Restores all the color settings below to their default values."],
+							tooltip = "Restores all the color settings below to their default values.",
 						},
 						{
 							type = "Button",
-							text = L["Import Appearance Settings"],
+							text = "Import Appearance Settings",
 							relativeWidth = 0.5,
 							callback = private.ShowImportFrame,
-							tooltip = L["This allows you to import appearance settings which other people have exported."],
+							tooltip = "This allows you to import appearance settings which other people have exported.",
 						},
 						{
 							type = "Button",
-							text = L["Export Appearance Settings"],
+							text = "Export Appearance Settings",
 							relativeWidth = 0.5,
 							callback = private.ShowExportFrame,
-							tooltip = L["This allows you to export your appearance settings to share with others."],
+							tooltip = "This allows you to export your appearance settings to share with others.",
 						},
 						{
 							type = "HeadingLine"
@@ -510,12 +509,12 @@ function private:LoadAppearancePage(parent)
 	end
 
 	local frameColorOptions = {
-		{ L["Frame Background - Backdrop"], "frameBG", "backdrop" },
-		{ L["Frame Background - Border"], "frameBG", "border" },
-		{ L["Region - Backdrop"], "frame", "backdrop" },
-		{ L["Region - Border"], "frame", "border" },
-		{ L["Content - Backdrop"], "content", "backdrop" },
-		{ L["Content - Border"], "content", "border" },
+		{ "Frame Background - Backdrop", "frameBG", "backdrop" },
+		{ "Frame Background - Border", "frameBG", "border" },
+		{ "Region - Backdrop", "frame", "backdrop" },
+		{ "Region - Border", "frame", "border" },
+		{ "Content - Backdrop", "content", "backdrop" },
+		{ "Content - Border", "content", "border" },
 	}
 	for _, optionInfo in ipairs(frameColorOptions) do
 		local label, key, subKey = unpack(optionInfo)
@@ -537,12 +536,12 @@ function private:LoadAppearancePage(parent)
 	tinsert(page[1].children[1].children, { type = "HeadingLine" })
 
 	local textColorOptions = {
-		{ L["Icon Region"], "iconRegion", "enabled" },
-		{ L["Title"], "title", "enabled" },
-		{ L["Label Text - Enabled"], "label", "enabled" },
-		{ L["Label Text - Disabled"], "label", "disabled" },
-		{ L["Content Text - Enabled"], "text", "enabled" },
-		{ L["Content Text - Disabled"], "text", "disabled" },
+		{ "Icon Region", "iconRegion", "enabled" },
+		{ "Title", "title", "enabled" },
+		{ "Label Text - Enabled", "label", "enabled" },
+		{ "Label Text - Disabled", "label", "disabled" },
+		{ "Content Text - Enabled", "text", "enabled" },
+		{ "Content Text - Disabled", "text", "disabled" },
 	}
 	for _, optionInfo in ipairs(textColorOptions) do
 		local label, key, subKey = unpack(optionInfo)
@@ -564,11 +563,11 @@ function private:LoadAppearancePage(parent)
 	tinsert(page[1].children[1].children, { type = "HeadingLine" })
 
 	local inlineColorOptions = {
-		{ L["Link Text (Requires Reload)"], "link" },
-		{ L["Link Text 2 (Requires Reload)"], "link2" },
-		{ L["Category Text (Requires Reload)"], "category" },
-		{ L["Category Text 2 (Requires Reload)"], "category2" },
-		{ L["Item Tooltip Text"], "tooltip" },
+		{ "Link Text (Requires Reload)", "link" },
+		{ "Link Text 2 (Requires Reload)", "link2" },
+		{ "Category Text (Requires Reload)", "category" },
+		{ "Category Text 2 (Requires Reload)", "category2" },
+		{ "Item Tooltip Text", "tooltip" },
 	}
 	for _, optionInfo in ipairs(inlineColorOptions) do
 		local label, key = unpack(optionInfo)
@@ -593,7 +592,7 @@ function private:LoadAppearancePage(parent)
 		{
 			type = "Slider",
 			relativeWidth = 0.5,
-			label = L["Small Text Size (Requires Reload)"],
+			label = "Small Text Size (Requires Reload)",
 			min = 6,
 			max = 30,
 			step = 1,
@@ -602,7 +601,7 @@ function private:LoadAppearancePage(parent)
 		{
 			type = "Slider",
 			relativeWidth = 0.5,
-			label = L["Medium Text Size (Requires Reload)"],
+			label = "Medium Text Size (Requires Reload)",
 			min = 6,
 			max = 30,
 			step = 1,
@@ -611,7 +610,7 @@ function private:LoadAppearancePage(parent)
 		{
 			type = "Slider",
 			relativeWidth = 0.5,
-			label = L["Normal Text Size (Requires Reload)"],
+			label = "Normal Text Size (Requires Reload)",
 			min = 6,
 			max = 30,
 			step = 1,
@@ -620,7 +619,7 @@ function private:LoadAppearancePage(parent)
 		{
 			type = "Slider",
 			relativeWidth = 0.5,
-			label = L["Border Thickness (Requires Reload)"],
+			label = "Border Thickness (Requires Reload)",
 			min = 0,
 			max = 3,
 			step = .1,
@@ -643,7 +642,7 @@ end
 function private:LoadProfilesPage(container)
 	-- Popup Confirmation Window used in this module
 	StaticPopupDialogs["TSMDeleteConfirm"] = StaticPopupDialogs["TSMDeleteConfirm"] or {
-		text = L["Are you sure you want to delete the selected profile?"],
+		text = "Are you sure you want to delete the selected profile?",
 		button1 = ACCEPT,
 		button2 = CANCEL,
 		timeout = 0,
@@ -653,7 +652,7 @@ function private:LoadProfilesPage(container)
 		-- OnAccept defined later
 	}
 	StaticPopupDialogs["TSMCopyProfileConfirm"] = StaticPopupDialogs["TSMCopyProfileConfirm"] or {
-		text = L["Are you sure you want to overwrite the current profile with the selected profile?"],
+		text = "Are you sure you want to overwrite the current profile with the selected profile?",
 		button1 = ACCEPT,
 		button2 = CANCEL,
 		timeout = 0,
@@ -678,7 +677,7 @@ function private:LoadProfilesPage(container)
 			children = {
 				{
 					type = "Label",
-					text = L["You can change the active database profile, so you can have different settings for every character."],
+					text = "You can change the active database profile, so you can have different settings for every character.",
 					relativeWidth = 1,
 				},
 				{
@@ -686,18 +685,18 @@ function private:LoadProfilesPage(container)
 				},
 				{
 					type = "Label",
-					text = L["Reset the current profile back to its default values, in case your configuration is broken, or you simply want to start over."],
+					text = "Reset the current profile back to its default values, in case your configuration is broken, or you simply want to start over.",
 					relativeWidth = 1,
 				},
 				{
 					type = "Button",
-					text = L["Reset Profile"],
+					text = "Reset Profile",
 					relativeWidth = 0.5,
 					callback = function() TSM.db:ResetProfile() end,
 				},
 				{
 					type = "Label",
-					text = L["Current Profile:"].." "..TSMAPI.Design:ColorText(TSM.db:GetCurrentProfile(), "link"),
+					text = "Current Profile:".." "..TSMAPI.Design:ColorText(TSM.db:GetCurrentProfile(), "link"),
 					relativeWidth = 0.5,
 				},
 				{
@@ -705,18 +704,18 @@ function private:LoadProfilesPage(container)
 				},
 				{
 					type = "Label",
-					text = L["You can either create a new profile by entering a name in the editbox, or choose one of the already exisiting profiles."],
+					text = "You can either create a new profile by entering a name in the editbox, or choose one of the already exisiting profiles.",
 					relativeWidth = 1,
 				},
 				{
 					type = "EditBox",
-					label = L["New"],
+					label = "New",
 					value = "",
 					relativeWidth = 0.5,
 					callback = function(_, _, value)
 						value = value:trim()
 						if not TSM.db:IsValidProfileName(value) then
-							return TSM:Print(L["This is not a valid profile name. Profile names must be at least one character long and may not contain '@' characters."])
+							return TSM:Print("This is not a valid profile name. Profile names must be at least one character long and may not contain '@' characters.")
 						end
 						TSM.db:SetProfile(value)
 						container:Reload()
@@ -724,7 +723,7 @@ function private:LoadProfilesPage(container)
 				},
 				{
 					type = "Dropdown",
-					label = L["Existing Profiles"],
+					label = "Existing Profiles",
 					list = profiles,
 					value = TSM.db:GetCurrentProfile(),
 					disabled = not next(profiles),
@@ -740,12 +739,12 @@ function private:LoadProfilesPage(container)
 				},
 				{
 					type = "Label",
-					text = L["Copy the settings from one existing profile into the currently active profile."],
+					text = "Copy the settings from one existing profile into the currently active profile.",
 					relativeWidth = 1,
 				},
 				{
 					type = "Dropdown",
-					label = L["Copy From"],
+					label = "Copy From",
 					list = profiles,
 					disabled = not next(profiles),
 					value = "",
@@ -763,12 +762,12 @@ function private:LoadProfilesPage(container)
 				},
 				{
 					type = "Label",
-					text = L["Delete existing and unused profiles from the database to save space, and cleanup the SavedVariables file."],
+					text = "Delete existing and unused profiles from the database to save space, and cleanup the SavedVariables file.",
 					relativeWidth = 1,
 				},
 				{
 					type = "Dropdown",
-					label = L["Delete a Profile"],
+					label = "Delete a Profile",
 					list = profiles,
 					disabled = not next(profiles),
 					value = "",
@@ -807,7 +806,7 @@ function private:LoadMultiAccountPage(parent)
 						{
 							type = "Label",
 							relativeWidth = 1,
-							text = L["Various modules can sync their data between multiple accounts automatically whenever you're logged into both accounts."],
+							text = "Various modules can sync their data between multiple accounts automatically whenever you're logged into both accounts.",
 						},
 						{
 							type = "Spacer",
@@ -815,27 +814,27 @@ function private:LoadMultiAccountPage(parent)
 						{
 							type = "Label",
 							relativeWidth = 1,
-							text = L["First, log into a character on the same realm (and faction) on both accounts. Type the name of the OTHER character you are logged into in the box below. Once you have done this on both accounts, TSM will do the rest automatically. Once setup, syncing will automatically happen between the two accounts while on any character on the account (not only the one you entered during this setup)."],
+							text = "First, log into a character on the same realm (and faction) on both accounts. Type the name of the OTHER character you are logged into in the box below. Once you have done this on both accounts, TSM will do the rest automatically. Once setup, syncing will automatically happen between the two accounts while on any character on the account (not only the one you entered during this setup).",
 						},
 						{
 							type = "EditBox",
 							relativeWidth = 1,
-							label = L["Character Name on Other Account"],
+							label = "Character Name on Other Account",
 							callback = function(self, _, value)
 								value = value:trim()
 								local function OnSyncSetup()
-									TSM:Print(L["Connection established!"])
+									TSM:Print("Connection established!")
 									if value == self:GetText() then
 										parent:Reload()
 									end
 								end
 								if TSM.Sync:DoSetup(value:trim(), OnSyncSetup) then
-									TSM:Printf(L["Establishing connection to %s. Make sure that you've entered this character's name on the other account."], value)
+									TSM:Printf("Establishing connection to %s. Make sure that you've entered this character's name on the other account.", value)
 								else
 									self:SetText("")
 								end
 							end,
-							tooltip = L["See instructions above this editbox."],
+							tooltip = "See instructions above this editbox.",
 						},
 					},
 				},
@@ -850,7 +849,7 @@ function private:LoadMultiAccountPage(parent)
 			},
 			{
 				type = "Button",
-				text = L["Refresh Sync Status"],
+				text = "Refresh Sync Status",
 				relativeWidth = 1,
 				callback = function() parent:Reload() end,
 			},
@@ -873,7 +872,7 @@ function private:LoadMultiAccountPage(parent)
 				{
 					type = "Label",
 					relativeWidth = 0.7,
-					text = L["Status: "]..TSM.Sync:GetConnectionStatus(account),
+					text = "Status: "..TSM.Sync:GetConnectionStatus(account),
 				},
 				{
 					type = "Label",
@@ -881,18 +880,18 @@ function private:LoadMultiAccountPage(parent)
 				},
 				{
 					type = "Button",
-					text = L["Remove Account"],
+					text = "Remove Account",
 					relativeWidth = 0.24,
 					callback = function()
 						TSM.Sync:RemoveSync(account)
-						TSM:Print(L["Sync removed. Make sure you remove the sync from the other account as well."])
+						TSM:Print("Sync removed. Make sure you remove the sync from the other account as well.")
 						parent:Reload()
 					end,
 				},
 				{
 					type = "Label",
 					relativeWidth = 1,
-					text = L["Known Characters: "]..TSMAPI.Design:GetInlineColor("link")..table.concat(playerList, ", ").."|r",
+					text = "Known Characters: "..TSMAPI.Design:GetInlineColor("link")..table.concat(playerList, ", ").."|r",
 				},
 			},
 		}
@@ -910,7 +909,7 @@ end
 
 function private:PromptToReload()
 	StaticPopupDialogs["TSMReloadPrompt"] = StaticPopupDialogs["TSMReloadPrompt"] or {
-		text = L["You must reload your UI for these settings to take effect. Reload now?"],
+		text = "You must reload your UI for these settings to take effect. Reload now?",
 		button1 = YES,
 		button2 = NO,
 		timeout = 0,
@@ -928,11 +927,11 @@ function private:LoadMiscFeatures(container)
 				{
 					type = "InlineGroup",
 					layout = "Flow",
-					title = L["Auction Buys"],
+					title = "Auction Buys",
 					children = {
 						{
 							type = "Label",
-							text = L["The auction buys feature will change the 'You have won an auction of XXX' text into something more useful which contains the link, stack size, and price of the item you bought."],
+							text = "The auction buys feature will change the 'You have won an auction of XXX' text into something more useful which contains the link, stack size, and price of the item you bought.",
 							relativeWidth = 1,
 						},
 						{
@@ -940,7 +939,7 @@ function private:LoadMiscFeatures(container)
 						},
 						{
 							type = "CheckBox",
-							label = L["Enable Auction Buys Feature"],
+							label = "Enable Auction Buys Feature",
 							relativeWidth = 1,
 							settingInfo = {TSM.db.global, "auctionBuyEnabled"},
 							callback = private.PromptToReload,
@@ -953,11 +952,11 @@ function private:LoadMiscFeatures(container)
 				{
 					type = "InlineGroup",
 					layout = "Flow",
-					title = L["Auction Sales"],
+					title = "Auction Sales",
 					children = {
 						{
 							type = "Label",
-							text = L["The auction sales feature will change the 'A buyer has been found for your auction of XXX' text into something more useful which contains a link to the item and, if possible, the amount the auction sold for."],
+							text = "The auction sales feature will change the 'A buyer has been found for your auction of XXX' text into something more useful which contains a link to the item and, if possible, the amount the auction sold for.",
 							relativeWidth = 1,
 						},
 						{
@@ -965,22 +964,22 @@ function private:LoadMiscFeatures(container)
 						},
 						{
 							type = "CheckBox",
-							label = L["Enable Auction Sales Feature"],
+							label = "Enable Auction Sales Feature",
 							relativeWidth = 1,
 							settingInfo = {TSM.db.global, "auctionSaleEnabled"},
 							callback = private.PromptToReload,
 						},
 						{
 							type = "Dropdown",
-							label = L["Enable Sound"],
+							label = "Enable Sound",
 							relativeWidth = 0.5,
 							list = TSMAPI:GetSounds(),
 							settingInfo = {TSM.db.global, "auctionSaleSound"},
-							tooltip = L["Play the selected sound when one of your auctions sells."],
+							tooltip = "Play the selected sound when one of your auctions sells.",
 						},
 						{
 							type = "Button",
-							text = L["Test Selected Sound"],
+							text = "Test Selected Sound",
 							relativeWidth = 0.49,
 							callback = function() TSMAPI:DoPlaySound(TSM.db.global.auctionSaleSound) end,
 						},
@@ -1060,7 +1059,7 @@ function private:DecodeAppearanceData(encodedData)
 	encodedData = gsub(encodedData, " ", "")
 
 	local result = private:StringToTable(encodedData, 1)
-	if not result then return TSM:Print(L["Invalid appearance data."]) end
+	if not result then return TSM:Print("Invalid appearance data.") end
 	TSM.db.profile.design = result
 	Options:SetDesignDefaults(TSM.designDefaults, TSM.db.profile.design)
 	TSM:UpdateDesign()
@@ -1071,7 +1070,7 @@ function private:ShowImportFrame()
 
 	local f = AceGUI:Create("TSMWindow")
 	f:SetCallback("OnClose", function(self) AceGUI:Release(self) end)
-	f:SetTitle("TradeSkillMaster - " .. L["Import Appearance Settings"])
+	f:SetTitle("TradeSkillMaster - " .. "Import Appearance Settings")
 	f:SetLayout("Flow")
 	f:SetHeight(200)
 	f:SetHeight(300)
@@ -1084,14 +1083,14 @@ function private:ShowImportFrame()
 	local btn = AceGUI:Create("TSMButton")
 
 	local eb = AceGUI:Create("MultiLineEditBox")
-	eb:SetLabel(L["Appearance Data"])
+	eb:SetLabel("Appearance Data")
 	eb:SetFullWidth(true)
 	eb:SetMaxLetters(0)
 	eb:SetCallback("OnEnterPressed", function(_, _, val) btn:SetDisabled(false) data = val end)
 	f:AddChild(eb)
 
 	btn:SetDisabled(true)
-	btn:SetText(L["Import Appearance Settings"])
+	btn:SetText("Import Appearance Settings")
 	btn:SetFullWidth(true)
 	btn:SetCallback("OnClick", function() private:DecodeAppearanceData(data) f:Hide() end)
 	f:AddChild(btn)
@@ -1132,12 +1131,12 @@ end
 function private:ShowExportFrame()
 	local f = AceGUI:Create("TSMWindow")
 	f:SetCallback("OnClose", function(self) AceGUI:Release(self) end)
-	f:SetTitle("TradeSkillMaster - " .. L["Export Appearance Settings"])
+	f:SetTitle("TradeSkillMaster - " .. "Export Appearance Settings")
 	f:SetLayout("Fill")
 	f:SetHeight(300)
 
 	local eb = AceGUI:Create("TSMMultiLineEditBox")
-	eb:SetLabel(L["Appearance Data"])
+	eb:SetLabel("Appearance Data")
 	eb:SetMaxLetters(0)
 	eb:SetText(private:EncodeAppearanceData())
 	f:AddChild(eb)

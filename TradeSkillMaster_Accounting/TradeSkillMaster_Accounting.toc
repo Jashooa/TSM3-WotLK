@@ -10,17 +10,6 @@
 ## X-Curse-Project-ID: tradeskillmaster_accounting
 ## X-Curse-Repository-ID: wow/tradeskillmaster_accounting/mainline
 
-Locale\enUS.lua
-Locale\frFR.lua
-Locale\deDE.lua
-Locale\koKR.lua
-Locale\esMX.lua
-Locale\ruRU.lua
-Locale\zhCN.lua
-Locale\esES.lua
-Locale\zhTW.lua
-Locale\ptBR.lua
-
 TradeSkillMaster_Accounting.lua
 Modules\ItemCache.lua
 Modules\GoldTracker.lua

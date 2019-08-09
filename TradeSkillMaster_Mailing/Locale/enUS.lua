@@ -112,6 +112,7 @@ L["Optionally specify a per-item COD amount."] = true
 L["Play the selected sound when Mailing is done opening all mail."] = true
 L["Preparing to Move"] = true
 L["Quick Send"] = true
+L["Reload UI"] = true
 L["Restart Delay (minutes)"] = true
 L["Restock Target to Max Quantity"] = true
 L["Sales"] = true

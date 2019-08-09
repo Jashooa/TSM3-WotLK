@@ -108,7 +108,7 @@ function Inbox:CreateTab()
 			{
 				type = "Button",
 				key = "reloadBtn",
-				text = RELOADUI,
+				text = L["Reload UI"],
 				textHeight = 16,
 				size = {150, 20},
 				points = {{"CENTER"}},

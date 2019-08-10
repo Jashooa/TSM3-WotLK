@@ -796,7 +796,14 @@ function Professions:UpdateSelectedTradeSkill(forceUpdate)
 		frame.craftInfoFrame.infoFrame.descText:SetText(GetTradeSkillDescription(skillIndex))
 
 		local toolsInfo = BuildColoredListString(GetTradeSkillTools(skillIndex))
-		frame.craftInfoFrame.infoFrame.toolsText:SetText(toolsInfo and REQUIRES_LABEL .. " " .. toolsInfo or "")
+        frame.craftInfoFrame.infoFrame.toolsText:SetText(toolsInfo and REQUIRES_LABEL .. " " .. toolsInfo or "")
+        if alternateVerb == ENSCRIBE then
+            local vellum = TSM:GetVellum(spellId)
+            local vellumName = TSMAPI.Item:GetName(vellum)
+            local texture = TSMAPI.Item:GetTexture(vellum)
+            local currentText = frame.craftInfoFrame.infoFrame.toolsText:GetText()
+            frame.craftInfoFrame.infoFrame.toolsText:SetText(currentText .. "\nVellum: |T" .. texture .. ":0|t " .. vellumName .. "|r")
+        end
 		local cooldown = GetTradeSkillCooldown(skillIndex)
 		if not cooldown then
             frame.craftInfoFrame.infoFrame.cooldownText:SetText("")

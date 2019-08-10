@@ -81,12 +81,12 @@ function Gold:Draw(container)
 	if TSM.db.global.timeFormat == "eudate" then
 		startDate = date("%d/%m/%y %H:%M", minX * 60)
 		endDate = date("%d/%m/%y %H:%M", maxX * 60)
-	elseif TSM.db.global.timeFormat == "aidate" then
+    elseif TSM.db.global.timeFormat == "usdate" then
+        startDate = date("%m/%d/%y %H:%M", minX * 60)
+		endDate = date("%m/%d/%y %H:%M", maxX * 60)
+	else
 		startDate = date("%y/%m/%d %H:%M", minX * 60)
 		endDate = date("%y/%m/%d %H:%M", maxX * 60)
-	else
-		startDate = date("%m/%d/%y %H:%M", minX * 60)
-		endDate = date("%m/%d/%y %H:%M", maxX * 60)
 	end
 
 	local page = {

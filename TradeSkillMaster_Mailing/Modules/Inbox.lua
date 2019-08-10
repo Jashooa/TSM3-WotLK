@@ -306,8 +306,9 @@ function private:InboxUpdate()
 			end
 			local itemDesc = (quantity > 0 and format("%s (%d)", itemLink, quantity)) or (quantity == -1 and "Multiple Items") or "---"
 
-			local name = TSMAPI.Item:GetName(itemLink) or "?"
-			if hasItem == 1 and itemLink and strfind(subject, "^" .. TSMAPI.Util:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, name))) then
+            local name = TSMAPI.Item:GetName(itemLink) or "?"
+            local baseName = TSMAPI.Item:GetName(TSMAPI.Item:ToBaseItemString(itemLink)) or "?"
+			if hasItem == 1 and itemLink and strfind(subject, "^" .. TSMAPI.Util:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, baseName))) then
 				mailInfo[i] = format("Expired: %s | %s", itemDesc, FormatDaysLeft(daysLeft, i))
 			elseif cod > 0 then
 				mailInfo[i] = format("COD: %s | %s | (%s) | %s | %s", itemDesc, TSMAPI:MoneyToString(cod, redColor), quantity > 0 and TSMAPI:MoneyToString(floor(cod / quantity + 0.5), redColor) or "---", sender or "---", FormatDaysLeft(daysLeft, i))
@@ -522,19 +523,21 @@ function private:ShouldOpenMail(index)
 	elseif private.mode == "cancels" then
 		local isInvoice = select(4, GetInboxText(index))
 		if not isInvoice and numItems == 1 then
-			local itemName = TSMAPI.Item:GetName(private:GetFirstInboxItemLink(index))
-			if itemName then
+            local itemLink = private:GetFirstInboxItemLink(index)
+            local baseName = TSMAPI.Item:GetName(TSMAPI.Item:ToBaseItemString(itemLink))
+			if baseName then
 				local quantity = select(3, GetInboxItem(index, 1))
-				if quantity and quantity > 0 and (subject == format(AUCTION_REMOVED_MAIL_SUBJECT.." (%d)", itemName, quantity) or subject == format(AUCTION_REMOVED_MAIL_SUBJECT, itemName)) then
+				if quantity and quantity > 0 and (subject == format(AUCTION_REMOVED_MAIL_SUBJECT.." (%d)", baseName, quantity) or subject == format(AUCTION_REMOVED_MAIL_SUBJECT, baseName)) then
 					return true
 				end
 			end
 		end
 	elseif private.mode == "expires" then
 		local isInvoice = select(4, GetInboxText(index))
-		if not isInvoice and numItems == 1 then
-			local itemName = TSMAPI.Item:GetName(private:GetFirstInboxItemLink(index))
-			if itemName and strfind(subject, "^" .. TSMAPI.Util:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, itemName))) then
+        if not isInvoice and numItems == 1 then
+            local itemLink = private:GetFirstInboxItemLink(index)
+            local baseName = TSMAPI.Item:GetName(TSMAPI.Item:ToBaseItemString(itemLink))
+			if baseName and strfind(subject, "^" .. TSMAPI.Util:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, baseName))) then
 				return true
 			end
 		end
@@ -577,10 +580,11 @@ function private:PrintOpenMailMessage(index)
 			itemLink = private:GetFirstInboxItemLink(index) or itemLink
 		end
 		local itemName = TSMAPI.Item:GetName(itemLink) or "?"
-		local itemDesc = (quantity > 0 and format("%s (%d)", itemLink, quantity)) or (quantity == -1 and "Multiple Items") or "?"
-		if hasItem == 1 and itemLink and strfind(subject, "^" .. TSMAPI.Util:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, itemName))) then
+        local itemDesc = (quantity > 0 and format("%s (%d)", itemLink, quantity)) or (quantity == -1 and "Multiple Items") or "?"
+        local baseName = TSMAPI.Item:GetName(TSMAPI.Item:ToBaseItemString(itemLink))
+		if hasItem == 1 and itemLink and strfind(subject, "^" .. TSMAPI.Util:StrEscape(format(AUCTION_EXPIRED_MAIL_SUBJECT, baseName))) then
 			TSM:Printf("Your auction of %s expired", itemDesc)
-		elseif hasItem == 1 and quantity > 0 and (subject == format(AUCTION_REMOVED_MAIL_SUBJECT.." (%d)", itemName, quantity) or subject == format(AUCTION_REMOVED_MAIL_SUBJECT, itemName)) then
+		elseif hasItem == 1 and quantity > 0 and (subject == format(AUCTION_REMOVED_MAIL_SUBJECT.." (%d)", baseName, quantity) or subject == format(AUCTION_REMOVED_MAIL_SUBJECT, baseName)) then
 			TSM:Printf("Cancelled auction of %sx%d", itemLink, quantity)
 		elseif cod > 0 then
 			TSM:Printf("%s sent you a COD of %s for %s", sender, TSMAPI:MoneyToString(cod, redColor), itemDesc)

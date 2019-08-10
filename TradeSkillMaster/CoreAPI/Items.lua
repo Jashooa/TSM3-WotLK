@@ -395,7 +395,7 @@ function TSMAPI.Item:GetName(itemString)
 	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
 	local info = private.GetCachedItemInfo(baseItemString)
 	if info and itemString ~= baseItemString and not info._getInfoResult then
-		tinsert(private.pendingItems, baseItemString)
+		TSMAPI.Item:FetchInfo(baseItemString)
 	end
 	local name = nil
 	if (info and itemString == baseItemString) then
@@ -443,7 +443,7 @@ function TSMAPI.Item:GetLink(itemString)
 	local baseItemString = TSMAPI.Item:ToBaseItemString(itemString)
 	local info = private.GetCachedItemInfo(baseItemString)
 	if info and itemString ~= baseItemString and not info._getInfoResult then
-		tinsert(private.pendingItems, baseItemString)
+		TSMAPI.Item:FetchInfo(baseItemString)
 	end
 	local name, link = nil, nil
 	if info then

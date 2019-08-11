@@ -140,12 +140,13 @@ end
 function Options:UpdateAverageST()
 	local items = {}
 	for spell, entries in pairs(TSM.db.global.history) do
-		for _, entry in ipairs(entries) do
-			items[entry.item] = items[entry.item] or {spell=spell, num=0}
-			items[entry.item].num = items[entry.item].num + 1
-			for itemString, quantity in pairs(entry.result) do
-				items[entry.item][itemString] = items[entry.item][itemString] or {total=0}
-				items[entry.item][itemString].total = items[entry.item][itemString].total + quantity
+        for _, entry in ipairs(entries) do
+            baseItem = TSMAPI.Item:ToBaseItemString(entry.item)
+			items[baseItem] = items[baseItem] or {spell=spell, num=0}
+			items[baseItem].num = items[baseItem].num + 1
+            for itemString, quantity in pairs(entry.result) do
+				items[baseItem][itemString] = items[baseItem][itemString] or {total=0}
+				items[baseItem][itemString].total = items[baseItem][itemString].total + quantity
 			end
 		end
 	end

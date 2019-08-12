@@ -65,6 +65,16 @@ function TSMAPI.Util:Round(value, sig)
 	return floor((value / sig) + 0.5) * sig
 end
 
+function TSMAPI.Util:Floor(value, sig)
+	sig = sig or 1
+	return floor(value / sig) * sig
+end
+
+function TSMAPI.Util:Ceil(value, sig)
+	sig = sig or 1
+	return ceil(value / sig) * sig
+end
+
 
 
 -- ============================================================================

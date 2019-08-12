@@ -25,11 +25,26 @@ local MATH_FUNCTIONS = {
 	["min"] = "self._min",
 	["max"] = "self._max",
 	["first"] = "self._first",
-	["check"] = "self._check",
+    ["check"] = "self._check",
+	["ifgt"] = "self._ifgt",
+	["ifgte"] = "self._ifgte",
+	["iflt"] = "self._iflt",
+	["iflte"] = "self._iflte",
+	["ifeq"] = "self._ifeq",
+	["round"] = "self._round",
+	["roundup"] = "self._roundup",
+	["rounddown"] = "self._rounddown",
 }
 local NAN = math.huge*0
 local NAN_STR = tostring(NAN)
 local function isNAN(num) return tostring(num) == NAN_STR end
+local COMPARISONS = {
+	["gt"] = 1,
+	["gte"] = 2,
+	["lt"] = 3,
+	["lte"] = 4,
+	["eq"] = 5,
+}
 
 
 
@@ -194,6 +209,36 @@ private.customPriceFunctions = {
 		ifValue = ifValue or NAN
 		elseValue = elseValue or NAN
 		return check > 0 and ifValue or elseValue
+    end,
+	_check = function(check, ...)
+		return private.RunComparison(COMPARISONS.gt, check, 0, ...)
+	end,
+	_ifgt = function(...)
+		return private.RunComparison(COMPARISONS.gt, ...)
+	end,
+	_ifgte = function(...)
+		return private.RunComparison(COMPARISONS.gte, ...)
+	end,
+	_iflt = function(...)
+		return private.RunComparison(COMPARISONS.lt, ...)
+	end,
+	_iflte = function(...)
+		return private.RunComparison(COMPARISONS.lte, ...)
+	end,
+	_ifeq = function(...)
+		return private.RunComparison(COMPARISONS.eq, ...)
+	end,
+	_round = function(...)
+		if select('#', ...) < 1 or select('#', ...) > 2 then return NAN end
+		return TSMAPI.Util:Round(...)
+	end,
+	_roundup = function(...)
+		if select('#', ...) < 1 or select('#', ...) > 2 then return NAN end
+		return TSMAPI.Util:Ceil(...)
+	end,
+	_rounddown = function(...)
+		if select('#', ...) < 1 or select('#', ...) > 2 then return NAN end
+		return TSMAPI.Util:Floor(...)
 	end,
 	_priceHelper = function(itemString, key, extraParam)
 		itemString = TSMAPI.Item:ToItemString(itemString)
@@ -211,6 +256,32 @@ private.customPriceFunctions = {
 		return private.priceCache[cacheKey] or NAN
 	end,
 }
+
+function private.RunComparison(comparison, ...)
+	if select('#', ...) > 4 then return NAN end
+
+	local leftCheck, rightCheck, ifValue, elseValue = ...
+	leftCheck = leftCheck or NAN
+	rightCheck = rightCheck or NAN
+	ifValue = ifValue or NAN
+	elseValue = elseValue or NAN
+
+	if not isNAN(leftCheck) or not isNAN(rightCheck) then
+		return NAN
+	elseif comparison == COMPARISONS.gt then
+		return leftCheck > rightCheck and ifValue or elseValue
+	elseif comparison == COMPARISONS.gte then
+		return leftCheck >= rightCheck and ifValue or elseValue
+	elseif comparison == COMPARISONS.lt then
+		return leftCheck < rightCheck and ifValue or elseValue
+	elseif comparison == COMPARISONS.lte then
+		return leftCheck <= rightCheck and ifValue or elseValue
+	elseif comparison == COMPARISONS.eq then
+		return leftCheck == rightCheck and ifValue or elseValue
+	else
+		error("Error in custom price comparison")
+	end
+end
 
 function private:CreateCustomPriceObj(func, origStr)
 	local data = {isUnlocked=nil, globalContext=private.context, origStr=origStr}

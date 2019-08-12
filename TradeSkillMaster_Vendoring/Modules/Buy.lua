@@ -129,16 +129,20 @@ function Buy:CreateTab(parent)
 												end
 											},
 											buyMaxBtn = {
-												OnClick = function(self)
+                                                OnClick = function(self)
+                                                    local stackSize = select(4, GetMerchantItemInfo(private.splitIndex))
 													local maxAfford = TSM.Util:GetMaxAfford(private.splitIndex)
-													local maxFit = TSM.Util:GetMaxFit(private.splitIndex)
+                                                    local maxFit = TSM.Util:GetMaxFit(private.splitIndex)
+                                                    maxFit = floor(maxFit / stackSize)
+
 													self:GetParent().quantityBox:SetNumber(min(maxFit,maxAfford))
 												end
 											},
 											buyStackBtn = {
-												OnClick = function(self)
+                                                OnClick = function(self)
+                                                    local stackSize = select(4, GetMerchantItemInfo(private.splitIndex))
 													local maxStackSize = TSMAPI.Item:GetMaxStack(GetMerchantItemLink(private.splitIndex))
-													self:GetParent().quantityBox:SetNumber(maxStackSize)
+													self:GetParent().quantityBox:SetNumber(floor(maxStackSize / stackSize + 0.5))
 												end
 											},
 											lessBtn = {

@@ -292,7 +292,7 @@ function private.PostScanThread(self, scanList)
 			for _, data in ipairs(private.queue) do
 				if data.itemString == itemString then
 					data.buyout = buyout
-					data.bid = buyout * operation.bidPercent
+					data.bid = floor(buyout * operation.bidPercent)
 					data.postTime = (duration == 48 and 3) or (duration == 24 and 2) or 1
 				end
 			end
@@ -417,7 +417,7 @@ function private:ShouldPost(itemString, operation, numInBags, pendingPosts)
 			TSMAPI:Assert(resetReasonLookup[operation.priceReset], "Unexpected 'below minimum price' setting: "..tostring(operation.priceReset))
 			reason = resetReasonLookup[operation.priceReset]
 			buyout = prices.resetPrice
-			bid = max(bid or buyout * operation.bidPercent, prices.minPrice)
+			bid = floor(max(bid or buyout * operation.bidPercent, prices.minPrice))
 			activeAuctions = TSM.Scan:GetPlayerAuctionCount(itemString, buyout, bid, perAuction, operation)
 		elseif lowestAuction.isBlacklist then
 			-- undercut the blacklisted player
@@ -455,10 +455,10 @@ function private:ShouldPost(itemString, operation, numInBags, pendingPosts)
 		buyout = lowestAuction.buyout - prices.undercut
 	end
 	if reason == "undercuttingBlacklist" then
-		bid = bid or buyout * operation.bidPercent
+		bid = floor(bid or buyout * operation.bidPercent)
 	else
 		buyout = max(buyout, prices.minPrice)
-		bid = max(bid or buyout * operation.bidPercent, prices.minPrice)
+		bid = floor(max(bid or buyout * operation.bidPercent, prices.minPrice))
 	end
 
 	-- check if we can't post anymore

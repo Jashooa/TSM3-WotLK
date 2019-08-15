@@ -82,9 +82,11 @@ function private.OnCancelFailed()
 end
 
 function private.EventHandler(event, message)
+    local ERR_MESSAGES = {ERR_ITEM_NOT_FOUND, ERR_AUCTION_DATABASE_ERROR,}
+
     if event == "CHAT_MSG_SYSTEM" and message == ERR_AUCTION_REMOVED and private.pendingCancels then
         private.OnAuctionCancelled()
-    elseif event == "UI_ERROR_MESSAGE" and message == ERR_ITEM_NOT_FOUND then
+    elseif event == "UI_ERROR_MESSAGE" and tContains(ERR_MESSAGES, message) then
         private.OnCancelFailed()
     end
 end

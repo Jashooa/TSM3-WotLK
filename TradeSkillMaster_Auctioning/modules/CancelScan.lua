@@ -142,8 +142,9 @@ function private.CancelScanThread(self, scanList)
 	local numToCancel, numCanceled, numConfirmed = 0, 0, 0
 	local usedItemIndex, itemsCanceled, failedCancels = {}, {}, {}
 	TSM.GUI:SetScanThreadId(self:GetThreadId())
-	self:RegisterEvent("CHAT_MSG_SYSTEM", function(_, msg) if msg == ERR_AUCTION_REMOVED then self:SendMsgToSelf("ACTION_CONFIRMED") end end)
-	self:RegisterEvent("UI_ERROR_MESSAGE", function(_, msg) if msg == ERR_ITEM_NOT_FOUND then self:SendMsgToSelf("ACTION_FAILED") end end)
+    self:RegisterEvent("CHAT_MSG_SYSTEM", function(_, msg) if msg == ERR_AUCTION_REMOVED then self:SendMsgToSelf("ACTION_CONFIRMED") end end)
+    local ERR_MESSAGES = {ERR_ITEM_NOT_FOUND, ERR_AUCTION_DATABASE_ERROR,}
+	self:RegisterEvent("UI_ERROR_MESSAGE", function(_, msg) if tContains(ERR_MESSAGES, msg) then self:SendMsgToSelf("ACTION_FAILED") end end)
 
 	if private.specialScanOptions then
 		for _, itemString in ipairs(scanList) do
@@ -331,7 +332,7 @@ function private:ShouldCancel(index, itemString, operation)
 	local _, _, quantity, _, _, _, bid, _, buyout, activeBid, _, _, wasSold = GetAuctionItemInfo("owner", index)
 	local buyoutPerItem = floor(buyout / quantity)
 	local bidPerItem = floor(bid / quantity)
-	if operation.matchStackSize and quantity ~= operation.stackSize then
+	if quantity ~= operation.stackSize then
 		return
 	end
 

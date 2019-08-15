@@ -132,7 +132,8 @@ function TSMAPI.Conversions:GetTargetItemsByMethod(method)
 				break
 			end
 		end
-	end
+    end
+    sort(result, function(a,b) return (TSMAPI.Item:GetQuality(a) or 0) < (TSMAPI.Item:GetQuality(b) or 0) end)
 	return result
 end
 

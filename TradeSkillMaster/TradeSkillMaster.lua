@@ -356,7 +356,11 @@ function TSM:RegisterModule()
 	tinsert(TSM.priceSources, { key = "VendorSell", label = "Sell to Vendor", callback = function(itemString) local sell = TSMAPI.Item:GetVendorPrice(itemString) return (sell or 0) > 0 and sell or nil end, takeItemString = true })
 
 	-- Disenchant Value
-	tinsert(TSM.priceSources, { key = "Destroy", label = "Destroy Value", callback = function(itemString) return TSMAPI.Conversions:GetValue(itemString, TSM.db.profile.destroyValueSource) end, takeItemString = true })
+    tinsert(TSM.priceSources, { key = "Destroy", label = "Destroy Value", callback = function(itemString) return TSMAPI.Conversions:GetValue(itemString, TSM.db.profile.destroyValueSource) end, takeItemString = true })
+
+    tinsert(TSM.priceSources, { key = "ItemQuality", label = "Item Quality", callback = function(itemString) return TSMAPI.Item:GetQuality(itemString) end, takeItemString = true })
+    tinsert(TSM.priceSources, { key = "ItemLevel", label = "Item Level", callback = function(itemString) return TSMAPI.Item:GetItemLevel(itemString) end, takeItemString = true })
+    tinsert(TSM.priceSources, { key = "RequiredLevel", label = "Required Level", callback = function(itemString) return TSMAPI.Item:GetMinLevel(itemString) end, takeItemString = true })
 
 	TSM.slashCommands = {
 		{ key = "version", label = "Prints out the version numbers of all installed modules", callback = "PrintVersion" },

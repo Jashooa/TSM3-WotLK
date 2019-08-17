@@ -344,14 +344,13 @@ function TSM:GetSpellIdFromName(spellName)
     end
     for i = 1, GetNumTradeSkills() do
         local link = GetTradeSkillRecipeLink(i)
-        if link and link:match(spellName) then
-            local spellId = tonumber(link:match("enchant:(%d+)"))
+        if link and strmatch(link, TSMAPI.Util:StrEscape(spellName)) then
+            local spellId = tonumber(strmatch(link, ":(%d+)\124h"))
             if spellId then
                 return spellId
             end
         end
     end
-
     return nil
 end
 

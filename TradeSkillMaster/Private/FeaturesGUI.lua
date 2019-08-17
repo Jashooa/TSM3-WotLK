@@ -621,8 +621,16 @@ function private:LoadMacroCreation(container)
 										tinsert(lines, "/click "..macroButtonNames[key])
 									end
 								end
-								local macroText = table.concat(lines, "\n")
-								CreateMacro("TSMMacro", "Achievement_Faction_GoldenLotus", macroText)
+                                local macroText = table.concat(lines, "\n")
+
+                                local iconIndex = 0
+                                for i = 1, GetNumMacroIcons() do
+                                    if strmatch(GetMacroIconInfo(i), "Spell_Fire_SunKey") then -- 631
+                                        iconIndex = i
+                                        break
+                                    end
+                                end
+								CreateMacro("TSMMacro", iconIndex, macroText)
 
 								-- create the scroll wheel binding
 								local modifierStr = (macroOptions.ctrl and "CTRL-" or "")..(macroOptions.alt and "ALT-" or "")..(macroOptions.shift and "SHIFT-" or "")

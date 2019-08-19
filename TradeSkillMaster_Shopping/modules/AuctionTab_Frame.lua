@@ -383,7 +383,7 @@ function AuctionTabFrame:Create(parent)
 									{
 										type = "Frame",
 										key = "bid",
-										size = {300, 160},
+										size = {300, 180},
 										points = {{"CENTER"}},
 										children = {
 											{
@@ -415,7 +415,7 @@ function AuctionTabFrame:Create(parent)
 												type = "Text",
 												text = "Auction Buyout:",
 												textHeight = 13,
-												size = {0, 25},
+												size = {0, 15},
 												points = {{"TOPLEFT", 5, -55}},
 											},
 											{
@@ -425,10 +425,25 @@ function AuctionTabFrame:Create(parent)
 												textHeight = 13,
 												justify = {"RIGHT", "MIDDLE"},
 												points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}, {"TOPRIGHT", -5, -55}}
+                                            },
+											{
+												type = "Text",
+												text = "Bidding On Auction:",
+												textHeight = 13,
+												justify = {"LEFT", "MIDDLE"},
+												size = {0, 15},
+												points = {{"TOPLEFT", 5, -75}},
+											},
+											{
+												type = "Text",
+												key = "auctionCountText",
+												textHeight = 13,
+												justify = {"RIGHT", "MIDDLE"},
+												points = {{"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}, {"TOPRIGHT", -5, -75}},
 											},
 											{
 												type = "HLine",
-												offset = -80,
+												offset = -100,
 											},
 											{
 												type = "Text",
@@ -436,18 +451,18 @@ function AuctionTabFrame:Create(parent)
 												textHeight = 14,
 												justify = {"LEFT", "MIDDLE"},
 												size = {0, 25},
-												points = {{"TOPLEFT", 5, -90}},
+												points = {{"TOPLEFT", 5, -110}},
 											},
 											{
 												type = "InputBox",
 												key = "bidBox",
 												justify = {"RIGHT", "MIDDLE"},
-												points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}, {"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}, {"TOPRIGHT", -5, -90}},
+												points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}, {"BOTTOMLEFT", BFC.PREV, "BOTTOMRIGHT", 5, 0}, {"TOPRIGHT", -5, -110}},
 												scripts = {"OnTextChanged", "OnEnterPressed", "OnEditFocusGained", "OnEditFocusLost"},
 											},
 											{
 												type = "HLine",
-												offset = -150,
+												offset = -170,
 											},
 											{
 												type = "Button",
@@ -1051,7 +1066,8 @@ function frameFunctions.UpdateConfirmation(mode, auctionRecord, info)
 			confirmationFrame.buyoutText:SetText("---")
 		else
 			confirmationFrame.buyoutText:SetText(TSMAPI:MoneyToString(auctionRecord.buyout, "OPT_ICON"))
-		end
+        end
+        confirmationFrame.auctionCountText:SetText(format("%d/%d", min(info.progress+1, info.totalNum), info.totalNum))
 		confirmationFrame.bidBox:SetText(TSMAPI:MoneyToString(info.bid, confirmationFrame.bidBox:HasFocus() and "OPT_DISABLE" or nil))
 	elseif mode == "post" then
 		confirmationFrame.item:SetText(info.itemLink)

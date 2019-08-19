@@ -605,99 +605,139 @@ function private.BidAuctionsThread(self, auctionInfo)
 	self:RegisterEvent("CHAT_MSG_SYSTEM", function(_, msg) if msg == ERR_AUCTION_BID_PLACED then self:SendMsgToSelf("BID_PLACED") end end)
 	self:RegisterEvent("UI_ERROR_MESSAGE", function(_, msg) if msg == ERR_AUCTION_HIGHER_BID or msg == ERR_ITEM_NOT_FOUND or msg == ERR_NOT_ENOUGH_MONEY then self:SendMsgToSelf("BID_FAILED") end end)
 
-	local bidInfo = { progress = 0, totalNum = auctionInfo.numAuctions, bid = auctionRecord.requiredBid, index = nil }
-	local indexList = TSMAPI.Auction:FindAuctionNoScan(auctionRecord)
-	if indexList then
-		-- remove auctions which we've already bid on
-		for i = #indexList, 1, -1 do
-			if select(11, GetAuctionItemInfo("list", indexList[i])) then
-				tremove(indexList, i)
-			end
-		end
-	end
-	if not indexList or #indexList == 0 then
-		TSMAPI.Auction:FindAuction("Shopping", auctionRecord, self:GetSendMsgToSelfCallback(), auctionInfo.database)
-		local args = self:ReceiveMsg()
-		local event = tremove(args, 1)
-		indexList = unpack(args)
-		if event == "INTERRUPTED" then
-			self:SendMsgToParent("CONFIRM_DONE")
-			return
-		end
-		TSMAPI:Assert(event == "FOUND_AUCTION", "Unexpected event: " .. tostring(event))
-		if indexList then
-			-- remove auctions which we've already bid on
-			for i = #indexList, 1, -1 do
-				if select(11, GetAuctionItemInfo("list", indexList[i])) then
-					tremove(indexList, i)
-				end
-			end
-		end
-		if not indexList or #indexList == 0 then
-			TSM:LOG_INFO("Could not find auction!")
-			private.frame.content.result.rt:RemoveSelectedRecord(bidInfo.totalNum)
-			self:SendMsgToParent("CONFIRM_DONE")
-			TSM:Print("Could not find this item on the AH. Removing it.")
-			return
-		end
-	end
-	sort(indexList)
-	TSM:LOG_INFO(table.concat(indexList, ", "))
+    local bidInfo = { progress = 0, totalNum = auctionInfo.numAuctions, bid = auctionRecord.requiredBid, index = nil }
+    local numComplete = 0
+    while true do
+        local indexList = TSMAPI.Auction:FindAuctionNoScan(auctionRecord)
+        if not indexList or #indexList == 0 then
+			-- clear out the message queue before continuing
+			while self:GetNumMsgs() > 0 do self:ReceiveMsg() end
+            TSMAPI.Auction:FindAuction("Shopping", auctionRecord, self:GetSendMsgToSelfCallback(), auctionInfo.database)
+            local args = self:ReceiveMsg()
+            local event = tremove(args, 1)
+            indexList = unpack(args)
+            if event == "INTERRUPTED" then
+                self:SendMsgToParent("CONFIRM_DONE")
+                return
+            end
+            TSMAPI:Assert(event == "FOUND_AUCTION", "Unexpected event: " .. tostring(event))
+            if not indexList or #indexList == 0 then
+                TSM:LOG_INFO("Could not find auction!")
+                private.frame.content.result.rt:RemoveSelectedRecord(auctionInfo.numAuctions - numComplete)
+                self:SendMsgToParent("CONFIRM_DONE")
+                TSM:Print("Could not find this item on the AH. Removing it.")
+                return
+            end
+        end
+        sort(indexList)
+        TSM:LOG_INFO(table.concat(indexList, ", "))
 
-	-- we have a list of auction indicies for the item we want to bid on
-	bidFrame.bidBtn:Enable()
-	bidFrame.closeBtn:Enable()
-	private.frame.UpdateConfirmation("bid", auctionRecord, bidInfo)
-	while true do
-		local args = self:ReceiveMsg()
-		local event = tremove(args, 1)
-		if event == "UPDATE_CONFIRMATION" then
-			-- update the confirmation frame
-			local change = unpack(args)
-			if change == "bid" then
-				bidInfo.bid = TSMAPI:MoneyFromString(bidFrame.bidBox:GetText()) or 0
-				bidFrame.bidBtn:SetDisabled(bidInfo.bid < auctionRecord.requiredBid or (auctionRecord.buyout > 0 and bidInfo.bid >= auctionRecord.buyout))
-			else
-				local temp = gsub(gsub(strsub(bidFrame.bidBox:GetText(), 1, bidFrame.bidBox:GetCursorPosition()), "\124cff([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])", ""), "\124r", "")
-				private.frame.UpdateConfirmation("bid", auctionRecord, bidInfo)
-				if bidFrame.bidBox:HasFocus() then
-					bidFrame.bidBox:SetCursorPosition(#temp)
-				end
-			end
-			bidFrame.bidBox:HighlightText(0, 0)
-		elseif event == "AUCTION_CONFIRMED" then
-			-- bid on the auction
-			local index = tremove(indexList)
-			if index then
-				if not auctionRecord:DoBid(index, bidInfo.bid) then
-					-- we failed to bid on this auction
-					TSM:Print("Failed to bid on this auction. Skipping it.")
-					break
-				else
-					bidInfo.index = index
-				end
-			end
-			bidFrame.bidBtn:Disable()
-			bidFrame.closeBtn:Disable()
-		elseif event == "INTERRUPTED" then
-			-- abort the bidding confirmation
-			break
-		elseif event == "BID_PLACED" or event == "BID_FAILED" then
-			-- bid was placed or failed
-			bidInfo.progress = bidInfo.progress + 1
-			private.frame.UpdateConfirmation("bid", auctionRecord, bidInfo)
-			private.frame.content.result.rt:RemoveSelectedRecord()
-			if event == "BID_PLACED" then
-				-- update and re-insert this record
-				local minBid, minIncrement, bid, highBidder = TSMAPI.Util:Select({ 7, 8, 10, 11 }, GetAuctionItemInfo("list", bidInfo.index))
-				auctionRecord:SetData(auctionRecord.itemLink, auctionRecord.texture, auctionRecord.stackSize, minBid, minIncrement, auctionRecord.buyout, bid, auctionRecord.seller, auctionRecord.timeLeft, highBidder, auctionRecord.rawItemLink)
-				private.frame.content.result.rt:InsertAuctionRecord(1, auctionRecord)
-			end
-			break
-		else
-			error("Unexpected message: " .. tostring(event))
-		end
-	end
+        -- we have a list of auction indicies for the item we want to bid on
+        local bidProgress, confirmProgress = 0, 0
+        local toRemove = {}
+        bidFrame.bidBtn:Enable()
+        bidFrame.closeBtn:Enable()
+        private.frame.UpdateConfirmation("bid", auctionRecord, bidInfo)
+        while true do
+            local args = self:ReceiveMsg()
+            local event = tremove(args, 1)
+            if event == "UPDATE_CONFIRMATION" then
+                -- update the confirmation frame
+                local change = unpack(args)
+                if change == "bid" then
+                    bidInfo.bid = TSMAPI:MoneyFromString(bidFrame.bidBox:GetText()) or 0
+                    bidFrame.bidBtn:SetDisabled(bidInfo.bid < auctionRecord.requiredBid or (auctionRecord.buyout > 0 and bidInfo.bid >= auctionRecord.buyout))
+                else
+                    local temp = gsub(gsub(strsub(bidFrame.bidBox:GetText(), 1, bidFrame.bidBox:GetCursorPosition()), "\124cff([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])", ""), "\124r", "")
+                    private.frame.UpdateConfirmation("bid", auctionRecord, bidInfo)
+                    if bidFrame.bidBox:HasFocus() then
+                        bidFrame.bidBox:SetCursorPosition(#temp)
+                    end
+                end
+                bidFrame.bidBox:HighlightText(0, 0)
+            elseif event == "AUCTION_CONFIRMED" then
+                -- bid on the auction
+                local index = tremove(indexList)
+                if index then
+                    bidProgress = bidProgress + 1
+                    local temp = bidInfo.progress
+                    bidInfo.progress = temp + bidProgress
+                    private.frame.UpdateConfirmation("bid", auctionRecord, bidInfo)
+                    bidInfo.progress = temp
+                    if not auctionRecord:DoBid(index, bidInfo.bid) then
+                        -- we failed to bid on this auction
+                        TSM:Print("Failed to bid on this auction. Skipping it.")
+                        self:SendMsgToSelf("BID_FAILED")
+                    else
+                        bidInfo.index = index
+                    end
+                end
+                bidFrame.bidBtn:Disable()
+                bidFrame.closeBtn:Disable()
+                if private:GetMaxQuantity(auctionRecord) > 0 and #indexList > 0 then
+                    -- wait one frame before re-enabling the buttons
+                    self:Yield(true)
+                    bidFrame.bidBtn:Enable()
+                    bidFrame.closeBtn:Enable()
+                end
+            elseif event == "INTERRUPTED" then
+                -- abort the bidding confirmation
+                if #toRemove > 0 then
+                    -- update and re-insert this record
+                    local numRemove = #toRemove
+                    private.frame.content.result.rt:RemoveSelectedRecord(numRemove > auctionInfo.numAuctions and auctionInfo.numAuctions or numRemove)
+                    local minBid, minIncrement, bid, highBidder = TSMAPI.Util:Select({ 7, 8, 10, 11 }, GetAuctionItemInfo("list", toRemove[1]))
+                    local tempRecord = TSMAPI.Auction:NewRecord(auctionRecord.itemLink, auctionRecord.texture, auctionRecord.stackSize, minBid, minIncrement, auctionRecord.buyout, bid, auctionRecord.seller, auctionRecord.timeLeft, highBidder, auctionRecord.rawItemLink)
+                    private.frame.content.result.rt:InsertAuctionRecord(numRemove, tempRecord)
+                end
+                self:SendMsgToParent("CONFIRM_DONE")
+                return
+            elseif event == "BID_PLACED" or event == "BID_FAILED" then
+                if event == "BID_FAILED" then
+                    local temp = bidInfo.progress
+                    bidInfo.progress = temp + 1
+                    private.frame.UpdateConfirmation("bid", auctionRecord, bidInfo)
+                    bidInfo.progress = temp
+                elseif event == "BID_PLACED" then
+                    -- update and re-insert this record
+                    numComplete = numComplete + 1
+                    tinsert(toRemove, bidInfo.index)
+                end
+                confirmProgress = confirmProgress + 1
+                TSM:LOG_INFO("bid progress: %d %d %d", bidProgress, confirmProgress, #indexList)
+                if confirmProgress == bidProgress then
+                    if private:GetMaxQuantity(auctionRecord) <= 0 then
+                        -- we've bid on all
+                        break
+                    end
+                    if #indexList == 0 then
+                        -- do find scan again
+                        bidInfo.progress = bidInfo.progress + bidProgress
+                        break
+                    end
+                end
+            else
+                error("Unexpected message: " .. tostring(event))
+            end
+        end
+        TSM:LOG_INFO("Removing successful bids.")
+        if #toRemove > 0 then
+            -- update and re-insert this record
+            local numRemove = #toRemove
+            private.frame.content.result.rt:RemoveSelectedRecord(numRemove > auctionInfo.numAuctions and auctionInfo.numAuctions or numRemove)
+            local minBid, minIncrement, bid, highBidder = TSMAPI.Util:Select({ 7, 8, 10, 11 }, GetAuctionItemInfo("list", toRemove[1]))
+            local tempRecord = TSMAPI.Auction:NewRecord(auctionRecord.itemLink, auctionRecord.texture, auctionRecord.stackSize, minBid, minIncrement, auctionRecord.buyout, bid, auctionRecord.seller, auctionRecord.timeLeft, highBidder, auctionRecord.rawItemLink)
+            private.frame.content.result.rt:InsertAuctionRecord(numRemove, tempRecord)
+        end
+        if bidInfo.progress >= auctionInfo.numAuctions or private:GetMaxQuantity(auctionRecord) <= 0 then
+            self:Yield(true)
+            break
+        else
+            self:Sleep(1)
+            -- clear out the message queue before continuing
+            while self:GetNumMsgs() > 0 do self:ReceiveMsg() end
+        end
+    end
 	self:SendMsgToParent("CONFIRM_DONE")
 end
 
@@ -1065,7 +1105,7 @@ function private.AuctionTabThread(self)
 				end
 				auctionInfo.record = data.record
 				auctionInfo.numAuctions = data.numAuctions
-				TSM:LOG_INFO("selected auction (num=%d, numInBags=%d)", auctionInfo.numAuctions, TSM.AuctionTabUtil:GetNumInBags(data.record.itemString))
+                TSM:LOG_INFO("selected auction (num=%d, numInBags=%d)", auctionInfo.numAuctions, TSM.AuctionTabUtil:GetNumInBags(data.record.itemString))
 			else
 				private.frame.content.result.cancelBtn:Disable()
 				private.frame.content.result.postBtn:Disable()

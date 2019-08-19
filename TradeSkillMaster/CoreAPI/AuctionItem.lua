@@ -57,6 +57,10 @@ private.AuctionRecord = setmetatable({}, {
 			-- set dataKeys from the passed parameters
 			for i, key in ipairs(self.dataKeys) do
 				self[key] = select(i, ...)
+            end
+			if self.isHighBidder then
+				-- this is to get around a bug in Blizzard's code where the minIncrement value will be inconsistent for auctions where the player is the highest bidder
+				self.minIncrement = 0
 			end
 			-- generate keys from otherKeys which we can
 			self.displayedBid = self.bid == 0 and self.minBid or self.bid
@@ -69,9 +73,9 @@ private.AuctionRecord = setmetatable({}, {
 			self.itemLevel = TSMAPI.Item:GetItemLevel(self.itemLink) or 1
 			self.minLevel = TSMAPI.Item:GetMinLevel(self.itemLink)
 			self.quality = TSMAPI.Item:GetQuality(self.itemLink)
-			self.hash = strjoin("~", self.itemLink, self.bid, self.displayedBid, self.buyout, self.timeLeft, self.stackSize)
-			self.hash2 = strjoin("~", self.itemLink, self.bid, self.displayedBid, self.buyout, self.timeLeft, self.stackSize, self.seller)
-			self.hash3 = strjoin("~", self.itemLink, self.minBid, self.minIncrement, self.buyout, self.bid, self.seller, self.timeLeft, self.stackSize, tostring(self.isHighBidder))
+			self.hash = strjoin("~", self.itemLink, self.displayedBid, self.buyout, self.timeLeft, self.stackSize)
+			self.hash2 = strjoin("~", self.itemLink, self.minIncrement, self.displayedBid, self.buyout, self.seller, self.timeLeft, self.stackSize, tostring(self.isHighBidder))
+			self.hash3 = strjoin("~", self.itemLink, self.minBid, self.minIncrement, self.bid, self.buyout, self.seller, self.timeLeft, self.stackSize, tostring(self.isHighBidder))
 			self.isPlayer = TSMAPI.Player:IsPlayer(self.seller, true, true, true)
 			-- caching of filters
 			self._filterHash = nil
@@ -98,7 +102,11 @@ private.AuctionRecord = setmetatable({}, {
 			local texture, stackSize, minBid, minIncrement, buyout, bid, isHighBidder, seller = TSMAPI.Util:Select({2, 3, 7, 8, 9, 10, 11, 12}, GetAuctionItemInfo(auctionType, index))
 			local timeLeft = GetAuctionItemTimeLeft(auctionType, index)
 			local itemLink = TSMAPI.Item:GeneralizeLink(GetAuctionItemLink(auctionType, index))
-			seller = TSM:GetAuctionPlayer(seller) or "?"
+            seller = TSM:GetAuctionPlayer(seller) or "?"
+            if isHighBidder then
+                -- this is to get around a bug in Blizzard's code where the minIncrement value will be inconsistent for auctions where the player is the highest bidder
+                minIncrement = 0
+            end
 			local testAuction = {itemLink=itemLink, texture=texture, stackSize=stackSize, minBid=minBid, minIncrement=minIncrement, buyout=buyout, bid=bid, seller=seller, timeLeft=timeLeft, isHighBidder=isHighBidder, rawItemLink=self.rawItemLink}
 			for _, key in ipairs(self.dataKeys) do
 				if self[key] ~= testAuction[key] then

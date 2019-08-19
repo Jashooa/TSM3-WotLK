@@ -37,7 +37,7 @@ function TSMAPI.Auction:ScanQuery(module, query, callbackHandler, resolveSellers
 	private.currentModule = module
 	if query.name ~= "" and (not query.items or #query.items == 1) then
 		private.optimize = true
-	end
+    end
 	TSM:SetAuctionTabFlashing(private.currentModule, true)
 
 	-- set up the query
@@ -128,9 +128,9 @@ function TSMAPI.Auction:FindAuctionNoScan(targetInfo)
 	TSMAPI:Assert(type(targetInfo) == "table", "Invalid targetInfo type: "..type(targetInfo))
 	TSMAPI:Assert(AuctionFrame:IsVisible())
 
-	local keys = {"itemString", "stackSize", "displayedBid", "buyout", "seller", "timeLeft"}
+	local keys = {"itemString", "stackSize", "minIncrement", "displayedBid", "buyout", "seller", "timeLeft", "isHighBidder"}
 	for i=#keys, 1, -1 do
-        if not targetInfo[keys[i]] then
+        if not targetInfo[keys[i]] and keys[i] ~= "isHighBidder" then
 			tremove(keys, i)
 		end
 	end
@@ -302,12 +302,16 @@ function private:SearchCurrentPageForTargetItem(targetInfo, keys)
 	-- check for the target item on this page
 	local indexList, firstAuction, lastAuction
 	for i=1, GetNumAuctionItems("list") do
-        local _, _, stackSize, _, _, _, minBid, _, buyout, bid, _, seller = GetAuctionItemInfo("list", i)
+        local _, _, stackSize, _, _, _, minBid, minIncrement, buyout, bid, isHighBidder, seller = GetAuctionItemInfo("list", i)
         local timeLeft = GetAuctionItemTimeLeft("list", i)
 		seller = TSM:GetAuctionPlayer(seller)
 		local displayedBid = bid == 0 and minBid or bid
-		local itemString = TSMAPI.Item:ToItemString(GetAuctionItemLink("list", i))
-		local auctionData = {itemString=itemString, stackSize=stackSize, displayedBid=displayedBid, buyout=buyout, seller=seller, timeLeft=timeLeft}
+        local itemString = TSMAPI.Item:ToItemString(GetAuctionItemLink("list", i))
+        if isHighBidder then
+            -- this is to get around a bug in Blizzard's code where the minIncrement value will be inconsistent for auctions where the player is the highest bidder
+            minIncrement = 0
+        end
+		local auctionData = {itemString=itemString, stackSize=stackSize, displayedBid=displayedBid, minIncrement=minIncrement, buyout=buyout, seller=seller, timeLeft=timeLeft, isHighBidder=isHighBidder}
 		local isTarget = private:CompareTableKeys(keys, auctionData, targetInfo)
 		if i == 1 then
 			firstAuction = auctionData
@@ -499,10 +503,10 @@ function private.FindAuctionThread(self, targetInfo)
 		page = 0,
 		exact = true
 	}
-	local keys = {"itemString", "stackSize", "displayedBid", "buyout", "seller"}
+	local keys = {"itemString", "stackSize", "minIncrement", "displayedBid", "buyout", "seller", "timeLeft", "isHighBidder"}
 	local indexList = nil
 	for i=#keys, 1, -1 do
-		if not targetInfo[keys[i]] then
+		if not targetInfo[keys[i]] and keys[i] ~= "isHighBidder" then
 			tremove(keys, i)
 		end
 	end
@@ -520,7 +524,7 @@ function private.FindAuctionThread(self, targetInfo)
 
 	local searchDirection = nil
 	local estimatedPage = nil
-	local totalPages = math.huge
+    local totalPages = math.huge
 	if private.database and not private.database.disableFastFind then
 		-- make an educated guess at the starting page and do a linear search from there
 		local view = private.database:CreateView()

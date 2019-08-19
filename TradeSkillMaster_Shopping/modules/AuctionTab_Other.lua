@@ -337,7 +337,7 @@ function AuctionTabOther:GetFrameInfo()
 					{
 						type = "CheckBox",
 						key = "exactCheckBox",
-						label = AH_EXACT_MATCH,
+						label = "Exact Match",
 						tooltip = "If set, only items which exactly match the search filter you have set will be included in the results.",
 						size = {200, 30},
 						points = {{"TOPLEFT", BFC.PREV, "TOPRIGHT", 5, 0}},

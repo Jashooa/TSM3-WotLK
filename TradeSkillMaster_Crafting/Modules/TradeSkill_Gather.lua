@@ -792,15 +792,30 @@ function Gather:Update(firstRun)
 								total = total + taskQuantity
 							end
 							quantity = total
-							if sourceName == "crafting" then
-								rowText = format("%s|r", leader .. "Intermediate Craft")
+                            if sourceName == "crafting" then
+                                local cost = TSMAPI:GetItemValue(itemString, "Crafting")
+                                if cost then
+                                    rowText = format("%s|r", leader .. "Intermediate Craft (" .. TSMAPI:MoneyToString(cost) .. ")")
+                                else
+                                    rowText = format("%s|r", leader .. "Intermediate Craft")
+                                end
 								tinsert(stData, { cols = { { value = rowText } }, isSubTitle = true, itemString = itemString, name = itemName, sourceName = sourceName, quantity = quantity })
 								rowInserted = true
 							else
-								if sourceName == "auction" then
-									rowText = format("%s|r", leader .. "Buy From AH")
-								elseif sourceName == "vendorBuy" then
-									rowText = format("%s|r", leader .. "Buy From Vendor")
+                                if sourceName == "auction" then
+                                    local cost = TSMAPI:GetItemValue(itemString, "DBMinBuyout")
+                                    if cost then
+                                        rowText = format("%s|r", leader .. "Buy From AH (" .. TSMAPI:MoneyToString(cost) .. ")")
+                                    else
+                                        rowText = format("%s|r", leader .. "Buy From AH")
+                                    end
+                                elseif sourceName == "vendorBuy" then
+                                    local cost = TSMAPI:GetItemValue(itemString, "VendorBuy")
+                                    if cost then
+                                        rowText = format("%s|r", leader .. "Buy From Vendor (" .. TSMAPI:MoneyToString(cost) .. ")")
+                                    else
+                                        rowText = format("%s|r", leader .. "Buy From Vendor")
+                                    end
 								elseif sourceName == "vendorTrade" then
 									rowText = format("%s|r", leader .. "Vendor Trade")
 								elseif sourceName == "transform" then

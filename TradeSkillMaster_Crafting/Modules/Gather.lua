@@ -211,86 +211,96 @@ function Gather:GetItemSources(crafter, neededMats)
 	if not neededMats then return end
 	local sources = {}
 	local inkTradeItem
-	local intermediate = {}
-	-- add crafting tasks
-	if not TSM.db.factionrealm.gathering.sessionOptions.ignoreIntermediate then
-		for itemString, quantity in pairs(neededMats) do
-			local matCost = TSM.Cost:GetMatCost(itemString) or math.huge
-			local cheapestSpellId, lowestCost = TSM.Cost:GetItemCraftPrices(itemString)
-			if cheapestSpellId and lowestCost <= matCost then
-				local data = TSM.db.factionrealm.crafts[cheapestSpellId]
-				if not data.hasCD then
-					local need = quantity - (TSMAPI.Inventory:GetBagQuantity(itemString, crafter) + TSMAPI.Inventory:GetBankQuantity(itemString, crafter) + TSMAPI.Inventory:GetMailQuantity(itemString, crafter))
-					if need > 0 then
-						local spellNeed = ceil(need / data.numResult)
-						sources[itemString] = sources[itemString] or {}
-						sources[itemString]["crafting"] = sources[itemString]["crafting"] or {}
-						sources[itemString]["crafting"][cheapestSpellId] = need
-						if TSM.db.factionrealm.gathering.selectedSourceStatus[cheapestSpellId] then
-							intermediate[itemString] = true
-							sources[itemString]["selected"] = (sources[itemString]["selected"] or 0) + need
-							for mat, matQty in pairs(data.mats) do
-								neededMats[mat] = (neededMats[mat] or 0) + (matQty * spellNeed)
-							end
-						end
-					end
-				end
-			end
-		end
-	end
+    local intermediate = {}
+    local restart = true
 
-	-- add vendor items
-	for itemString, quantity in pairs(neededMats) do
-		if TSMAPI.Item:GetVendorCost(itemString) then
-			local vendorNeed = quantity - (TSMAPI.Inventory:GetBagQuantity(itemString, crafter) + TSMAPI.Inventory:GetBankQuantity(itemString, crafter) + TSMAPI.Inventory:GetMailQuantity(itemString, crafter))
-			if vendorNeed > 0 then
-				sources[itemString] = sources[itemString] or {}
-				sources[itemString]["vendorBuy"] = sources[itemString]["vendorBuy"] or {}
-				sources[itemString]["vendorBuy"]["buy"] = vendorNeed
-				sources[itemString]["selected"] = (sources[itemString]["selected"] or 0) + vendorNeed
-			end
-		elseif TSMAPI.Conversions:GetData(itemString) and TSM.db.factionrealm.gathering.sessionOptions.inkTrade and not intermediate[itemString] then
-			for tradeItemString, info in pairs(TSMAPI.Conversions:GetData(itemString)) do
-				tradeItemString = TSMAPI.Item:ToItemString(tradeItemString)
-				if info.method == "vendortrade" then
-					local totalNum = TSMAPI.Inventory:GetTotalQuantity(itemString)
-					if quantity > totalNum then
-						sources[itemString] = sources[itemString] or {}
-						sources[itemString]["vendorTrade"] = sources[itemString]["vendorTrade"] or {}
-						sources[itemString]["vendorTrade"]["buy"] = quantity - totalNum
-						sources[itemString]["selected"] = (sources[itemString]["selected"] or 0) + (quantity - totalNum)
-						inkTradeItem = tradeItemString
-						mustHaveBags[inkTradeItem] = true
-						neededMats[tradeItemString] = (neededMats[tradeItemString] or 0) + quantity / info.rate -- add the qty of Warbinders ink to needed mats
-					end
-				end
-			end
-		end
-	end
+    while restart do
+        restart = false
+        -- add crafting tasks
+        if not TSM.db.factionrealm.gathering.sessionOptions.ignoreIntermediate then
+            for itemString, quantity in pairs(neededMats) do
+                local matCost = TSM.Cost:GetMatCost(itemString) or math.huge
+                local cheapestSpellId, lowestCost = TSM.Cost:GetItemCraftPrices(itemString)
+                --if cheapestSpellId and lowestCost <= matCost then
+                if cheapestSpellId then
+                    local data = TSM.db.factionrealm.crafts[cheapestSpellId]
+                    if not data.hasCD then
+                        local need = quantity - (TSMAPI.Inventory:GetBagQuantity(itemString, crafter) + TSMAPI.Inventory:GetBankQuantity(itemString, crafter) + TSMAPI.Inventory:GetMailQuantity(itemString, crafter))
+                        if need > 0 then
+                            local spellNeed = ceil(need / data.numResult)
+                            sources[itemString] = sources[itemString] or {}
+                            sources[itemString]["crafting"] = sources[itemString]["crafting"] or {}
+                            sources[itemString]["crafting"][cheapestSpellId] = need
+                            if TSM.db.factionrealm.gathering.selectedSourceStatus[cheapestSpellId] then
+                                intermediate[itemString] = true
+                                sources[itemString]["selected"] = (sources[itemString]["selected"] or 0) + need
+                                for mat, matQty in pairs(data.mats) do
+                                    if not neededMats[mat] then
+                                        neededMats[mat] = (neededMats[mat] or 0) + (matQty * spellNeed)
+                                        restart = true
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
 
-	-- add conversion tasks
---	for itemString, quantity in pairs(neededMats) do
---		if TSMAPI.Conversions:GetData(itemString) then
---			for srcItemString, info in pairs(TSMAPI.Conversions:GetData(itemString)) do
---				srcItemString = TSMAPI.Item:ToItemString(srcItemString)
---				if info.method == "transform" then
---					local totalNum = TSMAPI.Inventory:GetTotalQuantity(itemString)
---					if quantity > totalNum then
---						local srcNum = TSMAPI.Inventory:GetTotalQuantity(srcItemString)
---						if srcNum * info.rate > 1 then
---							mustHaveBags[srcItemString] = true
---							sources[itemString] = sources[itemString] or {}
---							sources[itemString]["transform"] = sources[itemString]["transform"] or {}
---							sources[itemString]["transform"]["transform"] = quantity - totalNum
---							if TSM.db.factionrealm.gathering.selectedSourceStatus["transform" .. "|" .. itemString] then
---								neededMats[srcItemString] = (neededMats[srcItemString] or 0) + (quantity - totalNum) / info.rate
---							end
---						end
---					end
---				end
---			end
---		end
---	end
+        -- add conversion tasks
+        for itemString, quantity in pairs(neededMats) do
+            if TSMAPI.Conversions:GetData(itemString) then
+                for srcItemString, info in pairs(TSMAPI.Conversions:GetData(itemString)) do
+                    srcItemString = TSMAPI.Item:ToItemString(srcItemString)
+                    if info.method == "transform" then
+                        local totalNum = TSMAPI.Inventory:GetTotalQuantity(itemString)
+                        if quantity > totalNum then
+                            local srcNum = TSMAPI.Inventory:GetTotalQuantity(srcItemString)
+                            if srcNum * info.rate > 1 then
+                                sources[itemString] = sources[itemString] or {}
+                                sources[itemString]["transform"] = sources[itemString]["transform"] or {}
+                                sources[itemString]["transform"]["transform"] = quantity - totalNum
+                                mustHaveBags[srcItemString] = true
+                                if not neededMats[srcItemString] then
+                                    neededMats[srcItemString] = (neededMats[srcItemString] or 0) + (quantity - totalNum) / info.rate
+                                    restart = true
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    -- add vendor items
+    for itemString, quantity in pairs(neededMats) do
+        if TSMAPI.Item:GetVendorCost(itemString) then
+            local vendorNeed = quantity - (TSMAPI.Inventory:GetBagQuantity(itemString, crafter) + TSMAPI.Inventory:GetBankQuantity(itemString, crafter) + TSMAPI.Inventory:GetMailQuantity(itemString, crafter))
+            if vendorNeed > 0 then
+                sources[itemString] = sources[itemString] or {}
+                sources[itemString]["vendorBuy"] = sources[itemString]["vendorBuy"] or {}
+                sources[itemString]["vendorBuy"]["buy"] = vendorNeed
+                sources[itemString]["selected"] = (sources[itemString]["selected"] or 0) + vendorNeed
+            end
+        elseif TSMAPI.Conversions:GetData(itemString) and TSM.db.factionrealm.gathering.sessionOptions.inkTrade and not intermediate[itemString] then
+            for tradeItemString, info in pairs(TSMAPI.Conversions:GetData(itemString)) do
+                tradeItemString = TSMAPI.Item:ToItemString(tradeItemString)
+                if info.method == "vendortrade" then
+                    local totalNum = TSMAPI.Inventory:GetTotalQuantity(itemString)
+                    if quantity > totalNum then
+                        sources[itemString] = sources[itemString] or {}
+                        sources[itemString]["vendorTrade"] = sources[itemString]["vendorTrade"] or {}
+                        sources[itemString]["vendorTrade"]["buy"] = quantity - totalNum
+                        sources[itemString]["selected"] = (sources[itemString]["selected"] or 0) + (quantity - totalNum)
+                        inkTradeItem = tradeItemString
+                        mustHaveBags[inkTradeItem] = true
+                        neededMats[tradeItemString] = (neededMats[tradeItemString] or 0) + quantity / info.rate -- add the qty of Warbinders ink to needed mats
+                    end
+                end
+            end
+        end
+    end
 
 	-- double check if crafter already has all the items needed
 	local shortItems = {}

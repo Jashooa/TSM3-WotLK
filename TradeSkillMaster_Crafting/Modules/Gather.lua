@@ -276,7 +276,7 @@ function Gather:GetItemSources(crafter, neededMats)
     -- round the decimal values
     for itemString, quantity in pairs(neededMats) do
         if quantity ~= floor(quantity) then
-            neededMats[itemString] = floor(quantity + 0.5)
+            neededMats[itemString] = ceil(quantity)
         end
     end
 

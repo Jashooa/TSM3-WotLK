@@ -268,15 +268,17 @@ function private.PostScanThread(self, scanList)
 		elseif event == "ACTION_CONFIRMED" then
 			-- a post has been confirmed by the server
 			numConfirmed = numConfirmed + 1
-		elseif event == "ACTION_FAILED" then
-			-- a post has failed
-			numConfirmed = numConfirmed + 1
-			local noRetry = unpack(args)
-			local info = confirmQueue[numConfirmed]
-			if not noRetry then
-				tinsert(failedQueue, info)
-			end
-			TSM:LOG_INFO("Posting auction %d failed (itemString=%s, bid=%s, buyout=%s, stackSize=%d, numStacks=%d, postTime=%d)", numConfirmed, info.itemString, info.bid, info.buyout, info.stackSize, info.numStacks, info.postTime)
+        elseif event == "ACTION_FAILED" then
+            if confirmQueue[numConfirmed + 1] then
+			    -- a post has failed
+                numConfirmed = numConfirmed + 1
+                local noRetry = unpack(args)
+                local info = confirmQueue[numConfirmed]
+                if not noRetry then
+                    tinsert(failedQueue, info)
+                end
+                TSM:LOG_INFO("Posting auction %d failed (itemString=%s, bid=%s, buyout=%s, stackSize=%d, numStacks=%d, postTime=%d)", numConfirmed, info.itemString, info.bid, info.buyout, info.stackSize, info.numStacks, info.postTime)
+            end
 		elseif event == "SKIP_BUTTON" then
 			-- skip the current item
 			for i=#private.queue, 1, -1 do

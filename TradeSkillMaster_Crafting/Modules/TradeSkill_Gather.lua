@@ -818,8 +818,13 @@ function Gather:Update(firstRun)
                                     end
 								elseif sourceName == "vendorTrade" then
 									rowText = format("%s|r", leader .. "Vendor Trade")
-								elseif sourceName == "transform" then
-									rowText = format("%s|r", leader .. "Transform")
+                                elseif sourceName == "transform" then
+                                    local cost = TSMAPI.Conversions:GetValue(itemString, "DBMinBuyout", "transform")
+                                    if cost then
+                                        rowText = format("%s|r", leader .. "Transform (" .. TSMAPI:MoneyToString(cost) .. ")")
+                                    else
+                                        rowText = format("%s|r", leader .. "Transform")
+                                    end
 								else
 									rowText = format("%s|r", leader .. "Retrieve From " .. sourceName .. " (" .. min(shortItems[item], quantity) .. ")")
 								end

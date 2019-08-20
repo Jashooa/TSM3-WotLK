@@ -273,6 +273,13 @@ function Gather:GetItemSources(crafter, neededMats)
         end
     end
 
+    -- round the decimal values
+    for itemString, quantity in pairs(neededMats) do
+        if quantity ~= floor(quantity) then
+            neededMats[itemString] = floor(quantity + 0.5)
+        end
+    end
+
     -- add vendor items
     for itemString, quantity in pairs(neededMats) do
         if TSMAPI.Item:GetVendorCost(itemString) then

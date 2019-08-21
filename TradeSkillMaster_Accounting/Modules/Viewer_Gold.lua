@@ -131,20 +131,22 @@ function Gold:Draw(container)
 		},
 	}
 
-	TSMAPI.GUI:BuildOptions(container, page)
+    TSMAPI.GUI:BuildOptions(container, page)
 
-	local parent = container.children[1].children[#container.children[1].children].frame
+    local parent = container.children[1].children[#container.children[1].children].frame
 
 	if not private.lineGraph then
-		local graph = LibStub("LibGraph-2.0"):CreateGraphLine(nil, parent, "CENTER", nil, nil, nil, parent:GetWidth(), parent:GetHeight())
+		local graph = LibStub("LibGraph-2.0"):CreateGraphLine(nil, parent1, "CENTER", nil, nil, nil, parent:GetWidth(), parent:GetHeight())
 		graph:SetGridColor({ 0.8, 0.8, 0.8, 0.6 })
 		graph:SetYLabels(true)
-		private.lineGraph = graph
+        private.lineGraph = graph
+
+        parent:SetScript("OnSizeChanged", function() graph:SetHeight(parent:GetHeight() - 180) graph:SetWidth(parent:GetWidth()) end)
 	end
 	private.lineGraph:Show()
 	private.lineGraph:SetParent(parent)
 	private.lineGraph:ClearAllPoints()
-	private.lineGraph:SetAllPoints(parent)
+    private.lineGraph:SetAllPoints(parent)
 
 	private.lineGraph:ResetData()
 	local ySpacing = max(ceil((maxY - minY) / 20), 0.5)
@@ -154,7 +156,7 @@ function Gold:Draw(container)
 	private.lineGraph:SetXAxis(minX-xBuffer, maxX)
 	private.lineGraph:SetYAxis(minY-yBuffer, maxY+yBuffer)
 	private.lineGraph:AddDataSeries(data, {1, 0.83, 0, 1})
-	private.lineGraph:RefreshGraph()
+    private.lineGraph:RefreshGraph()
 end
 
 function Gold:Hide()

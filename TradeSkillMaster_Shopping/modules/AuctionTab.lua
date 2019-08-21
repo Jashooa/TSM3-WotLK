@@ -272,8 +272,9 @@ function private.BuyAuctionsThread(self, auctionInfo)
 	private.frame.content.result.confirmation.buyout.buyoutBtn:Disable()
 	private.frame.content.result.confirmation.buyout.closeBtn:Enable()
 	private.frame.UpdateConfirmation("progress", nil, "Searching for auction...")
-	local lastMsgIsBid = nil
-	local pendingBuyMsg = format(ERR_AUCTION_WON_S, auctionRecord.name)
+    local lastMsgIsBid = nil
+    local baseName = TSMAPI.Item:GetName(TSMAPI.Item:ToBaseItemString(auctionRecord.itemString))
+	local pendingBuyMsg = format(ERR_AUCTION_WON_S, baseName)
 	self:RegisterEvent("CHAT_MSG_SYSTEM", function(_, msg)
 		if pendingBuyMsg == msg then
 			self:SendMsgToSelf("BUYOUT_PLACED")

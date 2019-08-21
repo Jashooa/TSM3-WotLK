@@ -352,10 +352,15 @@ function private.DestroyingThread(self)
 
 		if eventTriggered.EV_CAST_FAILED then
 			if currentState == "ST_CASTING_PENDING" then
-				-- cast failed, return to the ready state
+                -- cast failed, return to the ready state
+                if context.target and context.target.itemString then
+                    private.ignore[context.target.itemString] = true
+                    TSM:Printf("Cast failed, ignoring all %s this session (until your UI is reloaded).", context.target.link)
+                    private:UpdateSTData()
+                end
 				currentState = "ST_READY"
 			elseif currentState == "ST_CASTING_STARTED" then
-				-- cast failed, return to the ready state
+                -- cast failed, return to the ready state
 				currentState = "ST_READY"
 			end
 		end

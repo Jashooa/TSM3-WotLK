@@ -417,7 +417,6 @@ function private.PostAuctionsThread(self, auctionInfo)
 	local numInBags = TSM.AuctionTabUtil:GetNumInBags(auctionRecord.itemString)
 	local inventoryItemString, inventoryRawItemLink = select(3, TSM.AuctionTabUtil:GetItemLocation(auctionRecord.itemString))
 	local maxStackSize = TSMAPI.Item:GetMaxStack(auctionRecord.itemLink)
-	local maxNumStacks = (maxStackSize == 1) and 1 or math.huge
 	local postDuration = postFrame.durationDropdown:GetValue() or 2
 
 	auctionBuyout = floor(auctionBuyout / auctionRecord.stackSize) * min(auctionRecord.stackSize, numInBags)
@@ -446,11 +445,11 @@ function private.PostAuctionsThread(self, auctionInfo)
 			local numStacks = postFrame.numStacksBox:GetNumber()
 			postInfo.duration = postFrame.durationDropdown:GetValue()
 			postInfo.updateBuyout = true
-			if change == "numStacksMax" then
-				numStacks = min(maxNumStacks, floor(postInfo.numInBags / postInfo.stackSize))
+            if change == "numStacksMax" then
+				numStacks = floor(postInfo.numInBags / postInfo.stackSize)
 			elseif change == "stackSizeMax" then
 				stackSize = min(maxStackSize, postInfo.numInBags)
-				numStacks = min(maxNumStacks, floor(postInfo.numInBags / stackSize), numStacks)
+				numStacks = min(floor(postInfo.numInBags / stackSize), numStacks)
 			elseif change == "buyout" then
 				local buyout = TSMAPI:MoneyFromString(postFrame.buyoutBox:GetText()) or 0
 				postInfo.buyout = (postFrame.modeDropdown:GetValue() == 1) and buyout or (buyout * postInfo.stackSize)
@@ -463,10 +462,10 @@ function private.PostAuctionsThread(self, auctionInfo)
 					postInfo.buyout = TSMAPI.Util:Round(stackSize * postInfo.buyout / postInfo.stackSize)
 				end
 				postInfo.stackSize = stackSize
-				numStacks = min(maxNumStacks, floor(postInfo.numInBags / stackSize), numStacks)
+				numStacks = min(floor(postInfo.numInBags / stackSize), numStacks)
 			end
 
-			if postInfo.buyout > 0 and stackSizeValid and numStacks > 0 and numStacks <= maxNumStacks and numStacks * stackSize <= postInfo.numInBags then
+			if postInfo.buyout > 0 and stackSizeValid and numStacks > 0 and numStacks * stackSize <= postInfo.numInBags then
 				postInfo.numStacks = numStacks
 				private.frame.UpdateConfirmation("post", auctionRecord, postInfo)
 				postFrame.postBtn:Enable()

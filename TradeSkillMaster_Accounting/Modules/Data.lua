@@ -13,6 +13,7 @@ local LibParse = LibStub("LibParse")
 local private = {}
 
 local SECONDS_PER_DAY = 24 * 60 * 60
+local CLEAN_TIME = 2 * SECONDS_PER_DAY
 local TIME_BUCKET = 300 -- group sales/buys within 5 minutes together
 
 --[[
@@ -406,4 +407,16 @@ function Data:RemoveExpiredAuction(itemString, stackSize, time)
     if not (itemString and stackSize and time) then return end
 
     private:RemoveExpiredAuctionRecord({itemString=itemString, stackSize=stackSize, time=time})
+end
+
+function Data:CleanAuctions()
+    local now = time()
+
+    for i = 1, #TSM.auctions do
+        local expiry = private:GetAuctionExpiryTime(TSM.auctions[i])
+
+        if (now - expiry) >= CLEAN_TIME then
+            tremove(TSM.auctions, i)
+        end
+    end
 end

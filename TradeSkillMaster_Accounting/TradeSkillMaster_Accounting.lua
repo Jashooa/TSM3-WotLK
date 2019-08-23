@@ -361,6 +361,7 @@ function TSM:OnTSMDBShutdown()
 	end
     TSM.db.realm.csvExpense = LibParse:CSVEncode(TSM.EXPENSE_KEYS, expense)
 
+    TSM.Data:CleanAuctions()
     -- process auctions
     local auctions = {}
     for _, record in pairs(TSM.auctions) do

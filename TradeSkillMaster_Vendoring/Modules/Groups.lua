@@ -266,16 +266,16 @@ function private.BuyThread(self)
 							if restockAmount > 0 then
 								-- Lower the restock amount to the number available
 								if (numAvailable > -1) then
-									restockAmount = math.min(restockAmount,numAvailable)
+									restockAmount = math.min(restockAmount, numAvailable * stackCount)
 								end
 
 								local maxStack = GetMerchantItemMaxStack(index)
 								local maxAfford = TSM.Util:GetMaxAfford(index)
 
-								restockAmount = math.min(restockAmount,maxAfford)
+								restockAmount = math.min(restockAmount, maxAfford * stackCount)
 								while restockAmount > 0 do
-									BuyMerchantItem(index,math.min(restockAmount,maxStack))
-									restockAmount = restockAmount - maxStack
+									BuyMerchantItem(index,math.min(floor(restockAmount / stackCount + 0.5), maxStack))
+									restockAmount = restockAmount - (maxStack * stackCount)
 									self:Yield()
 								end
 

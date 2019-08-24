@@ -94,7 +94,7 @@ end
 function private.OnMerchantBuy(index, quantity)
 	local price, batchQuantity = select(3, GetMerchantItemInfo(index))
 	if not price or price <= 0 then return end
-	quantity = quantity or batchQuantity
+	quantity = (quantity * batchQuantity) or batchQuantity
 	local itemString = TSMAPI.Item:ToBaseItemString(GetMerchantItemLink(index))
 	local copper = TSMAPI.Util:Round(price / batchQuantity)
 	TSM.Data:InsertItemBuyRecord(itemString, "Vendor", quantity, copper, "Merchant")

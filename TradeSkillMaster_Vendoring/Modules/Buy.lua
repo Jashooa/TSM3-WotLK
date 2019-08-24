@@ -336,11 +336,12 @@ function Buy:OnMerchantUpdate()
 end
 
 function private:BuyItem(index,quantity)
+    local stackSize = select(4, GetMerchantItemInfo(i))
 	local maxStack = GetMerchantItemMaxStack(index)
 
 	while quantity > 0 do
-		BuyMerchantItem(index,math.min(quantity,maxStack))
-		quantity = quantity - maxStack
+		BuyMerchantItem(index,math.min(floor(quantity / stackSize + 0.5), maxStack))
+		quantity = quantity - (maxStack * stackSize)
 	end
 end
 

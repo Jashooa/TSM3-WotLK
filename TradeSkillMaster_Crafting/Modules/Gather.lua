@@ -23,13 +23,14 @@ local private = { shoppingItems = {} }
 function Gather:BuyFromMerchant(neededMats)
 	for i = 1, GetMerchantNumItems() do
 		local itemString = TSMAPI.Item:ToBaseItemString(GetMerchantItemLink(i))
-		if neededMats[itemString] then
+        if neededMats[itemString] then
+            local stackSize = select(4, GetMerchantItemInfo(i))
 			local maxStack = GetMerchantItemMaxStack(i)
 			local toBuy = neededMats[itemString]
 			local bought = toBuy
 			while toBuy > 0 do
-				BuyMerchantItem(i, math.min(toBuy, maxStack))
-				toBuy = toBuy - maxStack
+				BuyMerchantItem(i, math.min(floor(toBuy / stackSize + 0.5), maxStack))
+				toBuy = toBuy - (maxStack * stackSize)
 				TSM.db.factionrealm.gathering.gatheredMats = true
 			end
 			if UnitName("player") ~= TSM.db.factionrealm.gathering.crafter then

@@ -1117,8 +1117,8 @@ function Gather:Update(firstRun)
 				local numCanCraft = math.huge
 				for itemString, quantity in pairs(craft.mats) do
 					numCanCraft = max(min(numCanCraft, floor((bagTotals[itemString] or 0) / quantity)), 0)
-				end
-				numCanCraft = min(spellQuantity, floor(numCanCraft / craft.numResult))
+                end
+				numCanCraft = min(spellQuantity, (numCanCraft * craft.numResult))
 				if numCanCraft > 0 and TSM.db.factionrealm.gathering.selectedSourceStatus[spellID] then
 					if not headerAdded then
 						headerText = format(" %s|r", profession)

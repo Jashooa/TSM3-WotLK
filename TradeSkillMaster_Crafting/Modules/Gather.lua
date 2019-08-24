@@ -148,7 +148,7 @@ function Gather:CraftNext(spellList)
 			for itemString, quantity in pairs(craft.mats) do
 				numCanCraft = max(min(numCanCraft, floor((bagTotals[itemString] or 0) / quantity)), 0)
 			end
-			numCanCraft = min(spellQuantity, floor(numCanCraft / craft.numResult))
+			numCanCraft = min(spellQuantity, (numCanCraft * craft.numResult))
             if numCanCraft > 0 then
                 local velString = TSM:GetVellum(spellId)
 				local velName = velString and craft.mats[velString] and (TSMAPI.Item:GetName(velString) or TSM.db.factionrealm.mats[velString].name) or nil
@@ -226,7 +226,8 @@ function Gather:GetItemSources(crafter, neededMats)
                 if cheapestSpellId then
                     local data = TSM.db.factionrealm.crafts[cheapestSpellId]
                     if not data.hasCD then
-                        local need = quantity - (TSMAPI.Inventory:GetBagQuantity(itemString, crafter) + TSMAPI.Inventory:GetBankQuantity(itemString, crafter) + TSMAPI.Inventory:GetMailQuantity(itemString, crafter))
+                        local player = UnitName("player")
+                        local need = quantity - (TSMAPI.Inventory:GetBagQuantity(itemString, player) + TSMAPI.Inventory:GetBankQuantity(itemString, player) + TSMAPI.Inventory:GetMailQuantity(itemString, player))
                         if need > 0 then
                             local spellNeed = ceil(need / data.numResult)
                             sources[itemString] = sources[itemString] or {}

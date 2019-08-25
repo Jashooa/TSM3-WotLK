@@ -416,7 +416,7 @@ function Data:CleanAuctions()
         local expiry = private:GetAuctionExpiryTime(TSM.auctions[i])
 
         if (now - expiry) >= CLEAN_TIME then
-            tremove(TSM.auctions, i)
+            TSM.auctions[i] = nil
         end
     end
 end
